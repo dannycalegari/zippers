@@ -1,0 +1,3 @@
+monodromy RRL: phi(a)=ab phi(b)=babab ; cusped char heuristically selected (verify the picture)
+monodromy RRL, order 3: tr a = 1.718622+0.399951i, tr c = 2.104329+0.067386i
+Z+: 430555 leaves, 29658 polylines ; Z-: 219316 leaves, 12931 polylines

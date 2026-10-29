@@ -1,0 +1,5 @@
+subst_4.00_9.50_t3_r1.txt: |S| = 36 (18 pairs), roofs checked exactly; t^+ and t^- found
+Z+: R=2.55 acc=0.01: 19 roots, 917290 branches, 19 skipped, 811774 leaves, 8707 polylines, 3124 spikes, 0 forced, depth 8
+Z-: R=2.55 acc=0.01: 19 roots, 591036 branches, 8 skipped, 527391 leaves, 1697 polylines, 1871 spikes, 0 forced, depth 8
+built in <time>s
+check: min distance Z+ to Z- (vertex to segment, on S^3) = 0.00183  (<time>s)  at Z+ point (-0.1997 0.5947 0.1896 -0.7553)

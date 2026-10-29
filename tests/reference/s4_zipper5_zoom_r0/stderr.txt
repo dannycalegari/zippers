@@ -1,0 +1,11 @@
+Z+: 42 tips on 40 letters (the cusps of the closed paths of its roofs, of length <= 4, each verified exactly)
+Z-: 42 tips on 42 letters (the cusps of the closed paths of its roofs, of length <= 4, each verified exactly)
+subst5_2.30_4.50_t1_r0.txt: |S| = 80 (44 base arcs), roofs checked exactly; t^+ and t^- found
+note: culling is on by default for a zoomed still (K = 16; --nocull turns it off)
+note: the focus ball is on by default for a zoomed still (--focus 1; --nofocus turns it off)
+focus: L = 4.6052 (1 log zoom); h o at d(o, h o) = 4.7184, d(h o, o_F) = 1.0144 (h: 8 facets crossed to the tile of o_F, then 2 to Gamma)
+Z+: R=1.32 acc=0.02: 18 roots, 160787 branches, 3 skipped, 15774 leaves, 7081 polylines, 2 spikes, 0 forced, depth 12, 19056 points at tips, 120165 culled
+Z-: R=1.32 acc=0.02: 18 roots, 203604 branches, 0 skipped, 20065 leaves, 8814 polylines, 3 spikes, 0 forced, depth 12, 13198 points at tips, 153280 culled
+built in <time>s
+focus: 9 roots in B(R), 9 more from h B(R)
+wrote zoom100.png

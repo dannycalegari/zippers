@@ -1,0 +1,1 @@
+subst_4.00_9.50_t3.txt: |S| = 36 (18 pairs), roofs checked exactly; t^+ and t^- found

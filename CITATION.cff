@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below, and cite the paper that defines zippers."
+type: software
+title: "zippers"
+abstract: "Programs that draw zippers on the spheres at infinity of hyperbolic manifolds."
+authors:
+  - family-names: Calegari
+    given-names: Danny
+license: GPL-3.0-or-later
+references:
+  - type: article
+    authors:
+      - family-names: Calegari
+        given-names: Danny
+      - family-names: Loukidou
+        given-names: Ino
+    title: "Zippers"
+    year: 2024
+    url: "https://arxiv.org/abs/2411.15610"
+    identifiers:
+      - type: other
+        value: "arXiv:2411.15610"

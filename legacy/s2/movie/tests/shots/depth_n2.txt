@@ -1,0 +1,9 @@
+# cost test: depth growth to R = 6 for fig8 n=2 (built once at R = 6)
+frames = 120
+monodromy = fig8
+order = 2
+R = 6
+depth = 0:0 end:6
+depth_fade = 0.3
+arcs_plus.opacity = 1
+arcs_minus.opacity = 1

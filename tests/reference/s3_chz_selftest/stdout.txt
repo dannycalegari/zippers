@@ -1,0 +1,21 @@
+exact checks in Z[zeta_12] (primed coordinates)
+  u' unitary for F': yes
+  v' unitary for F': yes
+  b' unitary for F': yes
+  j unitary for F': yes
+  u u^-1 = 1: yes
+  u^3              = zeta^0  I
+  v^4              = zeta^0  I
+  b^3              = zeta^0  I
+  (uv)^2 (vu)^-2   = zeta^0  I
+  v b v^-1 b^-1    = zeta^0  I
+  (buv)^3          = zeta^11  I
+  (buvu)^2 v       = zeta^11  I
+  (uv)^2 j^-1      = zeta^0  I
+  a1 unitary for F': yes   d(o, a1 o) = 2.553374
+  a2 unitary for F': yes   d(o, a2 o) = 2.553374
+  a3 unitary for F': yes   d(o, a3 o) = 2.553374
+  j^4 a1 j^-4 = a3 a2^-3 a3^3 a1 : yes
+  j^4 a2 j^-4 = a3^-1             : yes
+  j^4 a3 j^-4 = (CKY's word)      : yes
+  max |entry| of a1^20 under zeta -> zeta^5: 1.705 (bounded, as it must be)

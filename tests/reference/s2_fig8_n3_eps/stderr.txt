@@ -1,0 +1,2 @@
+monodromy fig8, order 3: tr a = 1.651388+0.758745i, tr c = 2.074313+0.000000i
+Z+: 284539 leaves, 35606 polylines ; Z-: 196290 leaves, 15005 polylines

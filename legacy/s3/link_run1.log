@@ -1,0 +1,27 @@
+subst_4.00_9.50_t3.txt: |S| = 36 (18 pairs), roofs checked exactly; t^+ and t^- found
+20 relations of length <= 6 (0.00s):
+  w0: 0 0 15
+  w1: 0 26 1
+  w2: 0 28 5
+  w3: 3 16 25
+  w4: 4 17 23
+  w5: 0 13 6 15
+  w6: 0 2 29 15
+  w7: 0 9 21 15
+  w8: 0 15 2 29
+  w9: 0 15 9 21
+  w10: 1 28 24 20
+  w11: 1 9 21 26
+  w12: 5 26 23 34
+  w13: 0 2 30 16 5
+  w14: 0 9 35 33 1
+  w15: 0 13 26 1 15
+  w16: 0 13 28 5 15
+  w17: 1 3 31 12 7
+  w18: 0 15 26 1 13
+  w19: 1 13 26 1 26
+Z+ loops: 1396874 points in all (0.72s), 0 forced leaves
+translating the Z- loops by the 19 elements of B(2.60)
+tested 7600 pairs in 181.3s: 13 nonzero, 0 over/under disagreements, 79 closer than 5 acc; min separation 0.0083
+wrote pictures/link_w4_w12_h1.png
+wrote pictures/link_w10_w3_h13.png

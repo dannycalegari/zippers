@@ -1,0 +1,12 @@
+# the Catherine wheel of fig8 n=2 at R = 5, drawn along its length over faint zippers
+frames = 90
+monodromy = fig8
+order = 2
+R = 5
+wheel = 1
+zplus.opacity = 0.3
+zminus.opacity = 0.3
+wheel.width = 2
+wheel.reveal = 0:0 80%:1:linear
+wheel.pen = 3
+yaw = 0:0 end:20:linear

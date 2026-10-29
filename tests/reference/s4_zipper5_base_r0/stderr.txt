@@ -1,0 +1,7 @@
+Z+: 42 tips on 40 letters (the cusps of the closed paths of its roofs, of length <= 4, each verified exactly)
+Z-: 42 tips on 42 letters (the cusps of the closed paths of its roofs, of length <= 4, each verified exactly)
+subst5_2.30_4.50_t1_r0.txt: |S| = 80 (44 base arcs), roofs checked exactly; t^+ and t^- found
+Z+: R=0.00 acc=0.03: 1 roots, 37730 branches, 0 skipped, 32057 leaves, 858 polylines, 0 spikes, 0 forced, depth 10, 35753 points at tips
+Z-: R=0.00 acc=0.03: 1 roots, 46945 branches, 0 skipped, 40148 leaves, 485 polylines, 2 spikes, 0 forced, depth 10, 26945 points at tips
+built in <time>s
+wrote base.png

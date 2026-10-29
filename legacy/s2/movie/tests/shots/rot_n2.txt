@@ -1,0 +1,7 @@
+# cost test: fig8 n=2 R=6, rotating 60 degrees in 4 s
+frames = 120
+monodromy = fig8
+order = 2
+R = 6
+yaw = 0:0 end:60:linear
+pitch = 0:0 end:20

@@ -1,0 +1,28 @@
+# nonzero linking numbers lk(gamma_w, h delta_w'): w  w'  h-index  d(o,ho)  lk  crossings  separation
+w4 w10 h1 2.5534  lk +1  3114  >= 0.0500
+w4 w12 h1 2.5534  lk -1  1512  >= 0.0500
+w4 w17 h1 2.5534  lk +1  4742  >= 0.0500
+w4 w14 h6 2.5534  lk +1  916  >= 0.0500
+w2 w10 h13 2.5534  lk +1  802  >= 0.0500
+w4 w4 h13 2.5534  lk -1  6382  >= 0.0500
+w10 w3 h13 2.5534  lk -1  3176  0.0197
+w10 w4 h13 2.5534  lk +1  7990  >= 0.0500
+w13 w10 h13 2.5534  lk +1  2014  >= 0.0500
+w17 w4 h13 2.5534  lk +1  4820  >= 0.0500
+w2 w12 h16 2.5534  lk -1  516  >= 0.0500
+w12 w4 h16 2.5534  lk -1  2960  >= 0.0500
+w13 w12 h16 2.5534  lk -1  460  >= 0.0500
+# verification: w w' h | for acc, acc/2, acc/4: lk over three projections, separation, points
+w4 w10 h1:  [0.01: +1 +1 +1 sep 0.1702, 62351+28303 pts]  [0.005: +1 +1 +1 sep 0.1702, 211795+92959 pts]  [0.0025: +1 +1 +1 sep 0.1702, 718099+292745 pts]  pole >= 1.075  STABLE  | translated by g: +1 +1 +1 +1  ALL AGREE
+w4 w12 h1:  [0.01: -1 -1 -1 sep 0.0816, 62351+26687 pts]  [0.005: -1 -1 -1 sep 0.0806, 211795+86879 pts]  [0.0025: -1 -1 -1 sep 0.0806, 718099+277629 pts]  pole >= 1.043  STABLE  | translated by g: -1 -1 -1 -1  ALL AGREE
+w4 w17 h1:  [0.01: +1 +1 +1 sep 0.1429, 62351+62451 pts]  [0.005: +1 +1 +1 sep 0.1423, 211795+199048 pts]  [0.0025: +1 +1 +1 sep 0.1423, 718099+642901 pts]  pole >= 0.838  STABLE  | translated by g: +1 +1 +1 +1  ALL AGREE
+w4 w14 h6:  [0.01: +1 +1 +1 sep 0.1011, 62351+32248 pts]  [0.005: +1 +1 +1 sep 0.1011, 211795+103540 pts]  [0.0025: +1 +1 +1 sep 0.1011, 718099+328503 pts]  pole >= 1.092  STABLE  | translated by g: +1 +1 +1 +1  ALL AGREE
+w2 w10 h13:  [0.01: +1 +1 +1 sep 0.1256, 65201+60512 pts]  [0.005: +1 +1 +1 sep 0.1256, 216978+194444 pts]  [0.0025: +1 +1 +1 sep 0.1256, 746834+619621 pts]  pole >= 0.852  STABLE  | translated by g: +1 +1 +1 +1  ALL AGREE
+w4 w4 h13:  [0.01: -1 -1 -1 sep 0.1165, 62351+141364 pts]  [0.005: -1 -1 -1 sep 0.1159, 211795+448414 pts]  [0.0025: -1 -1 -1 sep 0.1157, 718099+1435807 pts]  pole >= 0.776  STABLE  | translated by g: -1 -1 -1 -1  ALL AGREE
+w10 w3 h13:  [0.01: -1 -1 -1 sep 0.0197, 78216+7765 pts]  [0.005: -1 -1 -1 sep 0.0197, 263595+23888 pts]  [0.0025: -1 -1 -1 sep 0.0197, 901776+77676 pts]  pole >= 1.473  STABLE  | translated by g: -1 -1 -1 -1  ALL AGREE
+w10 w4 h13:  [0.01: +1 +1 +1 sep 0.0991, 78216+141364 pts]  [0.005: +1 +1 +1 sep 0.0987, 263595+448414 pts]  [0.0025: +1 +1 +1 sep 0.0984, 901776+1435807 pts]  pole >= 0.940  STABLE  | translated by g: +1 +1 +1 +1  ALL AGREE
+w13 w10 h13:  [0.01: +1 +1 +1 sep 0.1256, 62504+60512 pts]  [0.005: +1 +1 +1 sep 0.1256, 205129+194444 pts]  [0.0025: +1 +1 +1 sep 0.1256, 704396+619621 pts]  pole >= 0.819  STABLE  | translated by g: +1 +1 +1 +1  ALL AGREE
+w17 w4 h13:  [0.01: +1 +1 +1 sep 0.1023, 47158+141364 pts]  [0.005: +1 +1 +1 sep 0.1005, 160826+448414 pts]  [0.0025: +1 +1 +1 sep 0.1005, 542300+1435807 pts]  pole >= 0.903  STABLE  | translated by g: +1 +1 +1 +1  ALL AGREE
+w2 w12 h16:  [0.01: -1 -1 -1 sep 0.1761, 65201+71794 pts]  [0.005: -1 -1 -1 sep 0.1759, 216978+226248 pts]  [0.0025: -1 -1 -1 sep 0.1758, 746834+732199 pts]  pole >= 1.060  STABLE  | translated by g: -1 -1 -1 -1  ALL AGREE
+w12 w4 h16:  [0.01: -1 -1 -1 sep 0.0962, 73307+53756 pts]  [0.005: -1 -1 -1 sep 0.0961, 249529+171754 pts]  [0.0025: -1 -1 -1 sep 0.0961, 847581+548633 pts]  pole >= 1.028  STABLE  | translated by g: -1 -1 -1 -1  ALL AGREE
+w13 w12 h16:  [0.01: -1 -1 -1 sep 0.1098, 62504+71794 pts]  [0.005: -1 -1 -1 sep 0.1094, 205129+226248 pts]  [0.0025: -1 -1 -1 sep 0.1093, 704396+732199 pts]  pole >= 1.019  STABLE  | translated by g: -1 -1 -1 -1  ALL AGREE

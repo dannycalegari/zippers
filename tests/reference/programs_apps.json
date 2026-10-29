@@ -1,0 +1,12 @@
+{
+  "about": "The new programs of apps/, each mapped to the legacy program whose reference runs it must reproduce exactly. Paths are in the build folder. A program added to apps/ is added here. tests/run_references.py --programs tests/reference/programs_apps.json runs the references with them; CTest does so in reference_apps_fast (label fast) and reference_apps (label reference) once the map names a program.",
+  "map": {
+    "legacy/s2/nogui/zipper": "apps/s2/zipper",
+    "legacy/s2/movie/bin/zmovie": "apps/s2/zmovie",
+    "legacy/s3/chz": "apps/s3/chz",
+    "legacy/s3/nogui/zipper3": "apps/s3/zipper3",
+    "legacy/s3/link3": "apps/s3/link3",
+    "legacy/s4/chz5": "apps/s4/chz5",
+    "legacy/s4/zipper5": "apps/s4/zipper5"
+  }
+}

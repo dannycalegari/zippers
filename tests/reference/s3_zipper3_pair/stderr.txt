@@ -1,0 +1,8 @@
+subst_4.00_9.50_t3.txt: |S| = 36 (18 pairs), roofs checked exactly; t^+ and t^- found
+Z+: R=0.00 acc=0.01: 1 roots, 100317 branches, 0 skipped, 88067 leaves, 3513 polylines, 526 spikes, 0 forced, depth 8
+Z-: R=0.00 acc=0.01: 1 roots, 89104 branches, 0 skipped, 78351 leaves, 2125 polylines, 741 spikes, 0 forced, depth 7
+built in <time>s
+linked_pairs.txt: 13 linked pairs
+built the 13 pairs of loops in <time>s
+pair 0: lk +1   gamma_w, w = 4 17 23 (Z+)   h.delta_w', w' = 1 28 24 20 (Z-), phi(h) = 1
+wrote pair0.png

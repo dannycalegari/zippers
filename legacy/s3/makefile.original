@@ -1,0 +1,48 @@
+# complex hyperbolic zipper: chz (the block-filling search), zipper3 (renderer and viewer),
+# link3 (linking numbers).  Needs a C++17 compiler and zlib; the viewer needs GLUT and OpenGL.
+
+CXX      = g++
+CXXFLAGS = -O2 -std=c++17 -Wall -Wextra
+
+ifeq ($(shell uname),Darwin)
+  GLLIBS = -framework GLUT -framework OpenGL        # macOS: the system frameworks
+else
+  GLLIBS = -lglut -lGLU -lGL                        # Linux: e.g. the freeglut packages
+endif
+
+all: chz zipper3 link3 chz5 zipper5 film5
+
+chz: chz.cc csgroup.h
+	$(CXX) $(CXXFLAGS) -o chz chz.cc
+
+zipper3: zipper3.cc zipcore.h csgroup.h
+	$(CXX) $(CXXFLAGS) -DZIPPER3_VIEWER -o zipper3 zipper3.cc -lz $(GLLIBS)
+
+# zipper3 without the interactive viewer (PNG output only; needs only zlib)
+nogui: zipper3.cc zipcore.h csgroup.h
+	$(CXX) $(CXXFLAGS) -o zipper3 zipper3.cc -lz
+
+link3: link3.cc zipcore.h csgroup.h
+	$(CXX) $(CXXFLAGS) -o link3 link3.cc -lz
+
+# the fibered hyperbolic 5-manifold of Italiano-Martelli-Migliorini: the block-filling search,
+# stills of its zippers on S^4, and the film's four-dimensional ending (a GLUT window)
+chz5: chz5.cc rh5.h
+	$(CXX) $(CXXFLAGS) -o chz5 chz5.cc
+
+zipper5: zipper5.cc zipcore5.h rh5.h
+	$(CXX) $(CXXFLAGS) -o zipper5 zipper5.cc -lz
+
+film5: film5.cc zipcore5.h rh5.h
+	$(CXX) $(CXXFLAGS) -o film5 film5.cc -lz $(GLLIBS)
+
+# macOS only: the PNG-frames-to-MP4 encoder used for the demonstration film
+encode_movie: encode_movie.swift
+	swiftc -O encode_movie.swift -o encode_movie
+
+# macOS only: put a soundtrack on the film
+add_audio: add_audio.swift
+	swiftc -O add_audio.swift -o add_audio
+
+clean:
+	rm -f chz zipper3 link3 chz5 zipper5 film5 encode_movie add_audio

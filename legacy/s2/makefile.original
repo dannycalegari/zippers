@@ -1,0 +1,42 @@
+# Makefile for the zipper drawing program.
+
+CXX      = g++
+CXXFLAGS = -std=c++17 -O3 -Wall $(SDKFLAGS)
+
+# Work around a half-installed macOS toolchain (seen during Xcode / Command Line Tools
+# updates): if the default compiler cannot find the C++ standard headers, fall back to the
+# Command Line Tools clang++ with an explicit SDK.
+CLT    := /Library/Developer/CommandLineTools
+STDOK  := $(shell printf '\#include <complex>\nint main(){}\n' | $(CXX) -std=c++17 -x c++ -fsyntax-only - 2>/dev/null && echo yes)
+ifneq ($(STDOK),yes)
+  SDK      := $(CLT)/SDKs/MacOSX.sdk
+  CXX      := $(CLT)/usr/bin/clang++
+  SDKFLAGS := -isysroot $(SDK) -nostdinc++ -isystem $(SDK)/usr/include/c++/v1
+endif
+
+# Default build: EPS + PNG output plus the interactive viewer.
+# PNG needs zlib (-lz); the viewer needs the macOS GLUT/OpenGL frameworks.
+LIBS_PNG  = -lz
+LIBS_VIEW = -framework GLUT -framework OpenGL
+
+all: zipper
+
+zipper: zipper.cc
+	$(CXX) $(CXXFLAGS) -DZIPPER_VIEWER -o zipper zipper.cc $(LIBS_PNG) $(LIBS_VIEW)
+
+# Build without the on-screen viewer (still has EPS and PNG); portable, needs only zlib.
+nogui: zipper.cc
+	$(CXX) $(CXXFLAGS) -o zipper zipper.cc $(LIBS_PNG)
+
+examples: zipper
+	./zipper -m fig8 -n 2   -a 0.004 -R 5 -o fig8_n2.eps
+	./zipper -m fig8 -n 3   -a 0.004 -R 5 -o fig8_n3.eps
+	./zipper -m fig8 -n inf -a 0.004 -R 5 -o fig8_cusp.eps
+	./zipper -m fig8 -n 2   -a 0.004 -R 6 -s 900 -o fig8_n2.png
+
+# the original program, kept for reference
+zcircle: zcircle.cc string_functions.cc linear_algebra_functions.cc drawing_functions.cc
+	$(CXX) -std=c++11 -O3 $(SDKFLAGS) -o zcircle zcircle.cc -lm
+
+clean:
+	rm -f zipper zcircle

@@ -1,0 +1,10 @@
+# cost test: a zoom into the cusp point V+ of fig8 n=inf to zoom 20, rebuilt every frame with
+# the accuracy scaled with the zoom (as zipper --zoom F -a 0.004/F)
+frames = 120
+monodromy = fig8
+order = inf
+R = 6
+build = perframe
+look_at = plus
+zoom = 0:1 end:20
+circle.opacity = 0.5

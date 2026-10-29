@@ -1,0 +1,23 @@
+# The engine demo: 6 s (180 frames) of fig8, cone order 3.  The base arcs are drawn first
+# (as they unfold), then the ball of translates grows from R = 0 to R = 6 while the sphere
+# turns slowly.  Built once at R = 6; every polyline is tagged with d(o, g.o) of its root.
+frames = 180
+monodromy = fig8
+order = 3
+R = 6
+accuracy = 0.003
+look_at = arcs                 # the centroid of the base arcs at the centre
+yaw = 0:-12 end:12:linear
+pitch = 0:4 end:-4:linear
+depth = 0:0 30%:0 92%:6:smooth
+depth_fade = 0.4
+fog = 0.35
+circle.opacity = 0:0.35 92%:0.15
+arcs_plus.opacity = 0:1 80%:1 100%:0.6
+arcs_minus.opacity = 0:1 80%:1 100%:0.6
+arcs_plus.reveal = 0:0 25%:1:out
+arcs_minus.reveal = 0:0 25%:1:out
+arcs_plus.pen = 2.5
+arcs_minus.pen = 2.5
+zplus.reveal = 0:0 25%:1:out
+zminus.reveal = 0:0 25%:1:out

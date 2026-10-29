@@ -1,0 +1,3 @@
+built: fig8 T=2 R=6 a=0.004: 183371 roots, Z+ 636521 points / 144834 polylines, Z- 687258 / 158092, <time> s
+job 0: 4 frames: render <time> s/frame, png <time> s/frame
+shot: 4 frames in <time> s

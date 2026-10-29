@@ -1,0 +1,6 @@
+B(3.00): 70185 tiles (<time>s); (mu, h) inconsistencies 0
+  d <= 1.0:       17 tiles,       1 in Gamma,      1 in K   (0.39 e^4r = 21)   h on Gamma: 0:1
+  d <= 1.5:       97 tiles,       9 in Gamma,      9 in K   (0.39 e^4r = 157)   h on Gamma: 0:9
+  d <= 2.0:      953 tiles,      41 in Gamma,      9 in K   (0.39 e^4r = 1163)   h on Gamma: -2:16 0:9 2:16
+  d <= 2.5:     9113 tiles,     617 in Gamma,    201 in K   (0.39 e^4r = 8590)   h on Gamma: -4:48 -2:160 0:201 2:160 4:48
+  d <= 3.0:    70185 tiles,    5313 in Gamma,   1657 in K   (0.39 e^4r = 63474)   h on Gamma: -8:2 -6:40 -4:522 -2:1264 0:1657 2:1264 4:522 6:40 8:2

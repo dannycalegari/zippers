@@ -1,0 +1,21 @@
+pair w13 w12 h16 at acc 0.01: 62504 + 71794 points, separation 0.1098
+  projection  0: lk -1  (A over B and B over A agree)  crossings 2138  pole distance 1.2123
+  projection  1: lk -1  (A over B and B over A agree)  crossings 4518  pole distance 1.1622
+  projection  2: lk -1  (A over B and B over A agree)  crossings 2722  pole distance 1.1145
+  projection  3: lk -1  (A over B and B over A agree)  crossings 2682  pole distance 1.2303
+  projection  4: lk -1  (A over B and B over A agree)  crossings 2010  pole distance 1.0805
+  projection  5: lk -1  (A over B and B over A agree)  crossings 1290  pole distance 1.1301
+  projection  6: lk -1  (A over B and B over A agree)  crossings 1650  pole distance 1.1405
+  projection  7: lk -1  (A over B and B over A agree)  crossings 3116  pole distance 1.1569
+  projection  8: lk -1  (A over B and B over A agree)  crossings 1608  pole distance 1.1085
+  projection  9: lk -1  (A over B and B over A agree)  crossings 2112  pole distance 1.2060
+  projection 10: lk -1  (A over B and B over A agree)  crossings 11314  pole distance 1.2507
+  projection 11: lk -1  (A over B and B over A agree)  crossings 3504  pole distance 1.0244
+  projection 12: lk -1  (A over B and B over A agree)  crossings 2470  pole distance 1.2029
+  projection 13: lk -1  (A over B and B over A agree)  crossings 2368  pole distance 1.2345
+  projection 14: lk -1  (A over B and B over A agree)  crossings 1692  pole distance 1.1682
+  projection 15: lk -1  (A over B and B over A agree)  crossings 2288  pole distance 1.1247
+  projection 16: lk -1  (A over B and B over A agree)  crossings 3616  pole distance 1.2650
+  projection 17: lk -1  (A over B and B over A agree)  crossings 1064  pole distance 1.1334
+  projection 18: lk -1  (A over B and B over A agree)  crossings 2048  pole distance 1.1122
+  projection 19: lk -1  (A over B and B over A agree)  crossings 2082  pole distance 1.1798

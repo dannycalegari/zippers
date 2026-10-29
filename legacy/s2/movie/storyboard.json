@@ -1,0 +1,536 @@
+{
+  "title": "Zippers: the 2D half (Bach, Fugue in B-flat minor, WTC II, BWV 891, bars 1 to the downbeat of 46)",
+  "note": "Every time is a musical landmark (music/landmarks.json), a bar 'barN' or a half-note beat 'barN.B' of the timing map; no clock times. 'start: 0' is the start of the recording (the film's frame 0). render_film.py turns this file into zmovie shot files, renders, composes (crossfades, overlays, captions), encodes and adds the music.",
+  "timing_note": "no timing map here: give the recording's with --timing (music/align.py writes it)",
+  "fps": 30,
+  "film": "zippers_2d_half.mp4",
+  "bitrate_mbit": 8,
+  "preview_tail_s": 0.6,
+  "film_end": "C2next",
+  "film_end_note": "make_movie.py runs the film on from the last shot's end (C2, the cadence on the downbeat of bar 46) to this landmark, the first new note after the cadence chord (tenor G-flat, bar 46 beat 1.5), holding the last picture; the 3D half begins there. render_film.py ignores it (its preview ends at C2, then preview_tail_s of fade to white).",
+  "audio_fade_out_s": 0.0,
+  "caption_line_gap": 24,
+  "defaults": {
+    "size": 840,
+    "fog": 0.35,
+    "png_level": 1
+  },
+  "scenes": {
+    "arcs_fig8": {
+      "#": "fig8, base arcs only (R = 0), framing interpolated between the program's frames at n = 2 and the cusp; a fixed view near the cusp point V",
+      "monodromy": "fig8",
+      "R": 0,
+      "accuracy": 0.0015,
+      "center": "interp 2 inf",
+      "look_at": "-0.564 0.423 -0.709",
+      "zplus.width": 2,
+      "zminus.width": 2,
+      "zplus.pen": 3,
+      "zminus.pen": 3,
+      "circle.opacity": 0.18,
+      "zplus.reveal": "@S1:0 @bar4.3:1:linear",
+      "zminus.reveal": "@A1:0 @bar8.3:1:linear"
+    },
+    "ghost_arcs": {
+      "monodromy": "fig8",
+      "R": 0,
+      "accuracy": 0.0015,
+      "center": "interp 2 inf",
+      "look_at": "-0.564 0.423 -0.709",
+      "zplus.width": 1.5,
+      "zminus.width": 1.5,
+      "fog": 0.35
+    },
+    "fig8_n2_R5": {
+      "monodromy": "fig8",
+      "order": 2,
+      "R": 5,
+      "center": "native",
+      "look_at": "-0.564 0.423 -0.709",
+      "circle.opacity": "@A2:0.18 @C1:0",
+      "depth": "@A2:0 @bar20.3:5:linear",
+      "depth_fade": 0.4,
+      "arcs_plus.opacity": "@A2:1 @C1:0.7",
+      "arcs_minus.opacity": "@A2:1 @C1:0.7",
+      "arcs_plus.width": 2,
+      "arcs_minus.width": 2,
+      "yaw": "@A2:0 @bar17.3:0 @E1+0.3:-28:in",
+      "pitch": "@A2:0 @bar17.3:0 @E1+0.3:10:in",
+      "#": "the turn starts at bar 17 beat 3, after the ghost arcs of shot 3 (fixed-view stills) have dissolved, and eases in"
+    },
+    "fig8_n12_lens": {
+      "monodromy": "fig8",
+      "order": 12,
+      "R": 5.5,
+      "build": "perframe",
+      "look_at": "mid",
+      "zoom": "@E1-0.3:1.5 @E1mid+0.3:3.2:linear",
+      "roll": "@E1-0.3:-6 @E1mid+0.3:6:linear",
+      "arcs_plus.opacity": 0.85,
+      "arcs_minus.opacity": 0.85
+    },
+    "fig8_cusp_zoom": {
+      "monodromy": "fig8",
+      "order": "inf",
+      "R": 6,
+      "build": "perframe",
+      "look_at": "plus",
+      "zoom": "@E1mid-0.3:3.2 @ST1:12:linear",
+      "roll": "@E1mid-0.3:6 @ST1:14:linear",
+      "arcs_plus.opacity": 0.85,
+      "arcs_minus.opacity": 0.85
+    },
+    "RRL_n3": {
+      "monodromy": "RRL",
+      "order": 3,
+      "R": 4.5,
+      "zplus.reveal": "@ST1:0 @bar29:1:out",
+      "zminus.reveal": "@ST1b:0 @bar29.2:1:out",
+      "arcs_plus.reveal": 1,
+      "arcs_minus.reveal": "@ST1b:0 @bar28.2:1:out",
+      "arcs_plus.opacity": "@ST1:1 @CD3:1 @ST2:0.6",
+      "arcs_minus.opacity": "@ST1:1 @CD3:1 @ST2:0.6",
+      "arcs_plus.pen": 0,
+      "arcs_minus.pen": 3,
+      "yaw": "@ST1:-12 @ST2:22:linear",
+      "pitch": "@ST1:6 @ST2:-6:linear",
+      "look_at": "mid",
+      "zoom": "@CD3:1 @ST2:1.3",
+      "#": "a slow zoom in through the codetta (bars 31-32, towards D-flat major), so that the codetta is marked and the seconds after the strettos complete are not a near-still"
+    },
+    "RLLRL_n4": {
+      "monodromy": "RLLRL",
+      "order": 4,
+      "R": 4.5,
+      "wheel": 1,
+      "depth": "@ST2:0 @bar35:4.5:linear",
+      "depth_fade": 0.4,
+      "zminus.opacity": "@ST2b:0 @bar33.3:1:out @E2:1 @bar38:0.45 @SI1:0.45",
+      "zplus.opacity": "@E2:1 @bar38:0.45",
+      "arcs_plus.opacity": "@ST2:1 @bar35:0.6 @E2:0",
+      "arcs_minus.opacity": "@ST2b:0 @bar33.3:1:out @bar35:0.6 @E2:0",
+      "wheel.width": 2,
+      "wheel.opacity": "@E2:0 @bar38.3:1",
+      "yaw": "@ST2:0 @E2:14:linear @SI1:40:linear",
+      "pitch": "@ST2:0 @E2:-10:linear @SI1:-24:linear",
+      "zoom": "@E2mid:1 @SI1:1.6",
+      "look_at": "mid"
+    },
+    "fig8_n2_R4_wheel": {
+      "monodromy": "fig8",
+      "order": 2,
+      "R": 4,
+      "wheel": 1,
+      "zplus.opacity": "@SI1:1 @bar43:0.5",
+      "zminus.opacity": "@SI1:1 @bar43:0.5",
+      "wheel.width": 2,
+      "wheel.pen": 3,
+      "wheel.reveal": "@SI1:0 @C2pre:0.62:linear @C2:1:linear",
+      "yaw": "@SI1:150 @C2pre:182:smooth",
+      "pitch": "@SI1:20 @C2pre:4:smooth",
+      "#": "The view is chosen so that the start of the wheel's length faces the camera: the tracing is visible from the downbeat of bar 42 and covers the front hemisphere by about bar 45; the rest of the wheel, on the back, is finished by the cadence (C2)."
+    }
+  },
+  "shots": [
+    {
+      "id": "01_subject",
+      "start": "0",
+      "end": "A1",
+      "transition_in": {
+        "type": "cut"
+      },
+      "music": "Bars 1-4: the subject alone, alto, B-flat minor.",
+      "picture": "The figure-eight knot complement (the cusp, n = infinity). The two arcs of Z+ (blue) are drawn from the cusp point V outwards, a pen tracing them through the four bars of the subject.",
+      "scene": "arcs_fig8",
+      "engine": {
+        "T": "inf"
+      },
+      "captions": [
+        {
+          "text": "Monodromy RL: the figure-eight knot complement, a punctured-torus bundle",
+          "start": "S1",
+          "end": "bar3",
+          "fade_in": 15,
+          "fade_out": 12
+        },
+        {
+          "text": "Z+ (blue) is the union of the translates of two arcs, from the cusp point V to a·V and to b·V",
+          "start": "bar3",
+          "end": "A1",
+          "fade_in": 12,
+          "fade_out": 10
+        }
+      ],
+      "stills": [
+        "bar2",
+        "bar3.2",
+        "bar4.3"
+      ]
+    },
+    {
+      "id": "02_answer",
+      "start": "A1",
+      "end": "S2",
+      "transition_in": {
+        "type": "cut"
+      },
+      "music": "Bars 5-8: the answer in the soprano (F minor) over the chromatic countersubject; bars 9-10: codetta I.",
+      "picture": "The same view. The two arcs of Z- (red) are traced from the same point V through the four bars of the answer; they close up with the blue arcs at a·V and b·V. A still hold through the codetta.",
+      "scene": "arcs_fig8",
+      "engine": {
+        "T": "inf"
+      },
+      "captions": [
+        {
+          "text": "Z− (red) joins the same points by two other arcs: at the cusp, the monodromy c fixes only V",
+          "start": "A1",
+          "end": "S2",
+          "fade_in": 12,
+          "fade_out": 12
+        }
+      ],
+      "stills": [
+        "bar6.2",
+        "bar8.3",
+        "bar10"
+      ]
+    },
+    {
+      "id": "03_filling",
+      "start": "S2",
+      "end": "A2",
+      "transition_in": {
+        "type": "cut"
+      },
+      "music": "Bars 11-14: the subject in the bass (three voices); bars 15-16: codetta II.",
+      "picture": "The cusp is filled in: the cone order goes from infinity down to 2, one step per bar (12, 6, 4, 3, 2), pausing for a beat at each. V splits into the two fixed points of c and the red and blue arcs pull apart. A faint copy of the arcs stays behind at each order, so that the codetta shows the whole family.",
+      "scene": "arcs_fig8",
+      "engine": {
+        "T": "@S2:inf @bar11.3:inf @bar12:12 @bar12.2:12 @bar13:6 @bar13.2:6 @bar14:4 @bar14.2:4 @bar15:3 @bar15.2:3 @bar16:2",
+        "zplus.pen": 0,
+        "zminus.pen": 0
+      },
+      "overlays": [
+        {
+          "scene": "ghost_arcs",
+          "engine": {
+            "T": "inf"
+          },
+          "opacity": "@bar11.3:0 @bar12:0.3 @A2:0.3"
+        },
+        {
+          "scene": "ghost_arcs",
+          "engine": {
+            "T": 12
+          },
+          "opacity": "@bar12.2:0 @bar13:0.32 @A2:0.32"
+        },
+        {
+          "scene": "ghost_arcs",
+          "engine": {
+            "T": 6
+          },
+          "opacity": "@bar13.2:0 @bar14:0.34 @A2:0.34"
+        },
+        {
+          "scene": "ghost_arcs",
+          "engine": {
+            "T": 4
+          },
+          "opacity": "@bar14.2:0 @bar15:0.36 @A2:0.36"
+        },
+        {
+          "scene": "ghost_arcs",
+          "engine": {
+            "T": 3
+          },
+          "opacity": "@bar15.2:0 @bar16:0.38 @A2:0.38"
+        }
+      ],
+      "captions": [
+        {
+          "text": "Filling the cusp: the arcs change as the cone angle 2π/n grows from 0 to π",
+          "start": "S2",
+          "end": "A2",
+          "fade_in": 12,
+          "fade_out": 10
+        },
+        {
+          "line": 2,
+          "text": "n = ∞",
+          "start": "S2",
+          "end": "bar12",
+          "fade_in": 8,
+          "fade_out": 6
+        },
+        {
+          "line": 2,
+          "text": "n = 12",
+          "start": "bar12",
+          "end": "bar13",
+          "fade_in": 6,
+          "fade_out": 6
+        },
+        {
+          "line": 2,
+          "text": "n = 6",
+          "start": "bar13",
+          "end": "bar14",
+          "fade_in": 6,
+          "fade_out": 6
+        },
+        {
+          "line": 2,
+          "text": "n = 4",
+          "start": "bar14",
+          "end": "bar15",
+          "fade_in": 6,
+          "fade_out": 6
+        },
+        {
+          "line": 2,
+          "text": "n = 3",
+          "start": "bar15",
+          "end": "bar16",
+          "fade_in": 6,
+          "fade_out": 6
+        },
+        {
+          "line": 2,
+          "text": "n = 2",
+          "start": "bar16",
+          "end": "A2",
+          "fade_in": 6,
+          "fade_out": 8
+        }
+      ],
+      "stills": [
+        "bar12.2",
+        "bar14.2",
+        "bar16.2"
+      ]
+    },
+    {
+      "id": "04_fill_in",
+      "start": "A2",
+      "end": "E1",
+      "transition_in": {
+        "type": "cut"
+      },
+      "music": "Bars 17-20: the answer in the tenor; all four voices now sound. Bar 21: end of the exposition (F minor).",
+      "picture": "Cone order 2. Starting from the arcs of the previous shot, the translates by the group elements nearest the basepoint are added, ever further out (R from 0 to 5), until the sphere is full; the sphere starts to turn. The faint copies of the arcs from shot 3 stay on through the cut and dissolve over the first two beats of bar 17, as the translates come in.",
+      "scene": "fig8_n2_R5",
+      "captions": [
+        {
+          "text": "Cone order 2: adding the translates of the arcs by all g with d(o, g·o) ≤ R, up to R = 5",
+          "start": "A2",
+          "end": "E1",
+          "fade_in": 12,
+          "fade_out": 9
+        }
+      ],
+      "stills": [
+        "bar18",
+        "bar19.2",
+        "bar20.3"
+      ],
+      "overlays": [
+        {
+          "scene": "ghost_arcs",
+          "engine": {
+            "T": "inf"
+          },
+          "opacity": "@A2:0.3 @bar17.3:0"
+        },
+        {
+          "scene": "ghost_arcs",
+          "engine": {
+            "T": 12
+          },
+          "opacity": "@A2:0.32 @bar17.3:0"
+        },
+        {
+          "scene": "ghost_arcs",
+          "engine": {
+            "T": 6
+          },
+          "opacity": "@A2:0.34 @bar17.3:0"
+        },
+        {
+          "scene": "ghost_arcs",
+          "engine": {
+            "T": 4
+          },
+          "opacity": "@A2:0.36 @bar17.3:0"
+        },
+        {
+          "scene": "ghost_arcs",
+          "engine": {
+            "T": 3
+          },
+          "opacity": "@A2:0.38 @bar17.3:0"
+        }
+      ]
+    },
+    {
+      "id": "05_lens",
+      "start": "E1",
+      "end": "E1mid",
+      "transition_in": {
+        "type": "crossfade",
+        "frames": 18
+      },
+      "music": "Bars 21-23: Episode I, a sequence of descending fifths.",
+      "picture": "Cone order 12, close to the cusp: a slow zoom between the two fixed points of c, a red star (where the arcs of Z- start) and a blue star (Z+), with a lens of arcs between them.",
+      "scene": "fig8_n12_lens",
+      "captions": [
+        {
+          "text": "Cone order 12: near the cusp, the two fixed points of c (where the arcs start) come close",
+          "start": "E1",
+          "end": "E1mid",
+          "fade_in": 15,
+          "fade_out": 9
+        }
+      ],
+      "stills": [
+        "bar21.3",
+        "bar23"
+      ]
+    },
+    {
+      "id": "06_cusp_point",
+      "start": "E1mid",
+      "end": "ST1",
+      "transition_in": {
+        "type": "crossfade",
+        "frames": 18
+      },
+      "music": "Bars 24-26: the sequence continues and turns back to B-flat minor (dominant F at bar 26, beat 3).",
+      "picture": "The cusp again (n = infinity), at full depth: the zoom continues into the cusp point, where the two stars have merged; two white discs touch there and the curves wind around them.",
+      "scene": "fig8_cusp_zoom",
+      "captions": [
+        {
+          "text": "At the cusp they merge into one parabolic fixed point, where Z+ and Z− meet",
+          "start": "E1mid",
+          "end": "ST1",
+          "fade_in": 15,
+          "fade_out": 6
+        }
+      ],
+      "stills": [
+        "bar24.3",
+        "bar25.3",
+        "bar26.3"
+      ]
+    },
+    {
+      "id": "07_stretto_I",
+      "start": "ST1",
+      "end": "ST2",
+      "transition_in": {
+        "type": "cut"
+      },
+      "music": "Bars 27-30: Stretto I, the subject in the tenor and, one beat later, in the alto; bars 31-32: codetta, to D-flat major.",
+      "picture": "A new bundle, monodromy RRL, cone order 3. On the downbeat of bar 27 only the blue base arc is there, and every translate of the blue arcs starts to grow from its start at once; one beat later, with the second voice of the stretto, the red base arc is drawn with a pen and the red translates follow. Then a slow turn through the codetta. From the codetta (bar 31) a slow zoom in, to 1.3 at the cut.",
+      "scene": "RRL_n3",
+      "captions": [
+        {
+          "text": "Monodromy RRL, fiber a torus with a cone point of order 3: Z+ and Z− out to R = 4.5",
+          "start": "ST1",
+          "end": "ST2",
+          "fade_in": 12,
+          "fade_out": 9
+        }
+      ],
+      "stills": [
+        "ST1",
+        "bar27.3",
+        "bar28.2",
+        "bar30",
+        "bar32.2"
+      ]
+    },
+    {
+      "id": "08_stretto_II",
+      "start": "ST2",
+      "end": "E2",
+      "transition_in": {
+        "type": "cut"
+      },
+      "music": "Bars 33-36: Stretto II in D-flat major, the soprano and, one beat later, the bass.",
+      "picture": "Another bundle, monodromy RLLRL, cone order 4. Z+ (blue) grows outward from its arcs from the downbeat; Z- (red) joins one beat later, with the bass; the sphere turns.",
+      "scene": "RLLRL_n4",
+      "captions": [
+        {
+          "text": "Monodromy RLLRL, fiber a torus with a cone point of order 4",
+          "start": "ST2",
+          "end": "E2",
+          "fade_in": 12,
+          "fade_out": 9
+        }
+      ],
+      "stills": [
+        "bar33.3",
+        "bar34.2",
+        "bar36.2"
+      ]
+    },
+    {
+      "id": "09_wheel_I",
+      "start": "E2",
+      "end": "SI1",
+      "transition_in": {
+        "type": "crossfade",
+        "frames": 18
+      },
+      "music": "Bars 37-41: Episode II, chromatic, back towards B-flat minor; its most remote harmony at bar 39.",
+      "picture": "The same picture continues; the zippers pale and the Catherine wheel (green) appears between them; from bar 39 a slow zoom in.",
+      "scene": "RLLRL_n4",
+      "captions": [
+        {
+          "text": "Its Catherine wheel (green): one circle separating the drawn Z+ from the drawn Z−",
+          "start": "E2",
+          "end": "SI1",
+          "fade_in": 15,
+          "fade_out": 6
+        }
+      ],
+      "stills": [
+        "bar37.3",
+        "bar39",
+        "bar41.2"
+      ]
+    },
+    {
+      "id": "10_wheel_II",
+      "start": "SI1",
+      "end": "C2",
+      "transition_in": {
+        "type": "cut"
+      },
+      "music": "Bars 42-45: the cadence in B-flat minor and the inverted subject in the tenor; the approach to the final cadence of this half (bar 45); bar 46: the cadence.",
+      "picture": "Back to the figure-eight, cone order 2, at a lower depth (R = 4). The Catherine wheel is drawn along its length as the sphere turns, complete at bar 45; then the picture holds still until the cadence, where the film cuts to the 3D half.",
+      "scene": "fig8_n2_R4_wheel",
+      "captions": [
+        {
+          "text": "Monodromy RL again, cone order 2: the Catherine wheel, traced along its length",
+          "start": "SI1",
+          "end": "C2next",
+          "fade_in": 12,
+          "fade_out": 9
+        }
+      ],
+      "stills": [
+        "bar42.3",
+        "bar44",
+        "C2pre",
+        "bar45.3"
+      ]
+    }
+  ],
+  "caption_style": {
+    "halo": 0.85,
+    "panel": 0.85,
+    "#": "panel = a soft-edged white rectangle behind each caption, opacity 0.85; invisible on white, it makes the captions legible over the full-frame close-ups (shots 5, 6, 9)"
+  }
+}

@@ -1,0 +1,198 @@
+{
+ "piece": "J. S. Bach, Fugue in B-flat minor, WTC II no. 22, BWV 891/2",
+ "metre": "3/2 (beats are half notes; a bar = 3 half notes = 6 quarters); 101 bars, 4 voices; no upbeat",
+ "score_source": "wtc2f22.krn (Humdrum **kern, David Huron 1994, github.com/humdrum-tools/bach-wtc); analysis checked against tonic-chord.com BWV 891 analysis",
+ "scope": "first half of the film = bars 1 to the downbeat of bar 46 (perfect cadence in B-flat minor). The second half (3D film) starts at bar 46.",
+ "subject": "4 bars: Bb C (halves), rest, Db | Eb A Bb, rest, C | eighth-note run Db..F | Gb Eb F ... landing on the next downbeat. Counter-subject = rising chromatic line in quarters (first heard alto bars 5-8).",
+ "roles": {
+  "cut": "strongest boundary: hard cut or very fast (<=0.3 s) crossfade exactly on the time",
+  "crossfade": "phrase seam inside a continuous texture: crossfade of about one half-note beat centred on the time",
+  "accent": "new voice entering inside a section: add/brighten an element (e.g. a new curve or arc), no scene change",
+  "hold": "arrival: let the image settle/freeze through this point",
+  "start": "film start",
+  "end": "end of the first half / hand-off to the 3D film"
+ },
+ "strength_scale": "1 (weak) .. 5 (strongest phrase boundary)",
+ "landmarks": [
+  {
+   "name": "S1",
+   "bar": 1,
+   "beat": 1,
+   "role": "start",
+   "strength": 5,
+   "section": "Exposition",
+   "description": "Subject alone in the alto, B-flat minor (bars 1-5)."
+  },
+  {
+   "name": "A1",
+   "bar": 5,
+   "beat": 1,
+   "role": "cut",
+   "strength": 4,
+   "section": "Exposition",
+   "description": "Answer in the soprano, F minor, with the chromatic counter-subject in the alto (bars 5-9). Second voice enters."
+  },
+  {
+   "name": "CD1",
+   "bar": 9,
+   "beat": 1,
+   "role": "crossfade",
+   "strength": 2,
+   "section": "Exposition",
+   "description": "Codetta I (bars 9-10), two voices, leads back to B-flat minor (F major chord at bar 10 beat 3)."
+  },
+  {
+   "name": "S2",
+   "bar": 11,
+   "beat": 1,
+   "role": "cut",
+   "strength": 4,
+   "section": "Exposition",
+   "description": "Subject in the bass, B-flat minor, counter-subject in alto (bars 11-15). Three voices."
+  },
+  {
+   "name": "CD2",
+   "bar": 15,
+   "beat": 1,
+   "role": "crossfade",
+   "strength": 2,
+   "section": "Exposition",
+   "description": "Codetta II (bars 15-16), towards F minor."
+  },
+  {
+   "name": "A2",
+   "bar": 17,
+   "beat": 1,
+   "role": "cut",
+   "strength": 4,
+   "section": "Exposition",
+   "description": "Answer in the tenor, F minor, counter-subject in the bass (bars 17-21). All four voices now sounding."
+  },
+  {
+   "name": "C1",
+   "bar": 21,
+   "beat": 1,
+   "role": "cut",
+   "strength": 3,
+   "section": "Exposition -> Episode I",
+   "description": "End of exposition: arrival on F minor (C major 6/3 -> F minor), elided with the start of Episode I."
+  },
+  {
+   "name": "E1",
+   "bar": 21,
+   "beat": 1,
+   "role": "crossfade",
+   "strength": 3,
+   "section": "Episode I",
+   "description": "Episode I (bars 21-26): descending-fifths sequence (F - Bb - Eb - Ab - Db ...) back to B-flat minor; dominant F at bar 26 beat 3."
+  },
+  {
+   "name": "E1mid",
+   "bar": 24,
+   "beat": 1,
+   "role": "crossfade",
+   "strength": 1,
+   "section": "Episode I",
+   "description": "Middle of the sequence (A-flat major chord); a soft seam if a 6-bar shot is too long."
+  },
+  {
+   "name": "ST1",
+   "bar": 27,
+   "beat": 1,
+   "role": "cut",
+   "strength": 5,
+   "section": "Stretto I",
+   "description": "Cadence to B-flat minor elided with Stretto I: subject in the tenor (Bb), answered one half note later by the alto beginning on A natural (stretto at the seventh), bars 27-31."
+  },
+  {
+   "name": "ST1b",
+   "bar": 27,
+   "beat": 2,
+   "role": "accent",
+   "strength": 2,
+   "section": "Stretto I",
+   "description": "Second stretto voice (alto, on A natural) enters one half note after the tenor."
+  },
+  {
+   "name": "CD3",
+   "bar": 31,
+   "beat": 1,
+   "role": "crossfade",
+   "strength": 3,
+   "section": "Codetta",
+   "description": "Codetta (bars 31-32) modulating from B-flat minor to D-flat major (A-flat 6/3 at bar 32 beat 3)."
+  },
+  {
+   "name": "ST2",
+   "bar": 33,
+   "beat": 1,
+   "role": "cut",
+   "strength": 5,
+   "section": "Stretto II",
+   "description": "Arrival in D-flat major (relative major; the only major-key passage of this half): Stretto II, subject in the soprano, answered one half note later by the bass a ninth below, bars 33-37."
+  },
+  {
+   "name": "ST2b",
+   "bar": 33,
+   "beat": 2,
+   "role": "accent",
+   "strength": 2,
+   "section": "Stretto II",
+   "description": "Second stretto voice (bass, on C) enters one half note after the soprano."
+  },
+  {
+   "name": "E2",
+   "bar": 37,
+   "beat": 1,
+   "role": "crossfade",
+   "strength": 3,
+   "section": "Episode II",
+   "description": "Episode II (bars 37-41), chromatic (C-flat/B natural in bars 38-39), modulating from D-flat major back to B-flat minor; dominant F at bar 41 beat 3.5."
+  },
+  {
+   "name": "E2mid",
+   "bar": 39,
+   "beat": 1,
+   "role": "crossfade",
+   "strength": 2,
+   "section": "Episode II",
+   "description": "Most remote harmony of the episode (C-flat / B-natural chords): a good place for the strangest image."
+  },
+  {
+   "name": "SI1",
+   "bar": 42,
+   "beat": 1,
+   "role": "cut",
+   "strength": 5,
+   "section": "Counter-exposition (inversion)",
+   "description": "Perfect cadence V-i in B-flat minor (bass F -> Bb) elided with the first entry of the INVERTED subject (tenor, starting on F; counter-subject inverted in the alto), bars 42-46."
+  },
+  {
+   "name": "C2pre",
+   "bar": 45,
+   "beat": 1,
+   "role": "hold",
+   "strength": 2,
+   "section": "Counter-exposition (inversion)",
+   "description": "Approach to the cadence: ii(half-dim)/C in the bass, then dominant F (bar 45 beats 2-3)."
+  },
+  {
+   "name": "C2",
+   "bar": 46,
+   "beat": 1,
+   "role": "end",
+   "strength": 5,
+   "section": "end of first half",
+   "description": "Perfect authentic cadence in B-flat minor (bass F -> BB-flat), elided with the alto's inverted-subject entry on B-flat (bars 46-50). End of the first half / start of the 3D film."
+  },
+  {
+   "name": "C2next",
+   "bar": 46,
+   "beat": 1.5,
+   "role": "handoff",
+   "strength": 3,
+   "section": "end of first half",
+   "description": "The first new note after the cadence chord: the tenor's G-flat, a quarter note after the downbeat of bar 46. The 2D half ends here and the 3D half begins (the cadence chord rings under the last, held frame of the 2D half)."
+  }
+ ]
+}

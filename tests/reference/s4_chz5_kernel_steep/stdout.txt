@@ -1,0 +1,32 @@
+ball: 70185 tiles with d <= 3.00 (<time>s), (mu, h) inconsistencies 0
+t = [0 5 8 4]   d(o, t o) = 2.2924   h(t) = 2
+|S_c| = 80 kernel elements with d <= 2.30 (shortest 1.3170)
+K-search: 116369 elements of K reached inside B(4.20) in <time>s, max S_c-length 11
+  (129 descents from outside the K-store, 35620 nodes)
+roofs up   (t^-1 s t): 80 / 80 found
+roofs down (t s t^-1): 80 / 80 found
+Schreier generators g of Gamma with g t^-phi(g) in <S_c>: 192 / 192
+CERTIFICATE that S_c generates K: YES
+up   roof lengths (in S_c-steps): min 2, mean 7.17, max 16, growth rate 7.038
+down roof lengths (in S_c-steps): min 3, mean 6.39, max 13, growth rate 5.593
+steep t = [1 3 2 8]   d(o, t o) = 2.4779   h(t) = 4
+  (280 descents from outside the K-store, 165242 nodes)
+steep roofs up 80 / 80, down 80 / 80
+up   roof lengths (in S_c-steps): min 2, mean 10.39, max 30, growth rate 11.616
+down roof lengths (in S_c-steps): min 2, mean 13.01, max 26, growth rate 15.903
+wrote subst5_2.30_4.20_t2.txt
+convergence of the chains for Z+ (t, theta_up) over the segment (1, s_0):
+   n    #points   max chord on S^4   d(o, chain) min..max
+   0          2        0.000e+00      0.00 .. 1.32
+   1         10        5.774e-01      2.29 .. 3.53
+   2         80        2.604e-01      2.89 .. 5.68
+   3        855        1.348e-01      3.74 .. 8.28
+   4       9607        8.091e-02      4.19 .. 10.83
+   5     110562        5.338e-02      4.66 .. 13.72
+convergence of the chains for Z- (t^-1, theta_down) over the segment (1, s_0):
+   n    #points   max chord on S^4   d(o, chain) min..max
+   0          2        0.000e+00      0.00 .. 1.32
+   1          7        4.537e-01      2.29 .. 3.18
+   2        104        1.049e-01      3.95 .. 6.14
+   3       1610        2.833e-02      5.21 .. 8.48
+   4      25649        1.121e-02      6.11 .. 11.66

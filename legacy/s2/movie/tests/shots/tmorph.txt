@@ -1,0 +1,15 @@
+# cost test: the base arcs of fig8 as T goes from 2 to 3 (framing interpolated between the
+# program's frames at T = 2 and T = 3), with the arcs drawn as they unfold first
+frames = 120
+monodromy = fig8
+R = 0
+T = 0:2 20%:2 90%:3
+center = interp 2 3
+accuracy = 0.002
+zplus.width = 2
+zminus.width = 2
+zplus.reveal = 0:0 18%:1:out
+zminus.reveal = 0:0 18%:1:out
+zplus.pen = 2.5
+zminus.pen = 2.5
+circle.opacity = 0.3

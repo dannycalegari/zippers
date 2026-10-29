@@ -1,0 +1,18 @@
+monodromy fig8, order 2: tr a = 1.780776+0.624811i, tr c = 2.135779+0.000000i
+orientation: cusp character (1.500000+0.866025i, 1.500000-0.866025i, 1.500000+0.866025i), cusp shape tau = t_c/t_[a,b] = 0.000000000-0.288675135i (convention Im tau < 0)
+Z+: 89781 leaves, 4887 polylines ; Z-: 92786 leaves, 4915 polylines
+ball: 24995 roots (estimate 2.87e+04); search generators |S| = 10 (a,b,c, inverses and 4 short elements), seeds B(o,3.0) = 465 elements (+ 0 beyond it without a nearer S-neighbour); descent certificate for d >= 3.0: certified; roots without a nearer S-neighbour (outside the seeds) 0
+Z+: roots 24995 (focus shift 0), branches visited 185992, skipped (drawn or covered elsewhere) 57698, culled (off view) 22676, split for a spike 0, split for an overlap 2922, leaves 89781, polylines 4887 (before joining 10016), points 94668
+Z+:   FALSE-MERGE mismatches 0 (max deviation of the endpoint sum on key hits, 1/16 of the keys, 1.98e-14; 0 branches below float resolution not checked)
+Z+:   GEOMETRIC-DUPLICATE leaf segments 0 (of those longer than 1e-07)
+Z+:   depth-capped leaves (chord > accuracy at depth 1000000) 0, max chord 0
+Z+:   overdraw: 2.38% of the ink is drawn twice (leaves refined exactly to accuracy/16; sub-branches shared by two leaves; estimated from a 1/16 sample of 110956 pieces)
+Z+:   spikes: 0 leaves stray > 2x accuracy from their chord (max 0.297x; leaves refined to accuracy/16 with their tips); split for the region bound 0
+Z+:   parabolic chains: 35168 end-chain and 0 tip-chain steps walked, 0 runs of 0 steps drawn as single chords (their curve strays at most 0x accuracy from the chord)
+Z-: roots 24995 (focus shift 0), branches visited 197735, skipped (drawn or covered elsewhere) 68689, culled (off view) 22397, split for a spike 0, split for an overlap 5260, leaves 92786, polylines 4915 (before joining 11051), points 97701
+Z-:   FALSE-MERGE mismatches 0 (max deviation of the endpoint sum on key hits, 1/16 of the keys, 6.59e-14; 0 branches below float resolution not checked)
+Z-:   GEOMETRIC-DUPLICATE leaf segments 0 (of those longer than 1e-07)
+Z-:   depth-capped leaves (chord > accuracy at depth 1000000) 0, max chord 0
+Z-:   overdraw: 2.48% of the ink is drawn twice (leaves refined exactly to accuracy/16; sub-branches shared by two leaves; estimated from a 1/16 sample of 111076 pieces)
+Z-:   spikes: 0 leaves stray > 2x accuracy from their chord (max 0.572x; leaves refined to accuracy/16 with their tips); split for the region bound 567
+Z-:   parabolic chains: 32624 end-chain and 9134 tip-chain steps walked, 0 runs of 0 steps drawn as single chords (their curve strays at most 0x accuracy from the chord)

@@ -1,0 +1,5 @@
+subst_4.00_9.50_t3_r1.txt: |S| = 36 (18 pairs), roofs checked exactly; t^+ and t^- found
+Z+: R=0.00 acc=0.01: 1 roots, 122391 branches, 0 skipped, 108419 leaves, 1119 polylines, 395 spikes, 0 forced, depth 7
+Z-: R=0.00 acc=0.01: 1 roots, 70739 branches, 0 skipped, 63131 leaves, 184 polylines, 226 spikes, 0 forced, depth 7
+built in <time>s
+wrote r0.png

@@ -1,0 +1,3 @@
+# START END FADE_IN FADE_OUT text   (frames of the 180-frame demo)
+@halo 0.85
+6 end 15 12 Figure-eight monodromy, cone order 3: the base arcs, then their translates out to R = 6

@@ -1,0 +1,9 @@
+subst_4.00_9.50_t3_r1.txt: |S| = 36 (18 pairs), roofs checked exactly; t^+ and t^- found
+note: culling is on by default for a zoomed still (K = 16; --nocull turns it off)
+note: the focus ball is on by default for a zoomed still (--focus 1; --nofocus turns it off)
+focus: L = 4.6052 (1 log zoom); h o at d(o, h o) = 6.3647, d(h o, o_F) = 1.8493 (h: 2 steps of the walk)
+Z+: R=2.55 acc=0.01: 38 roots, 214749 branches, 38 skipped, 27712 leaves, 3919 polylines, 301 spikes, 0 forced, depth 8, 5 split through one-letter roofs, 161873 culled
+Z-: R=2.55 acc=0.01: 38 roots, 161187 branches, 17 skipped, 15382 leaves, 2385 polylines, 301 spikes, 0 forced, depth 7, 3 split through one-letter roofs, 128146 culled
+built in <time>s
+focus: 19 roots in B(R), 19 more from h B(R)
+wrote zoom100.png

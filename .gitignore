@@ -1,0 +1,69 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Build folders: `make` uses build/ and `make sanitize` uses build-sanitize/; any other build-*/ is a private experiment.
+build/
+build-*/
+
+# What an accidental `cmake .` in the source folder leaves behind (CMakeLists.txt refuses to build there)
+/CMakeCache.txt
+/CMakeFiles/
+
+# Compiled objects and libraries
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.dSYM/
+*.exe
+
+# Compiled programs. The old makefiles built them inside the source folders; CMake builds them under build/.
+# The patterns are anchored to the folders of the imported programs, so that they cannot match anything else.
+# (legacy/s2/movie/bin is the link that points at the build folder, so it has no trailing slash.)
+/legacy/s2/zipper
+/legacy/s2/movie/bin
+/legacy/s3/chz
+/legacy/s3/zipper3
+/legacy/s3/link3
+/legacy/s4/chz5
+/legacy/s4/zipper5
+/legacy/s4/film5
+/film/swift/encode_movie
+/film/swift/add_audio
+/film/swift/probe_movie
+/film/swift/grab_frames
+/film/swift/extract_audio
+
+# macOS
+.DS_Store
+
+# Python's compiled modules (the film scripts import one another)
+__pycache__/
+*.pyc
+
+# Film frames, and scratch work
+frames/
+scratch/
+
+# No music and no recordings in this repository
+*.mp4
+*.wav
+*.m4a
+*.aac
+*.mov
+*.m4v
+*.mp3
+*.aif
+*.aiff
+*.flac
+*.ogg
+
+# File-sync services leave copies like these when two computers disagree about a file
+*conflicted copy*
+
+# Editor leftovers
+*~
+*.swp
+
+# the Humdrum score of BWV 891 (legacy/s2/movie/music/align.py reads it): rights reserved by its author, never commit it
+legacy/s2/movie/music/wtc2f22.krn

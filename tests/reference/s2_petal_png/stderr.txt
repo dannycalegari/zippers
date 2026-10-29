@@ -1,0 +1,3 @@
+monodromy fig8, order inf: tr a = 1.500000+0.866025i, tr c = 2.000000+0.000000i, cusp shape tau = 0.000000-0.288675i
+wrote petal.png
+Z+: 658026 leaves, 30898 polylines ; Z-: 688341 leaves, 18486 polylines

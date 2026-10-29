@@ -1,0 +1,4 @@
+  Hopf link              Gauss -1.0000   crossings:  -1/-1 (4)  -1/-1 (2)  -1/-1 (2)  -1/-1 (4)
+  Hopf link, reversed    Gauss +1.0000   crossings:  +1/+1 (2)  +1/+1 (2)  +1/+1 (4)  +1/+1 (2)
+  split circles          Gauss +0.0000   crossings:  +0/+0 (0)  +0/+0 (0)  +0/+0 (0)  +0/+0 (0)
+  (2,4) torus link       Gauss -2.0000   crossings:  -2/-2 (6)  -2/-2 (4)  -2/-2 (8)  -2/-2 (4)

@@ -1,0 +1,44 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Automatic test runs: build the suite and run the fast tests, on macOS and on Linux, for every push and every pull
+# request. (This runs only once the repository is on GitHub.)
+#
+# The fast tests are the ones labelled "fast" (ctest -L fast), the same as `make test`. The slow "reference" tests
+# are run by hand.
+
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: build and test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v5
+
+      - name: Install zlib, GLUT and OpenGL (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zlib1g-dev freeglut3-dev libglu1-mesa-dev
+
+      - name: Configure
+        run: cmake -S . -B build
+
+      - name: Build
+        run: cmake --build build --parallel 4
+
+      - name: Run the fast tests
+        run: ctest --test-dir build -L fast --output-on-failure

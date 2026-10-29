@@ -1,0 +1,2997 @@
+{
+ "about": "The reference runs. tests/run_references.py re-runs them and compares; tests/README.md explains the fields and which checks run where. \"program\" is a path in the CMake build folder; each run happens in a fresh folder holding copies of \"inputs\" (paths in the repository). \"expect\" is what the run produced when it was recorded (run_references.py --record), on the machine of \"machine\".",
+ "machine": {
+  "system": "Darwin",
+  "processor": "arm64",
+  "compiler": "AppleClang 21.0.0.21000101",
+  "recorded": "2026-10-25",
+  "programs": "the legacy programs (legacy/), built with the flags of their old makefiles; the runs that note says were recorded later, from the programs it names",
+  "note": "every run was recorded on 2026-10-25 from the legacy programs, except: three added on 2026-10-26 and recorded from the same legacy programs (byte for byte the same binaries): s4_chz5_kernel_steep, s3_zipper3_pair and s3_zipper3_pair_context; three recorded on 2026-10-26 from the new zipper5, apps/s4/zipper5, whose word reader reads facet 1: s4_zipper5_base and s4_zipper5_r18, recorded again (the legacy zipper5 drops facet 1), and s4_zipper5_t2, added; those three recorded again on 2026-10-26 from apps/s4/zipper5 with the tips (the leaves whose letter lies on a parabolic cycle of the roofs are drawn through its cusps); and the seven runs of the default files of data/, recorded on 2026-10-28 from apps/s3/zipper3 and apps/s4/zipper5 (also_recorded)",
+  "also_recorded": [
+   "2026-10-26, from apps/s4/zipper5 (a clean build): s4_zipper5_base, s4_zipper5_r18, s4_zipper5_t2",
+   "2026-10-28, from apps/s3/zipper3 and apps/s4/zipper5: s3_zipper3_t3r1_base, s3_zipper3_t3r1_shell, s3_zipper3_t3r1_check, s4_zipper5_base_r0, s4_zipper5_r18_r0",
+   "2026-10-28, from apps/s3/zipper3 and apps/s4/zipper5: s3_zipper3_t3r1_zoom, s4_zipper5_zoom_r0",
+   "2026-10-28, from apps/s3/zipper3 and apps/s4/zipper5 (a clean build), to bring program_sha256 up to date; no output changed: s3_zipper3_t3r1_base, s3_zipper3_t3r1_shell, s3_zipper3_t3r1_check, s3_zipper3_t3r1_zoom, s4_zipper5_base_r0, s4_zipper5_r18_r0"
+  ]
+ },
+ "runs": [
+  {
+   "id": "s2_fig8_n2_eps",
+   "title": "S2: fig8, order 2, the defaults (-R 6 -a 0.004)",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s2/nogui/zipper",
+   "args": [
+    "-m",
+    "fig8",
+    "-n",
+    "2",
+    "--memlimit",
+    "2",
+    "-o",
+    "fig8_n2.eps"
+   ],
+   "inputs": [],
+   "timeout": 120,
+   "portable": [],
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s2_fig8_n2_eps/stdout.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "stderr": {
+     "file": "s2_fig8_n2_eps/stderr.txt",
+     "sha256": "ff495e529c348f7f31d2fc4bae94056281e3b6a9711c8d5032925dad33807390",
+     "lines": 2
+    },
+    "outputs": {
+     "fig8_n2.eps": {
+      "sha256": "0701d9fbb5a96768d3983327d553f6ef565e35c6211eab71c9306a20f3b844e4",
+      "size": 2423242,
+      "small_copy": "s2_fig8_n2_eps/small_fig8_n2.jpg"
+     }
+    },
+    "portable": [],
+    "seconds": 0.74,
+    "peak_rss_mb": 59.5,
+    "program_sha256": "615f2416c25d7056aa1261ca934be4f7db4071af267769e0f78776d4daf053ac",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s2_fig8_n2_png",
+   "title": "S2: fig8, order 2, PNG 900 px",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s2/nogui/zipper",
+   "args": [
+    "-m",
+    "fig8",
+    "-n",
+    "2",
+    "-s",
+    "900",
+    "--memlimit",
+    "2",
+    "-o",
+    "fig8_n2.png"
+   ],
+   "inputs": [],
+   "timeout": 120,
+   "portable": [],
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s2_fig8_n2_png/stdout.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "stderr": {
+     "file": "s2_fig8_n2_png/stderr.txt",
+     "sha256": "d8197d48c65298668924895da6850a36b9b6a37fb8e8fa9f7032916a4a16f218",
+     "lines": 3
+    },
+    "outputs": {
+     "fig8_n2.png": {
+      "sha256": "42abf9c128199101f0cd34652ed76a20ecc37e9fa61050ff61f9f7dddfcf93b3",
+      "size": 309252,
+      "small_copy": "s2_fig8_n2_png/small_fig8_n2.jpg"
+     }
+    },
+    "portable": [],
+    "seconds": 0.85,
+    "peak_rss_mb": 59.4,
+    "program_sha256": "615f2416c25d7056aa1261ca934be4f7db4071af267769e0f78776d4daf053ac",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s2_fig8_n3_eps",
+   "title": "S2: fig8, order 3",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s2/nogui/zipper",
+   "args": [
+    "-m",
+    "fig8",
+    "-n",
+    "3",
+    "--memlimit",
+    "2",
+    "-o",
+    "fig8_n3.eps"
+   ],
+   "inputs": [],
+   "timeout": 120,
+   "portable": [],
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s2_fig8_n3_eps/stdout.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "stderr": {
+     "file": "s2_fig8_n3_eps/stderr.txt",
+     "sha256": "0a40fc4c93eaa00cf7f7dadaf5029f94ccd20ef6a7ce0dac12d0586879eb9c94",
+     "lines": 2
+    },
+    "outputs": {
+     "fig8_n3.eps": {
+      "sha256": "bb51b1bc8f598f469db54a6e6706aaba1552437364d9c79302be97bd865f2487",
+      "size": 2082949,
+      "small_copy": "s2_fig8_n3_eps/small_fig8_n3.jpg"
+     }
+    },
+    "portable": [],
+    "seconds": 0.65,
+    "peak_rss_mb": 51.8,
+    "program_sha256": "615f2416c25d7056aa1261ca934be4f7db4071af267769e0f78776d4daf053ac",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s2_cusp_png",
+   "title": "S2: the cusped figure-8 knot complement, PNG 1200 px",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s2/nogui/zipper",
+   "args": [
+    "-m",
+    "fig8",
+    "-n",
+    "inf",
+    "-s",
+    "1200",
+    "--memlimit",
+    "2",
+    "-o",
+    "cusp.png"
+   ],
+   "inputs": [],
+   "timeout": 120,
+   "portable": [],
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s2_cusp_png/stdout.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "stderr": {
+     "file": "s2_cusp_png/stderr.txt",
+     "sha256": "714502a4872be37dd152cabcaa80cbcd61f92fe32e2571da3b136bba6a29379a",
+     "lines": 3
+    },
+    "outputs": {
+     "cusp.png": {
+      "sha256": "eb1d7743907424ca885198ef452accf7a60e42cccfb50409c635197eda161c94",
+      "size": 534311,
+      "small_copy": "s2_cusp_png/small_cusp.jpg"
+     }
+    },
+    "portable": [],
+    "seconds": 1.09,
+    "peak_rss_mb": 76.6,
+    "program_sha256": "615f2416c25d7056aa1261ca934be4f7db4071af267769e0f78776d4daf053ac",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s2_rrl_eps",
+   "title": "S2: monodromy RRL, order 3",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s2/nogui/zipper",
+   "args": [
+    "-m",
+    "RRL",
+    "-n",
+    "3",
+    "--memlimit",
+    "2",
+    "-o",
+    "rrl.eps"
+   ],
+   "inputs": [],
+   "timeout": 120,
+   "portable": [],
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s2_rrl_eps/stdout.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "stderr": {
+     "file": "s2_rrl_eps/stderr.txt",
+     "sha256": "bc99403d09ea2de50ee9540e78ebedded506586280749c0b70fb68023f964f0b",
+     "lines": 3
+    },
+    "outputs": {
+     "rrl.eps": {
+      "sha256": "1ab68efddf1b2296010cc2479e92da25a58c94b0692f789669acc676d42cabf1",
+      "size": 1907966,
+      "small_copy": "s2_rrl_eps/small_rrl.jpg"
+     }
+    },
+    "portable": [],
+    "seconds": 0.93,
+    "peak_rss_mb": 64.3,
+    "program_sha256": "615f2416c25d7056aa1261ca934be4f7db4071af267769e0f78776d4daf053ac",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s2_wheel_png",
+   "title": "S2: the Catherine wheel, order 2, R = 5",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s2/nogui/zipper",
+   "args": [
+    "-n",
+    "2",
+    "-R",
+    "5",
+    "-C",
+    "--memlimit",
+    "2",
+    "-o",
+    "wheel.png"
+   ],
+   "inputs": [],
+   "timeout": 120,
+   "portable": [],
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s2_wheel_png/stdout.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "stderr": {
+     "file": "s2_wheel_png/stderr.txt",
+     "sha256": "a05ee8acf7a3939dfe1dc9a3ca7cfc3127b750171d188688ceae39d1ad50a585",
+     "lines": 4
+    },
+    "outputs": {
+     "wheel.png": {
+      "sha256": "29ca9acb626e8db11d827a744ef1e078aa09a5123bcb5c1960b67173b9981262",
+      "size": 113525,
+      "small_copy": "s2_wheel_png/small_wheel.jpg"
+     }
+    },
+    "portable": [],
+    "seconds": 0.81,
+    "peak_rss_mb": 149.4,
+    "program_sha256": "615f2416c25d7056aa1261ca934be4f7db4071af267769e0f78776d4daf053ac",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s2_petal_png",
+   "title": "S2: zoom 6 on a cusp point, accuracy 0.0005",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s2/nogui/zipper",
+   "args": [
+    "-n",
+    "inf",
+    "-a",
+    "0.0005",
+    "--yaw",
+    "42",
+    "--zoom",
+    "6",
+    "-s",
+    "900",
+    "--memlimit",
+    "2",
+    "-o",
+    "petal.png"
+   ],
+   "inputs": [],
+   "timeout": 300,
+   "portable": [],
+   "note": "not marked heavy: on the reference machine it takes 1.7 s and 135 MB",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s2_petal_png/stdout.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "stderr": {
+     "file": "s2_petal_png/stderr.txt",
+     "sha256": "8ebabc30febc988bc50258345a0cd7f70ed65db3c523563e03ba72974ca7adf0",
+     "lines": 3
+    },
+    "outputs": {
+     "petal.png": {
+      "sha256": "8a0ac326890f93d42ae7bb3b1b1f9c3194cce53f1154ae0a0c38b77de5f26f3f",
+      "size": 364932,
+      "small_copy": "s2_petal_png/small_petal.jpg"
+     }
+    },
+    "portable": [],
+    "seconds": 1.76,
+    "peak_rss_mb": 135.4,
+    "program_sha256": "615f2416c25d7056aa1261ca934be4f7db4071af267769e0f78776d4daf053ac",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s2_stats_eps",
+   "title": "S2: order 2, R = 5, with the diagnostics of --stats (on stderr)",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s2/nogui/zipper",
+   "args": [
+    "-n",
+    "2",
+    "-R",
+    "5",
+    "--stats",
+    "--memlimit",
+    "2",
+    "-o",
+    "stats.eps"
+   ],
+   "inputs": [],
+   "timeout": 120,
+   "portable": [],
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s2_stats_eps/stdout.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "stderr": {
+     "file": "s2_stats_eps/stderr.txt",
+     "sha256": "10510f563dd5ce51fd6b4bd9e6285bfc2ef9b2b6e23be1bea8e7a3d6fee310ac",
+     "lines": 18
+    },
+    "outputs": {
+     "stats.eps": {
+      "sha256": "f8ca9007869d1f06dee5da3277346070c36527352bb353ffbd1c6d2e4a3e60f5",
+      "size": 501752,
+      "small_copy": "s2_stats_eps/small_stats.jpg"
+     }
+    },
+    "portable": [],
+    "seconds": 0.44,
+    "peak_rss_mb": 62.6,
+    "program_sha256": "615f2416c25d7056aa1261ca934be4f7db4071af267769e0f78776d4daf053ac",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s2_zmovie_rot_n2",
+   "title": "S2 film engine: the shot rot_n2 (fig8, n = 2, R = 6), frames 0 to 3",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s2/movie/bin/zmovie",
+   "args": [
+    "rot_n2.txt",
+    "--frames",
+    "0:3",
+    "-o",
+    "rot_n2"
+   ],
+   "inputs": [
+    "legacy/s2/movie/tests/shots/rot_n2.txt"
+   ],
+   "timeout": 120,
+   "portable": [],
+   "note": "--frames A:B renders frames A to B inclusive, so 0:3 writes 4 frames; -o names the frame folder, which the shot file does not",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s2_zmovie_rot_n2/stdout.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "stderr": {
+     "file": "s2_zmovie_rot_n2/stderr.txt",
+     "sha256": "aca043ba4745ab052e2473bc4c2187c529b6ead0da2792a84ad820c5f7e84b64",
+     "lines": 3
+    },
+    "outputs": {
+     "rot_n2/frame_00000.png": {
+      "sha256": "fed75ad2eab4f35b549f5ffa3633248b6b4bf2224b44515e30eb66805fd310a3",
+      "size": 1145610,
+      "small_copy": "s2_zmovie_rot_n2/small_rot_n2_frame_00000.jpg"
+     },
+     "rot_n2/frame_00001.png": {
+      "sha256": "999f3bd4de87e858b607de0ef9856d73ca7bb01f9668e3edef44bebb45ca0248",
+      "size": 1145414,
+      "small_copy": "s2_zmovie_rot_n2/small_rot_n2_frame_00001.jpg"
+     },
+     "rot_n2/frame_00002.png": {
+      "sha256": "b8b7472382072b4a67d3239e67022d6186dbb0962b2a714136c46fee5695fc2a",
+      "size": 1145382,
+      "small_copy": "s2_zmovie_rot_n2/small_rot_n2_frame_00002.jpg"
+     },
+     "rot_n2/frame_00003.png": {
+      "sha256": "bfb7a4190d30a7f0dccb388fa906b934b58d205d601d7e11fb5f8dca78ca19e5",
+      "size": 1145020,
+      "small_copy": "s2_zmovie_rot_n2/small_rot_n2_frame_00003.jpg"
+     }
+    },
+    "portable": [],
+    "seconds": 1.67,
+    "peak_rss_mb": 92.5,
+    "program_sha256": "38d9fcaac648f998c105c11cb36c903b7b2bfc264ec59bb3c25b20e7780610e5",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s3_chz_selftest",
+   "title": "S3: chz selftest (exact checks in Z[zeta_12])",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s3/chz",
+   "args": [
+    "selftest"
+   ],
+   "inputs": [],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stdout",
+     "regex": "^(.*?(?:: (?:yes|no)\\b|= zeta\\^\\d+ +I))"
+    }
+   ],
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_chz_selftest/stdout.txt",
+     "sha256": "16d1f396334d08a8b68bb886fa8cfa3db4f2b7a32d5860902812005a0f923c0f",
+     "lines": 21
+    },
+    "stderr": {
+     "file": "s3_chz_selftest/stderr.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "outputs": {},
+    "portable": [
+     [
+      "  u' unitary for F': yes",
+      "  v' unitary for F': yes",
+      "  b' unitary for F': yes",
+      "  j unitary for F': yes",
+      "  u u^-1 = 1: yes",
+      "  u^3              = zeta^0  I",
+      "  v^4              = zeta^0  I",
+      "  b^3              = zeta^0  I",
+      "  (uv)^2 (vu)^-2   = zeta^0  I",
+      "  v b v^-1 b^-1    = zeta^0  I",
+      "  (buv)^3          = zeta^11  I",
+      "  (buvu)^2 v       = zeta^11  I",
+      "  (uv)^2 j^-1      = zeta^0  I",
+      "  a1 unitary for F': yes",
+      "  a2 unitary for F': yes",
+      "  a3 unitary for F': yes",
+      "  j^4 a1 j^-4 = a3 a2^-3 a3^3 a1 : yes",
+      "  j^4 a2 j^-4 = a3^-1             : yes",
+      "  j^4 a3 j^-4 = (CKY's word)      : yes"
+     ]
+    ],
+    "seconds": 0.02,
+    "peak_rss_mb": 1.3,
+    "program_sha256": "4c4fb1d9f585fd1af83d2ee7a9034ae899b78e1d6787248a0065f3b458e1920f",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s3_chz_kernel",
+   "title": "S3: the certificate that S_c generates K (C = 4, R = 9.5, phi(t) = 3); writes the substitution file",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s3/chz",
+   "args": [
+    "kernel",
+    "4",
+    "9.5",
+    "3"
+   ],
+   "inputs": [],
+   "timeout": 300,
+   "same_as": {
+    "subst_4.00_9.50_t3.txt": "legacy/s3/subst_4.00_9.50_t3.txt"
+   },
+   "portable": [
+    {
+     "stream": "stdout",
+     "regex": "^\\|S_c\\| = (\\d+) kernel elements"
+    },
+    {
+     "stream": "stdout",
+     "regex": "f-inconsistencies (\\d+)"
+    },
+    {
+     "stream": "stdout",
+     "regex": "^roofs (up|down) +\\(t\\S* s t\\S*\\): (\\d+ / \\d+) found"
+    },
+    {
+     "stream": "stdout",
+     "regex": "^(a\\d t\\^-?\\d+ in <S_c>: .*)$"
+    },
+    {
+     "stream": "stdout",
+     "regex": "^(CERTIFICATE that S_c generates K: .*)$"
+    },
+    {
+     "stream": "stdout",
+     "regex": "^(steep roofs up \\d+ / \\d+, down \\d+ / \\d+)"
+    },
+    {
+     "stream": "stdout",
+     "regex": "^(wrote \\S+)"
+    }
+   ],
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_chz_kernel/stdout.txt",
+     "sha256": "59773469fc1a63a4a73b08b7ef9e95320f53c48ed32a49ad50825f7ea5965dc5",
+     "lines": 35
+    },
+    "stderr": {
+     "file": "s3_chz_kernel/stderr.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "outputs": {
+     "subst_4.00_9.50_t3.txt": {
+      "sha256": "aced7a4829b88b949575ce4e5305c55a7e0d39ed7db9b204bca34d4f993f2572",
+      "size": 3814,
+      "same_as": "legacy/s3/subst_4.00_9.50_t3.txt",
+      "identical_to_same_as": true
+     }
+    },
+    "portable": [
+     [
+      "36"
+     ],
+     [
+      "0",
+      "0"
+     ],
+     [
+      "up | 36 / 36",
+      "down | 36 / 36"
+     ],
+     [
+      "a1 t^-1 in <S_c>: yes",
+      "a2 t^2 in <S_c>: yes",
+      "a3 t^1 in <S_c>: yes"
+     ],
+     [
+      "CERTIFICATE that S_c generates K: YES"
+     ],
+     [
+      "steep roofs up 36 / 36, down 36 / 36"
+     ],
+     [
+      "wrote subst_4.00_9.50_t3.txt"
+     ]
+    ],
+    "seconds": 6.87,
+    "peak_rss_mb": 295.6,
+    "program_sha256": "4c4fb1d9f585fd1af83d2ee7a9034ae899b78e1d6787248a0065f3b458e1920f",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s3_zipper3_r0",
+   "title": "S3: zipper3, the base arcs (R = 0), PNG 600 px",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s3/nogui/zipper3",
+   "args": [
+    "-f",
+    "subst_4.00_9.50_t3.txt",
+    "-R",
+    "0",
+    "-s",
+    "600",
+    "-o",
+    "r0.png"
+   ],
+   "inputs": [
+    "legacy/s3/subst_4.00_9.50_t3.txt"
+   ],
+   "timeout": 120,
+   "portable": [],
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_zipper3_r0/stdout.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "stderr": {
+     "file": "s3_zipper3_r0/stderr.txt",
+     "sha256": "e80396d81ca7624d6d6f28fbdb69aa4c7c78233141fbfa434cff8f63b620ea24",
+     "lines": 5
+    },
+    "outputs": {
+     "r0.png": {
+      "sha256": "ca225a09677475c4b9c6d235b968d844ac4c2afcf166f2d08209f26892a1e24d",
+      "size": 67398,
+      "small_copy": "s3_zipper3_r0/small_r0.jpg"
+     }
+    },
+    "portable": [],
+    "seconds": 0.26,
+    "peak_rss_mb": 42.0,
+    "program_sha256": "79680cc714511df8e5090ccad1165b781d85f68117e39f6fef9fb74a45904bf6",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s3_zipper3_r1",
+   "title": "S3: zipper3, the first shell of translates (R = 2.554), PNG 600 px",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s3/nogui/zipper3",
+   "args": [
+    "-f",
+    "subst_4.00_9.50_t3.txt",
+    "-R",
+    "2.554",
+    "-s",
+    "600",
+    "-o",
+    "r1.png"
+   ],
+   "inputs": [
+    "legacy/s3/subst_4.00_9.50_t3.txt"
+   ],
+   "timeout": 120,
+   "portable": [],
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_zipper3_r1/stdout.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "stderr": {
+     "file": "s3_zipper3_r1/stderr.txt",
+     "sha256": "75385a857fe1d4a0e9d48ee9d80babf32f071e1b10f79c820473278ba8b6cc8d",
+     "lines": 5
+    },
+    "outputs": {
+     "r1.png": {
+      "sha256": "4aedff3bfee1f92ddc97c9bf99312c05fe5a2d0f9da3c3a94680f7a9384200fe",
+      "size": 292316,
+      "small_copy": "s3_zipper3_r1/small_r1.jpg"
+     }
+    },
+    "portable": [],
+    "seconds": 1.16,
+    "peak_rss_mb": 187.9,
+    "program_sha256": "79680cc714511df8e5090ccad1165b781d85f68117e39f6fef9fb74a45904bf6",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s3_zipper3_check",
+   "title": "S3: zipper3 --check, the separation of Z+ and Z- at R = 2.554 (on stderr)",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s3/nogui/zipper3",
+   "args": [
+    "-f",
+    "subst_4.00_9.50_t3.txt",
+    "-R",
+    "2.554",
+    "--check"
+   ],
+   "inputs": [
+    "legacy/s3/subst_4.00_9.50_t3.txt"
+   ],
+   "timeout": 120,
+   "portable": [],
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_zipper3_check/stdout.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "stderr": {
+     "file": "s3_zipper3_check/stderr.txt",
+     "sha256": "b3b36177218ea71efa703cea6fb97131aeda2a67691ea79e0fb138bacc7ca36d",
+     "lines": 5
+    },
+    "outputs": {},
+    "portable": [],
+    "seconds": 1.34,
+    "peak_rss_mb": 119.6,
+    "program_sha256": "79680cc714511df8e5090ccad1165b781d85f68117e39f6fef9fb74a45904bf6",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s3/nogui/zipper3",
+   "inputs": [
+    "legacy/s3/subst_4.00_9.50_t3.txt",
+    "legacy/s3/linked_pairs.txt"
+   ],
+   "timeout": 300,
+   "portable": [
+    {
+     "stream": "stderr",
+     "regex": "^(\\S+: \\d+ linked pairs)$"
+    },
+    {
+     "stream": "stderr",
+     "regex": "^(pair \\d+: lk [+-]\\d+ .*)$"
+    }
+   ],
+   "id": "s3_zipper3_pair",
+   "title": "S3: the picture of linked pair 0 (zipper3 --pairs, the default brush of 2)",
+   "args": [
+    "--pairs",
+    "linked_pairs.txt",
+    "-o",
+    "pair0.png"
+   ],
+   "note": "added on 2026-10-26: no other run draws a linked pair (a changed default brush would pass every other test). Recorded from the legacy zipper3 (nogui), byte for byte the program of the first recording.",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_zipper3_pair/stdout.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "stderr": {
+     "file": "s3_zipper3_pair/stderr.txt",
+     "sha256": "7d7f082e012e808a2ac1ba3ca52071a0492b6da39a7e37f3cdb3cc7e5733ce15",
+     "lines": 8
+    },
+    "outputs": {
+     "pair0.png": {
+      "sha256": "404670ff6bfa4a9aebf048782f41c71e233174976133e5519b6abed05642f00a",
+      "size": 52351,
+      "small_copy": "s3_zipper3_pair/small_pair0.jpg"
+     }
+    },
+    "portable": [
+     [
+      "linked_pairs.txt: 13 linked pairs"
+     ],
+     [
+      "pair 0: lk +1   gamma_w, w = 4 17 23 (Z+)   h.delta_w', w' = 1 28 24 20 (Z-), phi(h) = 1"
+     ]
+    ],
+    "seconds": 1.17,
+    "peak_rss_mb": 95.1,
+    "program_sha256": "79680cc714511df8e5090ccad1165b781d85f68117e39f6fef9fb74a45904bf6",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s3/nogui/zipper3",
+   "inputs": [
+    "legacy/s3/subst_4.00_9.50_t3.txt",
+    "legacy/s3/linked_pairs.txt"
+   ],
+   "timeout": 300,
+   "portable": [
+    {
+     "stream": "stderr",
+     "regex": "^(\\S+: \\d+ linked pairs)$"
+    },
+    {
+     "stream": "stderr",
+     "regex": "^(pair \\d+: lk [+-]\\d+ .*)$"
+    }
+   ],
+   "id": "s3_zipper3_pair_context",
+   "title": "S3: linked pair 5 against the faint base arcs (zipper3 --pairs --pairindex 5 --context)",
+   "args": [
+    "--pairs",
+    "linked_pairs.txt",
+    "--pairindex",
+    "5",
+    "--context",
+    "-o",
+    "pair5_context.png"
+   ],
+   "note": "added on 2026-10-26 with s3_zipper3_pair, for the same reason; recorded from the legacy zipper3 (nogui).",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_zipper3_pair_context/stdout.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "stderr": {
+     "file": "s3_zipper3_pair_context/stderr.txt",
+     "sha256": "acd9af59f0c17f2634956600e0a3a4f273629be78d66b880f465d32c418eabf5",
+     "lines": 8
+    },
+    "outputs": {
+     "pair5_context.png": {
+      "sha256": "02a46261b55a590464fa21028fa88fddfbb21d0e78aaeb62ee768b5944cba4d4",
+      "size": 127844,
+      "small_copy": "s3_zipper3_pair_context/small_pair5_context.jpg"
+     }
+    },
+    "portable": [
+     [
+      "linked_pairs.txt: 13 linked pairs"
+     ],
+     [
+      "pair 5: lk -1   gamma_w, w = 4 17 23 (Z+)   h.delta_w', w' = 4 17 23 (Z-), phi(h) = 4"
+     ]
+    ],
+    "seconds": 1.21,
+    "peak_rss_mb": 103.3,
+    "program_sha256": "79680cc714511df8e5090ccad1165b781d85f68117e39f6fef9fb74a45904bf6",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s3_zipper3_t3r1_base",
+   "title": "S3: zipper3 on the default file (subst_4.00_9.50_t3_r1.txt), the base arcs (R = 0), PNG 600 px",
+   "fast": true,
+   "heavy": false,
+   "program": "apps/s3/zipper3",
+   "args": [
+    "-R",
+    "0",
+    "-s",
+    "600",
+    "-o",
+    "r0.png"
+   ],
+   "inputs": [
+    "data/s3/subst_4.00_9.50_t3_r1.txt"
+   ],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stderr",
+     "regex": "^\\S+: \\|S\\| = (\\d+) \\((\\d+) pairs\\), roofs checked exactly"
+    }
+   ],
+   "note": "The default file of zipper3 is subst_4.00_9.50_t3_r1.txt (data/s3/: chz kernel 4 9.5 3 --roofs --jexcess 1, the roofs chosen at one letter of excess). The same command as s3_zipper3_r0, which names subst_4.00_9.50_t3.txt with -f and so keeps its record (the legacy program's picture); here there is no -f, so the run tests the default. Recorded from apps/s3/zipper3 (there is no legacy original of this picture).",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_zipper3_t3r1_base/stdout.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "stderr": {
+     "file": "s3_zipper3_t3r1_base/stderr.txt",
+     "sha256": "90226d2871419569012cd26f76597b6d8c138e51db41d1fd5ff8b449625cc31e",
+     "lines": 5
+    },
+    "outputs": {
+     "r0.png": {
+      "sha256": "0db838d2d53ed20e62416d79a5fef5a04900207a3fd054daf19edb0cbe2e4437",
+      "size": 67797,
+      "small_copy": "s3_zipper3_t3r1_base/small_r0.jpg"
+     }
+    },
+    "portable": [
+     [
+      "36 | 18"
+     ]
+    ],
+    "seconds": 0.28,
+    "peak_rss_mb": 45.8,
+    "program_sha256": "19d859899b26a9032d6e659e427e97c5d0dd14dc4e76c3afde148858b118f8df",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s3_zipper3_t3r1_shell",
+   "title": "S3: zipper3 on the default file (subst_4.00_9.50_t3_r1.txt), the first shell of translates (R = 2.554), PNG 600 px",
+   "fast": true,
+   "heavy": false,
+   "program": "apps/s3/zipper3",
+   "args": [
+    "-R",
+    "2.554",
+    "-s",
+    "600",
+    "-o",
+    "r1.png"
+   ],
+   "inputs": [
+    "data/s3/subst_4.00_9.50_t3_r1.txt"
+   ],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stderr",
+     "regex": "^\\S+: \\|S\\| = (\\d+) \\((\\d+) pairs\\), roofs checked exactly"
+    }
+   ],
+   "note": "The default file of zipper3 is subst_4.00_9.50_t3_r1.txt (data/s3/: chz kernel 4 9.5 3 --roofs --jexcess 1, the roofs chosen at one letter of excess). The same command as s3_zipper3_r1, which names subst_4.00_9.50_t3.txt with -f and so keeps its record (the legacy program's picture); here there is no -f, so the run tests the default. Recorded from apps/s3/zipper3 (there is no legacy original of this picture).",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_zipper3_t3r1_shell/stdout.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "stderr": {
+     "file": "s3_zipper3_t3r1_shell/stderr.txt",
+     "sha256": "d9644c610c7ffdb888ba9ace163b23bdd8c6685a48cf421b0c281bd471587280",
+     "lines": 5
+    },
+    "outputs": {
+     "r1.png": {
+      "sha256": "fa71d3148b14c343e1d8206f954191b9b5f47adb4ae4a71e06a10b43c9be1299",
+      "size": 303655,
+      "small_copy": "s3_zipper3_t3r1_shell/small_r1.jpg"
+     }
+    },
+    "portable": [
+     [
+      "36 | 18"
+     ]
+    ],
+    "seconds": 1.3,
+    "peak_rss_mb": 192.2,
+    "program_sha256": "19d859899b26a9032d6e659e427e97c5d0dd14dc4e76c3afde148858b118f8df",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s3_zipper3_t3r1_check",
+   "title": "S3: zipper3 --check on the default file (subst_4.00_9.50_t3_r1.txt), the separation of Z+ and Z- at R = 2.554 (on stderr)",
+   "fast": true,
+   "heavy": false,
+   "program": "apps/s3/zipper3",
+   "args": [
+    "-R",
+    "2.554",
+    "--check"
+   ],
+   "inputs": [
+    "data/s3/subst_4.00_9.50_t3_r1.txt"
+   ],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stderr",
+     "regex": "^\\S+: \\|S\\| = (\\d+) \\((\\d+) pairs\\), roofs checked exactly"
+    }
+   ],
+   "note": "The default file of zipper3 is subst_4.00_9.50_t3_r1.txt (data/s3/: chz kernel 4 9.5 3 --roofs --jexcess 1, the roofs chosen at one letter of excess). The same command as s3_zipper3_check, which names subst_4.00_9.50_t3.txt with -f and so keeps its record (the legacy program's picture); here there is no -f, so the run tests the default. Recorded from apps/s3/zipper3 (there is no legacy original of this picture).",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_zipper3_t3r1_check/stdout.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "stderr": {
+     "file": "s3_zipper3_t3r1_check/stderr.txt",
+     "sha256": "f73cf63a91141ff8d301c2ddcd53054dbaf3e3787eaa4b9e57eda9e7f16f5ccc",
+     "lines": 5
+    },
+    "outputs": {},
+    "portable": [
+     [
+      "36 | 18"
+     ]
+    ],
+    "seconds": 1.55,
+    "peak_rss_mb": 120.6,
+    "program_sha256": "19d859899b26a9032d6e659e427e97c5d0dd14dc4e76c3afde148858b118f8df",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s3_zipper3_t3r1_zoom",
+   "title": "S3: zipper3 on the default file, a still of a zoomed view (zoom 100 about a point where Z+ and Z- come close, R = 2.554): culling and the focus ball are on by default, PNG 600 px",
+   "fast": true,
+   "heavy": false,
+   "program": "apps/s3/zipper3",
+   "args": [
+    "-R",
+    "2.554",
+    "--centre",
+    "0.1152,-0.1133,0.8356,0.5250",
+    "--zoom",
+    "100",
+    "-s",
+    "600",
+    "-o",
+    "zoom100.png"
+   ],
+   "inputs": [
+    "data/s3/subst_4.00_9.50_t3_r1.txt"
+   ],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stderr",
+     "regex": "^\\S+: \\|S\\| = (\\d+) \\((\\d+) pairs\\), roofs checked exactly"
+    },
+    {
+     "stream": "stderr",
+     "regex": "^(note: .*)$"
+    }
+   ],
+   "note": "A still of a zoomed view (-o, --zoom above 1): culling (K = 16) and the focus ball at log(zoom) are on by default, as if --cull --focus 1 had been given, and the program says so in two notes on stderr, which are the portable result. No -f and no --cull or --focus, so the run tests the defaults: the file, the margin factor, the focus distance and the conditions for them to apply. Recorded from apps/s3/zipper3.",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_zipper3_t3r1_zoom/stdout.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "stderr": {
+     "file": "s3_zipper3_t3r1_zoom/stderr.txt",
+     "sha256": "c2fb509d1c418d086cf374fcb0727bf4645accf0204ab5e6be6ef1062e22ba3b",
+     "lines": 9
+    },
+    "outputs": {
+     "zoom100.png": {
+      "sha256": "b6dd865a2bd0915aad09040fe19f7dbc1cdda1c4272c0085c5a98fc7e70f7506",
+      "size": 183249,
+      "small_copy": "s3_zipper3_t3r1_zoom/small_zoom100.jpg"
+     }
+    },
+    "portable": [
+     [
+      "36 | 18"
+     ],
+     [
+      "note: culling is on by default for a zoomed still (K = 16; --nocull turns it off)",
+      "note: the focus ball is on by default for a zoomed still (--focus 1; --nofocus turns it off)"
+     ]
+    ],
+    "seconds": 0.61,
+    "peak_rss_mb": 40.0,
+    "program_sha256": "19d859899b26a9032d6e659e427e97c5d0dd14dc4e76c3afde148858b118f8df",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s3_link3_selftest",
+   "title": "S3: link3 selftest (the linking-number code against the Gauss integral)",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s3/link3",
+   "args": [
+    "selftest"
+   ],
+   "inputs": [],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stdout",
+     "regex": "([+-]\\d+/[+-]\\d+) \\(\\d+\\)"
+    }
+   ],
+   "note": "the selftest of the linking-number code",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_link3_selftest/stdout.txt",
+     "sha256": "a880741b08cbe348992523f4597997c2cb8a2112b0103f89d1ece83c066c29f2",
+     "lines": 4
+    },
+    "stderr": {
+     "file": "s3_link3_selftest/stderr.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "outputs": {},
+    "portable": [
+     [
+      "-1/-1",
+      "-1/-1",
+      "-1/-1",
+      "-1/-1",
+      "+1/+1",
+      "+1/+1",
+      "+1/+1",
+      "+1/+1",
+      "+0/+0",
+      "+0/+0",
+      "+0/+0",
+      "+0/+0",
+      "-2/-2",
+      "-2/-2",
+      "-2/-2",
+      "-2/-2"
+     ]
+    ],
+    "seconds": 0.03,
+    "peak_rss_mb": 1.9,
+    "program_sha256": "ddf9c3dd6acdd95bdcf222b483191775ff413b679bc28a004c97c3b5a40ae60b",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s3_link3_export",
+   "title": "S3: link3 --export link_run2.txt: the 13 verified pairs of the stored scan, as words",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s3/link3",
+   "args": [
+    "-a",
+    "0.01",
+    "--nrel",
+    "20",
+    "--hr",
+    "2.6",
+    "--export",
+    "link_run2.txt"
+   ],
+   "inputs": [
+    "legacy/s3/subst_4.00_9.50_t3.txt",
+    "legacy/s3/link_run2.txt"
+   ],
+   "timeout": 120,
+   "same_as": {
+    "linked_pairs.txt": "legacy/s3/linked_pairs.txt"
+   },
+   "portable": [
+    {
+     "stream": "stderr",
+     "regex": "^(wrote \\d+ pairs to linked_pairs.txt)"
+    }
+   ],
+   "portable_files": [
+    "linked_pairs.txt"
+   ],
+   "note": "how linked_pairs.txt was made (legacy/s3/README.md); it checks that the relation and translate indices of the pairs below name the same words as in linked_pairs.txt",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_link3_export/stdout.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "stderr": {
+     "file": "s3_link3_export/stderr.txt",
+     "sha256": "c8d01d7e67def47f5dbd9a8953a5491976928b6e0cb17c479d1a58c81ff97ae0",
+     "lines": 2
+    },
+    "outputs": {
+     "linked_pairs.txt": {
+      "sha256": "cbff07afb0f394f0e4521af217d8cfa3076038efca78aeed68f6935c33fc55cc",
+      "size": 1138,
+      "same_as": "legacy/s3/linked_pairs.txt",
+      "identical_to_same_as": true
+     }
+    },
+    "portable": [
+     [
+      "wrote 13 pairs to linked_pairs.txt"
+     ]
+    ],
+    "seconds": 0.13,
+    "peak_rss_mb": 31.8,
+    "program_sha256": "ddf9c3dd6acdd95bdcf222b483191775ff413b679bc28a004c97c3b5a40ae60b",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s3_link3_pair_w4_w10_h1",
+   "title": "S3: the linking number of pair 1 of linked_pairs.txt (stored lk +1), in 20 projections",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s3/link3",
+   "args": [
+    "-a",
+    "0.01",
+    "--nrel",
+    "20",
+    "--hr",
+    "2.6",
+    "--pair",
+    "4",
+    "10",
+    "1"
+   ],
+   "inputs": [
+    "legacy/s3/subst_4.00_9.50_t3.txt"
+   ],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stdout",
+     "regex": "^(pair w\\d+ w\\d+ h\\d+) at acc"
+    },
+    {
+     "stream": "stdout",
+     "regex": "projection +\\d+: lk ([+-]\\d+) +\\(A over B and B over A (\\w+)\\)"
+    }
+   ],
+   "linked_pairs_line": 1,
+   "stored_lk": "+1",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_link3_pair_w4_w10_h1/stdout.txt",
+     "sha256": "19d9d36cd87297109c2d9bb9e3f7e55864128495d84abfb3f310bad6a53f58b8",
+     "lines": 21
+    },
+    "stderr": {
+     "file": "s3_link3_pair_w4_w10_h1/stderr.txt",
+     "sha256": "a1ed60118febe3c82a4917bafe0cf0d4dedce2d1fee49d738edff73c503118eb",
+     "lines": 1
+    },
+    "outputs": {},
+    "portable": [
+     [
+      "pair w4 w10 h1"
+     ],
+     [
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree"
+     ]
+    ],
+    "seconds": 0.88,
+    "peak_rss_mb": 35.5,
+    "program_sha256": "ddf9c3dd6acdd95bdcf222b483191775ff413b679bc28a004c97c3b5a40ae60b",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s3_link3_pair_w4_w12_h1",
+   "title": "S3: the linking number of pair 2 of linked_pairs.txt (stored lk -1), in 20 projections",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s3/link3",
+   "args": [
+    "-a",
+    "0.01",
+    "--nrel",
+    "20",
+    "--hr",
+    "2.6",
+    "--pair",
+    "4",
+    "12",
+    "1"
+   ],
+   "inputs": [
+    "legacy/s3/subst_4.00_9.50_t3.txt"
+   ],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stdout",
+     "regex": "^(pair w\\d+ w\\d+ h\\d+) at acc"
+    },
+    {
+     "stream": "stdout",
+     "regex": "projection +\\d+: lk ([+-]\\d+) +\\(A over B and B over A (\\w+)\\)"
+    }
+   ],
+   "linked_pairs_line": 2,
+   "stored_lk": "-1",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_link3_pair_w4_w12_h1/stdout.txt",
+     "sha256": "073df09d5ac7460403d63c80e19e59229b0a7fd210969ec4e07a31934e93d91f",
+     "lines": 21
+    },
+    "stderr": {
+     "file": "s3_link3_pair_w4_w12_h1/stderr.txt",
+     "sha256": "a1ed60118febe3c82a4917bafe0cf0d4dedce2d1fee49d738edff73c503118eb",
+     "lines": 1
+    },
+    "outputs": {},
+    "portable": [
+     [
+      "pair w4 w12 h1"
+     ],
+     [
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree"
+     ]
+    ],
+    "seconds": 0.73,
+    "peak_rss_mb": 35.3,
+    "program_sha256": "ddf9c3dd6acdd95bdcf222b483191775ff413b679bc28a004c97c3b5a40ae60b",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s3_link3_pair_w4_w17_h1",
+   "title": "S3: the linking number of pair 3 of linked_pairs.txt (stored lk +1), in 20 projections",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s3/link3",
+   "args": [
+    "-a",
+    "0.01",
+    "--nrel",
+    "20",
+    "--hr",
+    "2.6",
+    "--pair",
+    "4",
+    "17",
+    "1"
+   ],
+   "inputs": [
+    "legacy/s3/subst_4.00_9.50_t3.txt"
+   ],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stdout",
+     "regex": "^(pair w\\d+ w\\d+ h\\d+) at acc"
+    },
+    {
+     "stream": "stdout",
+     "regex": "projection +\\d+: lk ([+-]\\d+) +\\(A over B and B over A (\\w+)\\)"
+    }
+   ],
+   "linked_pairs_line": 3,
+   "stored_lk": "+1",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_link3_pair_w4_w17_h1/stdout.txt",
+     "sha256": "0a426d71a5c83880731f6218dd9407c0d4e9d2f2cb1453ecbf796308f18edbf6",
+     "lines": 21
+    },
+    "stderr": {
+     "file": "s3_link3_pair_w4_w17_h1/stderr.txt",
+     "sha256": "a1ed60118febe3c82a4917bafe0cf0d4dedce2d1fee49d738edff73c503118eb",
+     "lines": 1
+    },
+    "outputs": {},
+    "portable": [
+     [
+      "pair w4 w17 h1"
+     ],
+     [
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree"
+     ]
+    ],
+    "seconds": 0.79,
+    "peak_rss_mb": 37.0,
+    "program_sha256": "ddf9c3dd6acdd95bdcf222b483191775ff413b679bc28a004c97c3b5a40ae60b",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s3_link3_pair_w4_w14_h6",
+   "title": "S3: the linking number of pair 4 of linked_pairs.txt (stored lk +1), in 20 projections",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s3/link3",
+   "args": [
+    "-a",
+    "0.01",
+    "--nrel",
+    "20",
+    "--hr",
+    "2.6",
+    "--pair",
+    "4",
+    "14",
+    "6"
+   ],
+   "inputs": [
+    "legacy/s3/subst_4.00_9.50_t3.txt"
+   ],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stdout",
+     "regex": "^(pair w\\d+ w\\d+ h\\d+) at acc"
+    },
+    {
+     "stream": "stdout",
+     "regex": "projection +\\d+: lk ([+-]\\d+) +\\(A over B and B over A (\\w+)\\)"
+    }
+   ],
+   "linked_pairs_line": 4,
+   "stored_lk": "+1",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_link3_pair_w4_w14_h6/stdout.txt",
+     "sha256": "513fa7d50c9f10f70738326a39588ccb66344cb6f0f7b404c39c4aa7fc70ecab",
+     "lines": 21
+    },
+    "stderr": {
+     "file": "s3_link3_pair_w4_w14_h6/stderr.txt",
+     "sha256": "a1ed60118febe3c82a4917bafe0cf0d4dedce2d1fee49d738edff73c503118eb",
+     "lines": 1
+    },
+    "outputs": {},
+    "portable": [
+     [
+      "pair w4 w14 h6"
+     ],
+     [
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree"
+     ]
+    ],
+    "seconds": 0.77,
+    "peak_rss_mb": 35.6,
+    "program_sha256": "ddf9c3dd6acdd95bdcf222b483191775ff413b679bc28a004c97c3b5a40ae60b",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s3_link3_pair_w2_w10_h13",
+   "title": "S3: the linking number of pair 5 of linked_pairs.txt (stored lk +1), in 20 projections",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s3/link3",
+   "args": [
+    "-a",
+    "0.01",
+    "--nrel",
+    "20",
+    "--hr",
+    "2.6",
+    "--pair",
+    "2",
+    "10",
+    "13"
+   ],
+   "inputs": [
+    "legacy/s3/subst_4.00_9.50_t3.txt"
+   ],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stdout",
+     "regex": "^(pair w\\d+ w\\d+ h\\d+) at acc"
+    },
+    {
+     "stream": "stdout",
+     "regex": "projection +\\d+: lk ([+-]\\d+) +\\(A over B and B over A (\\w+)\\)"
+    }
+   ],
+   "linked_pairs_line": 5,
+   "stored_lk": "+1",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_link3_pair_w2_w10_h13/stdout.txt",
+     "sha256": "cb0c802ed7c79774fd8a1bdd2ec46be029740b3b3560d93d3975d15ceb3da493",
+     "lines": 21
+    },
+    "stderr": {
+     "file": "s3_link3_pair_w2_w10_h13/stderr.txt",
+     "sha256": "a1ed60118febe3c82a4917bafe0cf0d4dedce2d1fee49d738edff73c503118eb",
+     "lines": 1
+    },
+    "outputs": {},
+    "portable": [
+     [
+      "pair w2 w10 h13"
+     ],
+     [
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree"
+     ]
+    ],
+    "seconds": 0.79,
+    "peak_rss_mb": 36.8,
+    "program_sha256": "ddf9c3dd6acdd95bdcf222b483191775ff413b679bc28a004c97c3b5a40ae60b",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s3_link3_pair_w4_w4_h13",
+   "title": "S3: the linking number of pair 6 of linked_pairs.txt (stored lk -1), in 20 projections",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s3/link3",
+   "args": [
+    "-a",
+    "0.01",
+    "--nrel",
+    "20",
+    "--hr",
+    "2.6",
+    "--pair",
+    "4",
+    "4",
+    "13"
+   ],
+   "inputs": [
+    "legacy/s3/subst_4.00_9.50_t3.txt"
+   ],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stdout",
+     "regex": "^(pair w\\d+ w\\d+ h\\d+) at acc"
+    },
+    {
+     "stream": "stdout",
+     "regex": "projection +\\d+: lk ([+-]\\d+) +\\(A over B and B over A (\\w+)\\)"
+    }
+   ],
+   "linked_pairs_line": 6,
+   "stored_lk": "-1",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_link3_pair_w4_w4_h13/stdout.txt",
+     "sha256": "3fb6487d9b37920f06ed8260cd7f84156d3813ead5093820afce19c3a50997c5",
+     "lines": 21
+    },
+    "stderr": {
+     "file": "s3_link3_pair_w4_w4_h13/stderr.txt",
+     "sha256": "a1ed60118febe3c82a4917bafe0cf0d4dedce2d1fee49d738edff73c503118eb",
+     "lines": 1
+    },
+    "outputs": {},
+    "portable": [
+     [
+      "pair w4 w4 h13"
+     ],
+     [
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree"
+     ]
+    ],
+    "seconds": 0.85,
+    "peak_rss_mb": 37.8,
+    "program_sha256": "ddf9c3dd6acdd95bdcf222b483191775ff413b679bc28a004c97c3b5a40ae60b",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s3_link3_pair_w10_w3_h13",
+   "title": "S3: the linking number of pair 7 of linked_pairs.txt (stored lk -1), in 20 projections",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s3/link3",
+   "args": [
+    "-a",
+    "0.01",
+    "--nrel",
+    "20",
+    "--hr",
+    "2.6",
+    "--pair",
+    "10",
+    "3",
+    "13"
+   ],
+   "inputs": [
+    "legacy/s3/subst_4.00_9.50_t3.txt"
+   ],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stdout",
+     "regex": "^(pair w\\d+ w\\d+ h\\d+) at acc"
+    },
+    {
+     "stream": "stdout",
+     "regex": "projection +\\d+: lk ([+-]\\d+) +\\(A over B and B over A (\\w+)\\)"
+    }
+   ],
+   "linked_pairs_line": 7,
+   "stored_lk": "-1",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_link3_pair_w10_w3_h13/stdout.txt",
+     "sha256": "12603eed7f285ad54bece5413fb4a1396be3d69e206a350fe1ba793c1ba139f3",
+     "lines": 21
+    },
+    "stderr": {
+     "file": "s3_link3_pair_w10_w3_h13/stderr.txt",
+     "sha256": "a1ed60118febe3c82a4917bafe0cf0d4dedce2d1fee49d738edff73c503118eb",
+     "lines": 1
+    },
+    "outputs": {},
+    "portable": [
+     [
+      "pair w10 w3 h13"
+     ],
+     [
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree"
+     ]
+    ],
+    "seconds": 0.79,
+    "peak_rss_mb": 35.5,
+    "program_sha256": "ddf9c3dd6acdd95bdcf222b483191775ff413b679bc28a004c97c3b5a40ae60b",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s3_link3_pair_w10_w4_h13",
+   "title": "S3: the linking number of pair 8 of linked_pairs.txt (stored lk +1), in 20 projections",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s3/link3",
+   "args": [
+    "-a",
+    "0.01",
+    "--nrel",
+    "20",
+    "--hr",
+    "2.6",
+    "--pair",
+    "10",
+    "4",
+    "13"
+   ],
+   "inputs": [
+    "legacy/s3/subst_4.00_9.50_t3.txt"
+   ],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stdout",
+     "regex": "^(pair w\\d+ w\\d+ h\\d+) at acc"
+    },
+    {
+     "stream": "stdout",
+     "regex": "projection +\\d+: lk ([+-]\\d+) +\\(A over B and B over A (\\w+)\\)"
+    }
+   ],
+   "linked_pairs_line": 8,
+   "stored_lk": "+1",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_link3_pair_w10_w4_h13/stdout.txt",
+     "sha256": "424bfbe5521fe1e4d5733c5f3b85df975bcc973d095e4408fdf4c985e6d5033c",
+     "lines": 21
+    },
+    "stderr": {
+     "file": "s3_link3_pair_w10_w4_h13/stderr.txt",
+     "sha256": "a1ed60118febe3c82a4917bafe0cf0d4dedce2d1fee49d738edff73c503118eb",
+     "lines": 1
+    },
+    "outputs": {},
+    "portable": [
+     [
+      "pair w10 w4 h13"
+     ],
+     [
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree"
+     ]
+    ],
+    "seconds": 1.03,
+    "peak_rss_mb": 41.4,
+    "program_sha256": "ddf9c3dd6acdd95bdcf222b483191775ff413b679bc28a004c97c3b5a40ae60b",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s3_link3_pair_w13_w10_h13",
+   "title": "S3: the linking number of pair 9 of linked_pairs.txt (stored lk +1), in 20 projections",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s3/link3",
+   "args": [
+    "-a",
+    "0.01",
+    "--nrel",
+    "20",
+    "--hr",
+    "2.6",
+    "--pair",
+    "13",
+    "10",
+    "13"
+   ],
+   "inputs": [
+    "legacy/s3/subst_4.00_9.50_t3.txt"
+   ],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stdout",
+     "regex": "^(pair w\\d+ w\\d+ h\\d+) at acc"
+    },
+    {
+     "stream": "stdout",
+     "regex": "projection +\\d+: lk ([+-]\\d+) +\\(A over B and B over A (\\w+)\\)"
+    }
+   ],
+   "linked_pairs_line": 9,
+   "stored_lk": "+1",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_link3_pair_w13_w10_h13/stdout.txt",
+     "sha256": "7564c81bae9aa5e6ba51cd6d8914ca474cc8ee778f495b7381fa1866e85e6852",
+     "lines": 21
+    },
+    "stderr": {
+     "file": "s3_link3_pair_w13_w10_h13/stderr.txt",
+     "sha256": "a1ed60118febe3c82a4917bafe0cf0d4dedce2d1fee49d738edff73c503118eb",
+     "lines": 1
+    },
+    "outputs": {},
+    "portable": [
+     [
+      "pair w13 w10 h13"
+     ],
+     [
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree"
+     ]
+    ],
+    "seconds": 0.76,
+    "peak_rss_mb": 36.7,
+    "program_sha256": "ddf9c3dd6acdd95bdcf222b483191775ff413b679bc28a004c97c3b5a40ae60b",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s3_link3_pair_w17_w4_h13",
+   "title": "S3: the linking number of pair 10 of linked_pairs.txt (stored lk +1), in 20 projections",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s3/link3",
+   "args": [
+    "-a",
+    "0.01",
+    "--nrel",
+    "20",
+    "--hr",
+    "2.6",
+    "--pair",
+    "17",
+    "4",
+    "13"
+   ],
+   "inputs": [
+    "legacy/s3/subst_4.00_9.50_t3.txt"
+   ],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stdout",
+     "regex": "^(pair w\\d+ w\\d+ h\\d+) at acc"
+    },
+    {
+     "stream": "stdout",
+     "regex": "projection +\\d+: lk ([+-]\\d+) +\\(A over B and B over A (\\w+)\\)"
+    }
+   ],
+   "linked_pairs_line": 10,
+   "stored_lk": "+1",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_link3_pair_w17_w4_h13/stdout.txt",
+     "sha256": "79746ef7db50a9b548d45a519b985be976fac8d3cea08e128c021db9b0b6202a",
+     "lines": 21
+    },
+    "stderr": {
+     "file": "s3_link3_pair_w17_w4_h13/stderr.txt",
+     "sha256": "a1ed60118febe3c82a4917bafe0cf0d4dedce2d1fee49d738edff73c503118eb",
+     "lines": 1
+    },
+    "outputs": {},
+    "portable": [
+     [
+      "pair w17 w4 h13"
+     ],
+     [
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree",
+      "+1 | agree"
+     ]
+    ],
+    "seconds": 0.73,
+    "peak_rss_mb": 37.9,
+    "program_sha256": "ddf9c3dd6acdd95bdcf222b483191775ff413b679bc28a004c97c3b5a40ae60b",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s3_link3_pair_w2_w12_h16",
+   "title": "S3: the linking number of pair 11 of linked_pairs.txt (stored lk -1), in 20 projections",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s3/link3",
+   "args": [
+    "-a",
+    "0.01",
+    "--nrel",
+    "20",
+    "--hr",
+    "2.6",
+    "--pair",
+    "2",
+    "12",
+    "16"
+   ],
+   "inputs": [
+    "legacy/s3/subst_4.00_9.50_t3.txt"
+   ],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stdout",
+     "regex": "^(pair w\\d+ w\\d+ h\\d+) at acc"
+    },
+    {
+     "stream": "stdout",
+     "regex": "projection +\\d+: lk ([+-]\\d+) +\\(A over B and B over A (\\w+)\\)"
+    }
+   ],
+   "linked_pairs_line": 11,
+   "stored_lk": "-1",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_link3_pair_w2_w12_h16/stdout.txt",
+     "sha256": "0fbdb73548a59cb396676509aa3efe5e5f578deb292b3ab5974a6dc133ca503f",
+     "lines": 21
+    },
+    "stderr": {
+     "file": "s3_link3_pair_w2_w12_h16/stderr.txt",
+     "sha256": "a1ed60118febe3c82a4917bafe0cf0d4dedce2d1fee49d738edff73c503118eb",
+     "lines": 1
+    },
+    "outputs": {},
+    "portable": [
+     [
+      "pair w2 w12 h16"
+     ],
+     [
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree"
+     ]
+    ],
+    "seconds": 1.04,
+    "peak_rss_mb": 35.5,
+    "program_sha256": "ddf9c3dd6acdd95bdcf222b483191775ff413b679bc28a004c97c3b5a40ae60b",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s3_link3_pair_w12_w4_h16",
+   "title": "S3: the linking number of pair 12 of linked_pairs.txt (stored lk -1), in 20 projections",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s3/link3",
+   "args": [
+    "-a",
+    "0.01",
+    "--nrel",
+    "20",
+    "--hr",
+    "2.6",
+    "--pair",
+    "12",
+    "4",
+    "16"
+   ],
+   "inputs": [
+    "legacy/s3/subst_4.00_9.50_t3.txt"
+   ],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stdout",
+     "regex": "^(pair w\\d+ w\\d+ h\\d+) at acc"
+    },
+    {
+     "stream": "stdout",
+     "regex": "projection +\\d+: lk ([+-]\\d+) +\\(A over B and B over A (\\w+)\\)"
+    }
+   ],
+   "linked_pairs_line": 12,
+   "stored_lk": "-1",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_link3_pair_w12_w4_h16/stdout.txt",
+     "sha256": "adc16d1920b094a66b85a82ed47e8c95cad3cbb229d60328316b33596c97fa48",
+     "lines": 21
+    },
+    "stderr": {
+     "file": "s3_link3_pair_w12_w4_h16/stderr.txt",
+     "sha256": "a1ed60118febe3c82a4917bafe0cf0d4dedce2d1fee49d738edff73c503118eb",
+     "lines": 1
+    },
+    "outputs": {},
+    "portable": [
+     [
+      "pair w12 w4 h16"
+     ],
+     [
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree"
+     ]
+    ],
+    "seconds": 0.85,
+    "peak_rss_mb": 35.1,
+    "program_sha256": "ddf9c3dd6acdd95bdcf222b483191775ff413b679bc28a004c97c3b5a40ae60b",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s3_link3_pair_w13_w12_h16",
+   "title": "S3: the linking number of pair 13 of linked_pairs.txt (stored lk -1), in 20 projections",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s3/link3",
+   "args": [
+    "-a",
+    "0.01",
+    "--nrel",
+    "20",
+    "--hr",
+    "2.6",
+    "--pair",
+    "13",
+    "12",
+    "16"
+   ],
+   "inputs": [
+    "legacy/s3/subst_4.00_9.50_t3.txt"
+   ],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stdout",
+     "regex": "^(pair w\\d+ w\\d+ h\\d+) at acc"
+    },
+    {
+     "stream": "stdout",
+     "regex": "projection +\\d+: lk ([+-]\\d+) +\\(A over B and B over A (\\w+)\\)"
+    }
+   ],
+   "linked_pairs_line": 13,
+   "stored_lk": "-1",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_link3_pair_w13_w12_h16/stdout.txt",
+     "sha256": "565d3937ebe6e662e1048584a19e63da63134964607750ccab31184cfd2b85e6",
+     "lines": 21
+    },
+    "stderr": {
+     "file": "s3_link3_pair_w13_w12_h16/stderr.txt",
+     "sha256": "a1ed60118febe3c82a4917bafe0cf0d4dedce2d1fee49d738edff73c503118eb",
+     "lines": 1
+    },
+    "outputs": {},
+    "portable": [
+     [
+      "pair w13 w12 h16"
+     ],
+     [
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree",
+      "-1 | agree"
+     ]
+    ],
+    "seconds": 0.75,
+    "peak_rss_mb": 35.5,
+    "program_sha256": "ddf9c3dd6acdd95bdcf222b483191775ff413b679bc28a004c97c3b5a40ae60b",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s3_link3_scan",
+   "title": "S3: the link3 scan that made link_run2.txt (20 relations, B(2.6), accuracy 0.01)",
+   "fast": false,
+   "heavy": true,
+   "program": "legacy/s3/link3",
+   "args": [
+    "-a",
+    "0.01",
+    "--nrel",
+    "20",
+    "--hr",
+    "2.6"
+   ],
+   "inputs": [
+    "legacy/s3/subst_4.00_9.50_t3.txt"
+   ],
+   "timeout": 1200,
+   "mkdirs": [
+    "pictures"
+   ],
+   "stdout_same_as": "legacy/s3/link_run2.txt",
+   "portable": [
+    {
+     "stream": "stdout",
+     "regex": "^(w\\d+ w\\d+ h\\d+) \\S+  lk ([+-]\\d+) "
+    },
+    {
+     "stream": "stdout",
+     "regex": "^(w\\d+ w\\d+ h\\d+):.*  (STABLE|not stable)  \\| translated by g: (.*?)  (ALL AGREE|MISMATCH)$"
+    },
+    {
+     "stream": "stderr",
+     "regex": "^tested (\\d+) pairs in .*?: (\\d+) nonzero, (\\d+) over/under disagreements, (\\d+) pairs where two projections disagree"
+    }
+   ],
+   "note": "legacy/s3/README.md gives it as the command that made link_run2.txt (3 to 6 minutes)",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s3_link3_scan/stdout.txt",
+     "sha256": "c05e69e60ac9484f63557c8059f4b05d175b84655dd21cb92b9f1aee1f8287f8",
+     "lines": 28
+    },
+    "stderr": {
+     "file": "s3_link3_scan/stderr.txt",
+     "sha256": "df669182d694d663c74eaa6a5341079bacda1eaf9a9373387ccf74dff53c3d5b",
+     "lines": 31
+    },
+    "outputs": {
+     "pictures/link_w2_w10_h13.png": {
+      "sha256": "468d7405c4912d3fff67262629d97e5243200f8a404adedf0613af5c539ca3f8",
+      "size": 56686,
+      "small_copy": "s3_link3_scan/small_pictures_link_w2_w10_h13.jpg"
+     },
+     "pictures/link_w4_w10_h1.png": {
+      "sha256": "c094dbf573791e908b0b4843e936f858e8efbb9b5be0a29f0cb05ce819230fd4",
+      "size": 54560,
+      "small_copy": "s3_link3_scan/small_pictures_link_w4_w10_h1.jpg"
+     },
+     "pictures/link_w4_w12_h1.png": {
+      "sha256": "f3a9c0fe5e35b4df3893ed9bf80b0581e197625f06a79776c491bb1b22e640eb",
+      "size": 50914,
+      "small_copy": "s3_link3_scan/small_pictures_link_w4_w12_h1.jpg"
+     },
+     "pictures/link_w4_w14_h6.png": {
+      "sha256": "65e28455d483f86647de20a505c7edfd193cd5f2f658bbef264ecd03c5c8bf32",
+      "size": 55437,
+      "small_copy": "s3_link3_scan/small_pictures_link_w4_w14_h6.jpg"
+     },
+     "pictures/link_w4_w17_h1.png": {
+      "sha256": "a0b3ecb316283d7d0201547186c16fd8eacf287856cbdfa703e42c572778c337",
+      "size": 56612,
+      "small_copy": "s3_link3_scan/small_pictures_link_w4_w17_h1.jpg"
+     },
+     "pictures/link_w4_w4_h13.png": {
+      "sha256": "8c8a73c3f00314d06364d1084f02880bb08a3184934934bdf2810dd39bf33717",
+      "size": 79672,
+      "small_copy": "s3_link3_scan/small_pictures_link_w4_w4_h13.jpg"
+     }
+    },
+    "portable": [
+     [
+      "w4 w10 h1 | +1",
+      "w4 w12 h1 | -1",
+      "w4 w17 h1 | +1",
+      "w4 w14 h6 | +1",
+      "w2 w10 h13 | +1",
+      "w4 w4 h13 | -1",
+      "w10 w3 h13 | -1",
+      "w10 w4 h13 | +1",
+      "w13 w10 h13 | +1",
+      "w17 w4 h13 | +1",
+      "w2 w12 h16 | -1",
+      "w12 w4 h16 | -1",
+      "w13 w12 h16 | -1"
+     ],
+     [
+      "w4 w10 h1 | STABLE | +1 +1 +1 +1 | ALL AGREE",
+      "w4 w12 h1 | STABLE | -1 -1 -1 -1 | ALL AGREE",
+      "w4 w17 h1 | STABLE | +1 +1 +1 +1 | ALL AGREE",
+      "w4 w14 h6 | STABLE | +1 +1 +1 +1 | ALL AGREE",
+      "w2 w10 h13 | STABLE | +1 +1 +1 +1 | ALL AGREE",
+      "w4 w4 h13 | STABLE | -1 -1 -1 -1 | ALL AGREE",
+      "w10 w3 h13 | STABLE | -1 -1 -1 -1 | ALL AGREE",
+      "w10 w4 h13 | STABLE | +1 +1 +1 +1 | ALL AGREE",
+      "w13 w10 h13 | STABLE | +1 +1 +1 +1 | ALL AGREE",
+      "w17 w4 h13 | STABLE | +1 +1 +1 +1 | ALL AGREE",
+      "w2 w12 h16 | STABLE | -1 -1 -1 -1 | ALL AGREE",
+      "w12 w4 h16 | STABLE | -1 -1 -1 -1 | ALL AGREE",
+      "w13 w12 h16 | STABLE | -1 -1 -1 -1 | ALL AGREE"
+     ],
+     [
+      "7600 | 13 | 0 | 0"
+     ]
+    ],
+    "stdout_identical_to_same_as": true,
+    "seconds": 498.11,
+    "peak_rss_mb": 455.2,
+    "program_sha256": "ddf9c3dd6acdd95bdcf222b483191775ff413b679bc28a004c97c3b5a40ae60b",
+    "recorded_from": "one run"
+   }
+  },
+  {
+   "id": "s4_chz5_selftest",
+   "title": "S4: chz5 selftest (the relations of W and the cocycle)",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s4/chz5",
+   "args": [
+    "selftest"
+   ],
+   "inputs": [],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stdout",
+     "regex": "^(selftest: .*)$"
+    }
+   ],
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s4_chz5_selftest/stdout.txt",
+     "sha256": "f622302a63bc8464c22f88189ca7e91ae01a4f492d433696ec4921664904f0b3",
+     "lines": 1
+    },
+    "stderr": {
+     "file": "s4_chz5_selftest/stderr.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "outputs": {},
+    "portable": [
+     [
+      "selftest: 160 orthogonal pairs, cocycle on every square from all 16 states; ok"
+     ]
+    ],
+    "seconds": 0.02,
+    "peak_rss_mb": 1.3,
+    "program_sha256": "1c4f82ef29676741f4dafbedeb676222fef5010687f5fb1f504b440277570199",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s4_chz5_ball3",
+   "title": "S4: chz5 ball 3, the tiles of B(3) and the cocycle check",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s4/chz5",
+   "args": [
+    "ball",
+    "3"
+   ],
+   "inputs": [],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stdout",
+     "regex": "\\(mu, h\\) inconsistencies (\\d+)"
+    }
+   ],
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s4_chz5_ball3/stdout.txt",
+     "sha256": "a8ff93aeb4d2fa55b140e0cf7833ce0b964970a3414c32fa780a4e3b722ac6e5",
+     "lines": 6
+    },
+    "stderr": {
+     "file": "s4_chz5_ball3/stderr.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "outputs": {},
+    "portable": [
+     [
+      "0"
+     ]
+    ],
+    "seconds": 0.18,
+    "peak_rss_mb": 29.2,
+    "program_sha256": "1c4f82ef29676741f4dafbedeb676222fef5010687f5fb1f504b440277570199",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s4_chz5_kernel",
+   "title": "S4: the certificate that S_c generates K (C = 2.3, R = 4.5, rho = 3); writes the substitution file",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s4/chz5",
+   "args": [
+    "kernel",
+    "2.3",
+    "4.5",
+    "3"
+   ],
+   "inputs": [],
+   "timeout": 300,
+   "same_as": {
+    "subst5_2.30_4.50_t1.txt": "legacy/s4/subst5_2.30_4.50_t1.txt"
+   },
+   "portable": [
+    {
+     "stream": "stdout",
+     "regex": "\\(mu, h\\) inconsistencies (\\d+)"
+    },
+    {
+     "stream": "stdout",
+     "regex": "^\\|S_c\\| = (\\d+) kernel elements"
+    },
+    {
+     "stream": "stdout",
+     "regex": "^roofs (up|down) +\\(t\\S* s t\\S*\\): (\\d+ / \\d+) found"
+    },
+    {
+     "stream": "stdout",
+     "regex": "^(Schreier generators .*: \\d+ / \\d+)"
+    },
+    {
+     "stream": "stdout",
+     "regex": "^(CERTIFICATE that S_c generates K: .*)$"
+    },
+    {
+     "stream": "stdout",
+     "regex": "^(wrote \\S+)"
+    }
+   ],
+   "note": "\"chz5 kernel 2.3 4.5 3\" is C = 2.3, R = 4.5, RHO = 3 with the default phi(t) = 1, so it writes subst5_2.30_4.50_t1.txt",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s4_chz5_kernel/stdout.txt",
+     "sha256": "f805afa85ffd04e0139445e02e4053664a5df7ca95c5eea199b88325df54d7d7",
+     "lines": 32
+    },
+    "stderr": {
+     "file": "s4_chz5_kernel/stderr.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "outputs": {
+     "subst5_2.30_4.50_t1.txt": {
+      "sha256": "b6793be8aa52ade278205aa1fc9f414b3861135f5f0cf75c1d6a4714361e2a26",
+      "size": 5744,
+      "same_as": "legacy/s4/subst5_2.30_4.50_t1.txt",
+      "identical_to_same_as": true
+     }
+    },
+    "portable": [
+     [
+      "0"
+     ],
+     [
+      "80"
+     ],
+     [
+      "up | 80 / 80",
+      "down | 80 / 80"
+     ],
+     [
+      "Schreier generators g of Gamma with g t^-phi(g) in <S_c>: 192 / 192"
+     ],
+     [
+      "CERTIFICATE that S_c generates K: YES"
+     ],
+     [
+      "wrote subst5_2.30_4.50_t1.txt"
+     ]
+    ],
+    "seconds": 5.0,
+    "peak_rss_mb": 144.2,
+    "program_sha256": "1c4f82ef29676741f4dafbedeb676222fef5010687f5fb1f504b440277570199",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s4_chz5_kernel_steep",
+   "title": "S4: the certificate with a steep t (C = 2.3, R = 4.2, rho = 3, phi(t) = 2): roofs found by the descent, and the roofs of the steep t",
+   "fast": true,
+   "heavy": false,
+   "program": "legacy/s4/chz5",
+   "args": [
+    "kernel",
+    "2.3",
+    "4.2",
+    "3",
+    "2"
+   ],
+   "inputs": [],
+   "timeout": 300,
+   "portable": [
+    {
+     "stream": "stdout",
+     "regex": "\\(mu, h\\) inconsistencies (\\d+)"
+    },
+    {
+     "stream": "stdout",
+     "regex": "^\\|S_c\\| = (\\d+) kernel elements"
+    },
+    {
+     "stream": "stdout",
+     "regex": "^roofs (up|down) +\\(t\\S* s t\\S*\\): (\\d+ / \\d+) found"
+    },
+    {
+     "stream": "stdout",
+     "regex": "^(Schreier generators .*: \\d+ / \\d+)"
+    },
+    {
+     "stream": "stdout",
+     "regex": "^(CERTIFICATE that S_c generates K: .*)$"
+    },
+    {
+     "stream": "stdout",
+     "regex": "^steep roofs up (\\d+ / \\d+), down (\\d+ / \\d+)"
+    },
+    {
+     "stream": "stdout",
+     "regex": "^(wrote \\S+)"
+    }
+   ],
+   "note": "added on 2026-10-26 (resetting the descent counts before the steep roofs would pass every other fast test): the only run of chz5 with a steep t, and with descents (the K-store of R = 4.2 misses some roofs). Recorded from the legacy chz5, byte for byte the program of the first recording. The descent counts are compared in exact mode only: the descent is best first by float distances.",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s4_chz5_kernel_steep/stdout.txt",
+     "sha256": "43edeb74ef0d9f8ade36195bc913c9fbb32e2af917f144999389b80bc5e5bc85",
+     "lines": 32
+    },
+    "stderr": {
+     "file": "s4_chz5_kernel_steep/stderr.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "outputs": {
+     "subst5_2.30_4.20_t2.txt": {
+      "sha256": "ef683ef55a38f3dffee96753774079dc84dc2933bc4a9ccff96118448dc2ce3b",
+      "size": 8105,
+      "stored": "s4_chz5_kernel_steep/files/subst5_2.30_4.20_t2.txt"
+     }
+    },
+    "portable": [
+     [
+      "0"
+     ],
+     [
+      "80"
+     ],
+     [
+      "up | 80 / 80",
+      "down | 80 / 80"
+     ],
+     [
+      "Schreier generators g of Gamma with g t^-phi(g) in <S_c>: 192 / 192"
+     ],
+     [
+      "CERTIFICATE that S_c generates K: YES"
+     ],
+     [
+      "80 / 80 | 80 / 80"
+     ],
+     [
+      "wrote subst5_2.30_4.20_t2.txt"
+     ]
+    ],
+    "seconds": 1.49,
+    "peak_rss_mb": 55.1,
+    "program_sha256": "1c4f82ef29676741f4dafbedeb676222fef5010687f5fb1f504b440277570199",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s4_zipper5_base",
+   "title": "S4: zipper5, the base arcs, accuracy 0.03, PNG 600 px",
+   "fast": true,
+   "heavy": false,
+   "program": "apps/s4/zipper5",
+   "args": [
+    "-f",
+    "subst5_2.30_4.50_t1.txt",
+    "-a",
+    "0.03",
+    "-s",
+    "600",
+    "-o",
+    "base.png"
+   ],
+   "inputs": [
+    "legacy/s4/subst5_2.30_4.50_t1.txt"
+   ],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stderr",
+     "regex": "^\\S+: \\|S\\| = (\\d+) \\((\\d+) base arcs\\), roofs checked exactly"
+    }
+   ],
+   "note": "recorded again on 2026-10-26 from apps/s4/zipper5 with the tips: each leaf whose letter lies on a parabolic cycle of the roofs is drawn through the cusp points of the cycles, exact points of the true curve (src/render/tips.h), so the spikes into the cusps reach their tips. The leaves are the same; the text has two new lines (the tips of each zipper) and \", N points at tips\" in each line of the build. The picture before was base.png with SHA-256 07dc617e144a8b06d7df375a9610908913ef7587568c2d5960b1a3ecf8d573f3 (71417 bytes). Before that: recorded again on 2026-10-26 from the new zipper5, apps/s4/zipper5, whose word reader reads facet 1. The legacy zipper5 drops facet 1 from every word, so it drew this picture from misread letters, with 47 base arcs where the data have 44; that picture, the reference until then, was base.png with SHA-256 9ebed1ef59d010897f18501bd1a5d3361a047f45d542a3b843a9b0c3b2afef42 (84329 bytes). The portable pattern is the count of letters and of base arcs. --programs keeps the run as it is, since its program is already the new one.",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s4_zipper5_base/stdout.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "stderr": {
+     "file": "s4_zipper5_base/stderr.txt",
+     "sha256": "6261ecb798f34de26183d5257b2a7bb156260e00aeec8c22dc4f08b0ad64fa95",
+     "lines": 7
+    },
+    "outputs": {
+     "base.png": {
+      "sha256": "8e08e5f2bd496ba3edcb2787eb915233a7ae281019388e437095e3a7e6425879",
+      "size": 83482,
+      "small_copy": "s4_zipper5_base/small_base.jpg"
+     }
+    },
+    "portable": [
+     [
+      "80 | 44"
+     ]
+    ],
+    "seconds": 0.08,
+    "peak_rss_mb": 28.9,
+    "program_sha256": "552f4b45e812a6523b988e4bee78ad0112ea9df19cc507be7c3f502e95e17a01",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s4_zipper5_r18",
+   "title": "S4: zipper5, R = 1.8, accuracy 0.02, PNG 600 px",
+   "fast": true,
+   "heavy": false,
+   "program": "apps/s4/zipper5",
+   "args": [
+    "-f",
+    "subst5_2.30_4.50_t1.txt",
+    "-R",
+    "1.8",
+    "-a",
+    "0.02",
+    "-s",
+    "600",
+    "-o",
+    "r18.png"
+   ],
+   "inputs": [
+    "legacy/s4/subst5_2.30_4.50_t1.txt"
+   ],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stderr",
+     "regex": "^\\S+: \\|S\\| = (\\d+) \\((\\d+) base arcs\\), roofs checked exactly"
+    }
+   ],
+   "note": "recorded again on 2026-10-26 from apps/s4/zipper5 with the tips: each leaf whose letter lies on a parabolic cycle of the roofs is drawn through the cusp points of the cycles, exact points of the true curve (src/render/tips.h), so the spikes into the cusps reach their tips. The leaves are the same; the text has two new lines (the tips of each zipper) and \", N points at tips\" in each line of the build. The picture before was r18.png with SHA-256 ad9cc57d1c7dd46cfc4c1cda97211aca447975acfd661ec11219af5a06e05182 (268769 bytes). Before that: recorded again on 2026-10-26 from the new zipper5, apps/s4/zipper5, whose word reader reads facet 1. The legacy zipper5 drops facet 1 from every word, so it drew this picture from misread letters, with 47 base arcs where the data have 44; that picture, the reference until then, was r18.png with SHA-256 6cdfe3c92cfe9707f72b16171e1c3fbe2f0a2004ade8a8a942c815445c694821 (293987 bytes). The portable pattern is the count of letters and of base arcs. --programs keeps the run as it is, since its program is already the new one.",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s4_zipper5_r18/stdout.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "stderr": {
+     "file": "s4_zipper5_r18/stderr.txt",
+     "sha256": "80d68d2cc923f27f09d10ccad1be751151632050df62ff92b6947e6022c36e6a",
+     "lines": 7
+    },
+    "outputs": {
+     "r18.png": {
+      "sha256": "3252c2e2397c61e54246c148b64ed30117891f1e7cfc2138c66e2b5a4582cbec",
+      "size": 289264,
+      "small_copy": "s4_zipper5_r18/small_r18.jpg"
+     }
+    },
+    "portable": [
+     [
+      "80 | 44"
+     ]
+    ],
+    "seconds": 1.08,
+    "peak_rss_mb": 341.9,
+    "program_sha256": "552f4b45e812a6523b988e4bee78ad0112ea9df19cc507be7c3f502e95e17a01",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s4_zipper5_t2",
+   "title": "S4: zipper5 on subst5_2.30_4.50_t2.txt, whose t (1 3 2 8) contains facet 1: the base arcs, accuracy 0.03, PNG 600 px",
+   "fast": true,
+   "heavy": false,
+   "program": "apps/s4/zipper5",
+   "args": [
+    "-f",
+    "subst5_2.30_4.50_t2.txt",
+    "-a",
+    "0.03",
+    "-s",
+    "600",
+    "-o",
+    "t2.png"
+   ],
+   "inputs": [
+    "legacy/s4/subst5_2.30_4.50_t2.txt"
+   ],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stderr",
+     "regex": "^\\S+: \\|S\\| = (\\d+) \\((\\d+) base arcs\\), roofs checked exactly"
+    }
+   ],
+   "note": "recorded again on 2026-10-26 from apps/s4/zipper5 with the tips: each leaf whose letter lies on a parabolic cycle of the roofs is drawn through the cusp points of the cycles, exact points of the true curve (src/render/tips.h), so the spikes into the cusps reach their tips. The leaves are the same; the text has two new lines (the tips of each zipper) and \", N points at tips\" in each line of the build. The picture before was t2.png with SHA-256 2da2b635d85d21f865b7b2c28a79e242a6fcc2cfb4f85456d84a52c3258b31e2 (58414 bytes). Before that: added on 2026-10-26 to pin the reading of t: the t of this file, 1 3 2 8, contains facet 1, which the legacy reader dropped (it read r3 r2 r8, which is not even in Gamma); the other S4 runs read the _t1 file, whose t has no facet 1. Recorded from the new zipper5, apps/s4/zipper5. Measured first: 0.06 s and 17 MB (the legacy zipper5 on the same command: 47 base arcs, t2.png with SHA-256 9b124802dc620ff9a272dd32dcba61d322b41ce00b964cd10836d877cb8fb5e8).",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s4_zipper5_t2/stdout.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "stderr": {
+     "file": "s4_zipper5_t2/stderr.txt",
+     "sha256": "73950a388d2e60b7f38af63a2b566211a4d771bf79ce278ddf6c25308c024203",
+     "lines": 7
+    },
+    "outputs": {
+     "t2.png": {
+      "sha256": "928702530f62447b964e3f1a40411c1b1a8f201a2ea40b14f796626d75c2d95b",
+      "size": 62443,
+      "small_copy": "s4_zipper5_t2/small_t2.jpg"
+     }
+    },
+    "portable": [
+     [
+      "80 | 44"
+     ]
+    ],
+    "seconds": 0.06,
+    "peak_rss_mb": 18.7,
+    "program_sha256": "552f4b45e812a6523b988e4bee78ad0112ea9df19cc507be7c3f502e95e17a01",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s4_zipper5_base_r0",
+   "title": "S4: zipper5 on the default file (subst5_2.30_4.50_t1_r0.txt), the base arcs, accuracy 0.03, PNG 600 px",
+   "fast": true,
+   "heavy": false,
+   "program": "apps/s4/zipper5",
+   "args": [
+    "-a",
+    "0.03",
+    "-s",
+    "600",
+    "-o",
+    "base.png"
+   ],
+   "inputs": [
+    "data/s4/subst5_2.30_4.50_t1_r0.txt"
+   ],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stderr",
+     "regex": "^\\S+: \\|S\\| = (\\d+) \\((\\d+) base arcs\\), roofs checked exactly"
+    }
+   ],
+   "note": "The default file of zipper5 is subst5_2.30_4.50_t1_r0.txt (data/s4/: chz5 kernel 2.3 4.5 3 --roofs, the t of subst5_2.30_4.50_t1.txt with the roofs chosen at no extra length). The same command as s4_zipper5_base, which names subst5_2.30_4.50_t1.txt with -f and so keeps its record; here there is no -f, so the run tests the default. Recorded from apps/s4/zipper5.",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s4_zipper5_base_r0/stdout.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "stderr": {
+     "file": "s4_zipper5_base_r0/stderr.txt",
+     "sha256": "db621f623176eadbfb649a7851cbf8682e08f15521b6c613e5872c94247dad88",
+     "lines": 7
+    },
+    "outputs": {
+     "base.png": {
+      "sha256": "f74b802fa98904be1c13aaa0dc5768fe43f670a53d5e1ffd507301f7312cd686",
+      "size": 83937,
+      "small_copy": "s4_zipper5_base_r0/small_base.jpg"
+     }
+    },
+    "portable": [
+     [
+      "80 | 44"
+     ]
+    ],
+    "seconds": 0.06,
+    "peak_rss_mb": 25.3,
+    "program_sha256": "1383628fef0657c8b13d0ad649612ac36c5a66c76c168724c2659f7676d6c8a0",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s4_zipper5_r18_r0",
+   "title": "S4: zipper5 on the default file (subst5_2.30_4.50_t1_r0.txt), R = 1.8, accuracy 0.02, PNG 600 px",
+   "fast": true,
+   "heavy": false,
+   "program": "apps/s4/zipper5",
+   "args": [
+    "-R",
+    "1.8",
+    "-a",
+    "0.02",
+    "-s",
+    "600",
+    "-o",
+    "r18.png"
+   ],
+   "inputs": [
+    "data/s4/subst5_2.30_4.50_t1_r0.txt"
+   ],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stderr",
+     "regex": "^\\S+: \\|S\\| = (\\d+) \\((\\d+) base arcs\\), roofs checked exactly"
+    }
+   ],
+   "note": "The default file of zipper5 is subst5_2.30_4.50_t1_r0.txt (data/s4/: chz5 kernel 2.3 4.5 3 --roofs, the t of subst5_2.30_4.50_t1.txt with the roofs chosen at no extra length). The same command as s4_zipper5_r18, which names subst5_2.30_4.50_t1.txt with -f and so keeps its record; here there is no -f, so the run tests the default. Recorded from apps/s4/zipper5.",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s4_zipper5_r18_r0/stdout.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "stderr": {
+     "file": "s4_zipper5_r18_r0/stderr.txt",
+     "sha256": "7011692c493d2edf098d23b74d0a74f9b6105397b5420373ece268fbf76bc737",
+     "lines": 7
+    },
+    "outputs": {
+     "r18.png": {
+      "sha256": "fac674cea3a0879eaa0115797befc5157b4243132e84e4487b48e8f55b768a38",
+      "size": 276182,
+      "small_copy": "s4_zipper5_r18_r0/small_r18.jpg"
+     }
+    },
+    "portable": [
+     [
+      "80 | 44"
+     ]
+    ],
+    "seconds": 0.87,
+    "peak_rss_mb": 291.7,
+    "program_sha256": "1383628fef0657c8b13d0ad649612ac36c5a66c76c168724c2659f7676d6c8a0",
+    "recorded_from": "two runs that agree"
+   }
+  },
+  {
+   "id": "s4_zipper5_zoom_r0",
+   "title": "S4: zipper5 on the default file, a still of a zoomed view (zoom 100 about t+, R = 1.317): culling and the focus ball are on by default, PNG 600 px",
+   "fast": true,
+   "heavy": false,
+   "program": "apps/s4/zipper5",
+   "args": [
+    "-R",
+    "1.317",
+    "-a",
+    "0.02",
+    "--zoom",
+    "100",
+    "-s",
+    "600",
+    "-o",
+    "zoom100.png"
+   ],
+   "inputs": [
+    "data/s4/subst5_2.30_4.50_t1_r0.txt"
+   ],
+   "timeout": 120,
+   "portable": [
+    {
+     "stream": "stderr",
+     "regex": "^\\S+: \\|S\\| = (\\d+) \\((\\d+) base arcs\\), roofs checked exactly"
+    },
+    {
+     "stream": "stderr",
+     "regex": "^(note: .*)$"
+    }
+   ],
+   "note": "A still of a zoomed view (-o, --zoom above 1): culling (K = 16) and the focus ball at log(zoom) are on by default, as if --cull --focus 1 had been given, and the program says so in two notes on stderr, which are the portable result. No -f and no --cull or --focus, so the run tests the defaults: the file, the margin factor, the focus distance and the conditions for them to apply. Recorded from apps/s4/zipper5.",
+   "expect": {
+    "exit": 0,
+    "stdout": {
+     "file": "s4_zipper5_zoom_r0/stdout.txt",
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "lines": 0
+    },
+    "stderr": {
+     "file": "s4_zipper5_zoom_r0/stderr.txt",
+     "sha256": "9e4cb720f47ea51801fcc92995b47dec6f7487e4d3cd5a37435190cb8f645d44",
+     "lines": 11
+    },
+    "outputs": {
+     "zoom100.png": {
+      "sha256": "f02f8249461ab0c46541ce06aae139ea4cef7949f185f9c9c6f6e71e8deb9f73",
+      "size": 226054,
+      "small_copy": "s4_zipper5_zoom_r0/small_zoom100.jpg"
+     }
+    },
+    "portable": [
+     [
+      "80 | 44"
+     ],
+     [
+      "note: culling is on by default for a zoomed still (K = 16; --nocull turns it off)",
+      "note: the focus ball is on by default for a zoomed still (--focus 1; --nofocus turns it off)"
+     ]
+    ],
+    "seconds": 0.27,
+    "peak_rss_mb": 26.2,
+    "program_sha256": "1383628fef0657c8b13d0ad649612ac36c5a66c76c168724c2659f7676d6c8a0",
+    "recorded_from": "two runs that agree"
+   }
+  }
+ ]
+}

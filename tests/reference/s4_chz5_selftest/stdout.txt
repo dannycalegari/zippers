@@ -1,0 +1,1 @@
+selftest: 160 orthogonal pairs, cocycle on every square from all 16 states; ok

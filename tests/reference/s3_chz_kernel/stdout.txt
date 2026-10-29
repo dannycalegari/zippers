@@ -1,0 +1,35 @@
+small ball: 3463 elements with d <= 5.50 (<time>s), f-inconsistencies 0
+t = a1   d(o,t o) = 2.5534   f(t) = (1,3)
+|S_c| = 36 kernel elements with d <= 4.00 (shortest 3.3258)
+K-search: 930123 elements of K reached inside B(9.50) in <time>s, max S_c-length 23, f-inconsistencies 0
+roofs up   (t^-1 s t): 36 / 36 found
+roofs down (t s t^-1): 36 / 36 found
+a1 t^-1 in <S_c>: yes
+a2 t^2 in <S_c>: yes
+a3 t^1 in <S_c>: yes
+CERTIFICATE that S_c generates K: YES
+up   roof lengths (in S_c-steps): min 1, mean 4.83, max 7;  growth rate of the substitution 4.6603
+down roof lengths (in S_c-steps): min 1, mean 4.61, max 6;  growth rate of the substitution 4.6972
+steep t = A2 a1 a3 A1 A3 A3 A1 a2 a1 A2 A1 A1 A3 A3 A3 a2 a1   d(o,t o) = 2.5534   f(t) = (3,1)
+steep roofs up 36 / 36, down 36 / 36
+up   roof lengths (in S_c-steps): min 1, mean 5.42, max 14;  growth rate of the substitution 7.5439
+down roof lengths (in S_c-steps): min 1, mean 5.11, max 15;  growth rate of the substitution 7.5788
+wrote subst_4.00_9.50_t3.txt
+convergence of the chains for Z+ (t, theta_up) over the segment (1, s_0):
+   n    #points   max chord on S^3   d(o, chain) min..max
+   0          2        0.000e+00      0.00 .. 3.33
+   1          3        1.278e+00      2.55 .. 3.98
+   2         17        5.627e-01      3.76 .. 7.25
+   3        130        2.319e-01      5.76 .. 12.42
+   4        982        9.826e-02      7.06 .. 17.01
+   5       7439        4.294e-02      8.58 .. 21.64
+   6      56246        2.080e-02     10.22 .. 26.27
+convergence of the chains for Z- (t^-1, theta_down) over the segment (1, s_0):
+   n    #points   max chord on S^3   d(o, chain) min..max
+   0          2        0.000e+00      0.00 .. 3.33
+   1          3        8.871e-01      2.55 .. 5.27
+   2         17        2.270e-01      4.70 .. 7.60
+   3        128        7.460e-02      6.82 .. 12.03
+   4       1025        3.554e-02      8.96 .. 16.66
+   5       7752        1.560e-02     10.99 .. 21.29
+   6      58811        7.728e-03     12.36 .. 25.91

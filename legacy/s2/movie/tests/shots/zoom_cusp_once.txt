@@ -1,0 +1,12 @@
+# the same zoom from ONE build at the final accuracy (0.004/20), culled to the zoom-1 view
+frames = 120
+monodromy = fig8
+order = inf
+R = 6
+accuracy = 0.0002
+build = once
+cull = 1
+build_zoom = 1
+look_at = plus
+zoom = 0:1 end:20
+circle.opacity = 0.5

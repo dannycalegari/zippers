@@ -1,0 +1,48 @@
+# Makefile for the zipper film tools (macOS).  `make` builds bin/zmovie, bin/ztest,
+# bin/encode_movie, bin/add_audio, bin/probe_movie, bin/grab_frames and bin/extract_audio; `make check-snapshot` compares the snapshot of
+# zipper.cc with the program's current source.
+CXX  = /Library/Developer/CommandLineTools/usr/bin/clang++
+SR   = /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
+CXXFLAGS = -std=c++17 -O3 -Wall -Wextra -isysroot $(SR) -nostdinc++ -isystem $(SR)/usr/include/c++/v1
+SWIFTSDK = /Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk
+BIN  = ../bin
+
+all: $(BIN)/zmovie $(BIN)/ztest $(BIN)/encode_movie $(BIN)/add_audio $(BIN)/probe_movie $(BIN)/grab_frames $(BIN)/extract_audio
+
+$(BIN)/zmovie: zmovie.cc zipper_snapshot.cc
+	@mkdir -p $(BIN)
+	$(CXX) $(CXXFLAGS) -o $@ zmovie.cc -lz
+
+$(BIN)/ztest: ztest.cc zmovie.cc zipper_snapshot.cc
+	@mkdir -p $(BIN)
+	$(CXX) $(CXXFLAGS) -o $@ ztest.cc -lz
+
+$(BIN)/encode_movie: encode_movie.swift
+	@mkdir -p $(BIN)
+	swiftc -O -sdk $(SWIFTSDK) encode_movie.swift -o $@
+
+$(BIN)/add_audio: add_audio.swift
+	@mkdir -p $(BIN)
+	swiftc -O -sdk $(SWIFTSDK) add_audio.swift -o $@
+
+$(BIN)/probe_movie: probe_movie.swift
+	@mkdir -p $(BIN)
+	swiftc -O -sdk $(SWIFTSDK) probe_movie.swift -o $@
+
+$(BIN)/grab_frames: grab_frames.swift
+	@mkdir -p $(BIN)
+	swiftc -O -sdk $(SWIFTSDK) grab_frames.swift -o $@
+
+$(BIN)/extract_audio: extract_audio.swift
+	@mkdir -p $(BIN)
+	swiftc -O -sdk $(SWIFTSDK) extract_audio.swift -o $@
+
+# the snapshot must equal the program's zipper.cc (or be refreshed deliberately)
+check-snapshot:
+	@cmp -s zipper_snapshot.cc ../../zipper.cc && echo "snapshot = ../../zipper.cc" || \
+	  echo "WARNING: zipper_snapshot.cc differs from ../../zipper.cc (cp ../../zipper.cc zipper_snapshot.cc to refresh)"
+
+clean:
+	rm -f $(BIN)/zmovie $(BIN)/ztest
+
+.PHONY: all clean check-snapshot
