@@ -1,0 +1,14 @@
+# linked pairs (gamma_w in Z+, h delta_w' in Z-), verified by link3; letters are indices into S
+lk +1 | w 4 17 23 | w' 1 28 24 20 | phi(h) 1 | h a1
+lk -1 | w 4 17 23 | w' 5 26 23 34 | phi(h) 1 | h a1
+lk +1 | w 4 17 23 | w' 1 3 31 12 7 | phi(h) 1 | h a1
+lk +1 | w 4 17 23 | w' 0 9 35 33 1 | phi(h) 1 | h A3
+lk +1 | w 0 28 5 | w' 1 28 24 20 | phi(h) 4 | h A2 a1 a3 A1 A3 A3 A1 a2 a1 A2 A1 A1 A3 A3 A3
+lk -1 | w 4 17 23 | w' 4 17 23 | phi(h) 4 | h A2 a1 a3 A1 A3 A3 A1 a2 a1 A2 A1 A1 A3 A3 A3
+lk -1 | w 1 28 24 20 | w' 3 16 25 | phi(h) 4 | h A2 a1 a3 A1 A3 A3 A1 a2 a1 A2 A1 A1 A3 A3 A3
+lk +1 | w 1 28 24 20 | w' 4 17 23 | phi(h) 4 | h A2 a1 a3 A1 A3 A3 A1 a2 a1 A2 A1 A1 A3 A3 A3
+lk +1 | w 0 2 30 16 5 | w' 1 28 24 20 | phi(h) 4 | h A2 a1 a3 A1 A3 A3 A1 a2 a1 A2 A1 A1 A3 A3 A3
+lk +1 | w 1 3 31 12 7 | w' 4 17 23 | phi(h) 4 | h A2 a1 a3 A1 A3 A3 A1 a2 a1 A2 A1 A1 A3 A3 A3
+lk -1 | w 0 28 5 | w' 5 26 23 34 | phi(h) 4 | h a1 a3 a3 a1 A3 A1 A2 A2 a3 a3 a3 a1 A2
+lk -1 | w 5 26 23 34 | w' 4 17 23 | phi(h) 4 | h a1 a3 a3 a1 A3 A1 A2 A2 a3 a3 a3 a1 A2
+lk -1 | w 0 2 30 16 5 | w' 5 26 23 34 | phi(h) 4 | h a1 a3 a3 a1 A3 A1 A2 A2 a3 a3 a3 a1 A2

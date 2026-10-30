@@ -44,8 +44,12 @@
     they are two letters, conjugate by r_1.
     CHECKED: compiled with the legacy word reader and no tips (a policy like test_render_imm's LegacyReadingPolicy),
     this program writes frames identical byte for byte to the legacy film5's, on frames of the ending.
+    The substitution file (the default subst5_2.30_4.50_t1.txt, of data/s4/, or that of -f) is found by the search of
+    core/data_files.h, as zipper5 finds its own: a name with a '/' as given; else the working folder, the folders of
+    ZIPPERS_DATA, then data/ of the source tree; the first place that holds an entry of the name is used.
 */
 
+#include "core/data_files.h"
 #include "examples/imm_m5.h"
 #include "examples/imm_m5_render.h"
 #include "output/png.h"
@@ -87,6 +91,7 @@ struct Opts {
     double Rfull = 2.1, acc = 0.025, penacc = 0.008, clip = 3, hidfog = 1.6;
     vector<int> pens;
     bool list = false, nocaptions = false;      // --nocaptions: the captions are added afterwards (film/captions.py)
+    bool subst_given = false;                   // -f was given
 };
 Opts O;
 std::map<string, double> LM;
@@ -329,7 +334,7 @@ int main(int argc, char** argv)
     for (int i = 1; i < argc; i++) {
         string a = argv[i];
         auto next = [&]() -> string { if (i + 1 >= argc) { fprintf(stderr, "missing value for %s\n", a.c_str()); exit(1); } return argv[++i]; };
-        if (a == "-f") O.subst = next();
+        if (a == "-f") { O.subst = next(); O.subst_given = true; }
         else if (a == "--landmarks") O.landmarks = next();
         else if (a == "--movie") O.movie = next();
         else if (a == "--still") { O.stillframe = atoi(next().c_str()); O.still = next(); }
@@ -343,6 +348,9 @@ int main(int argc, char** argv)
         else if (a == "--pens") { string s = next(); for (size_t p = 0; p < s.size();) { size_t q = s.find(',', p); if (q == string::npos) q = s.size(); O.pens.push_back(atoi(s.substr(p, q - p).c_str())); p = q + 1; } }
         else { fprintf(stderr, "unknown option %s\n", a.c_str()); return 1; }
     }
+    // the file: the working folder, then ZIPPERS_DATA, then the data of the suite (core/data_files.h)
+    if (!find_data(O.subst, "s4", ZIPPERS_DATA_PLACES, O.subst_given ? nullptr : "the default substitution file", "-f"))
+        return 1;
     prepare<Policy>(O.subst.c_str(), W0);
     if (O.list) {
         // each base arc of Z+: its number of points and its extent in the starting view

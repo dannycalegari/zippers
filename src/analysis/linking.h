@@ -24,7 +24,8 @@
 //                      random_rotation, then crossings; the separation (minsep below sephint if sephint > 0, else
 //                      separation), the pole and its distance
 //     draw_pair        a picture of two loops (A blue, B red, 900 pixels, brush 2), stereographically projected from
-//                      the given pole, with the clip radius 1.02 times the largest radius of the two
+//                      the given pole, with the clip radius 1.02 times the largest radius of the two; false if the file
+//                      cannot be written
 //
 // THE RANDOM NUMBERS. far_pole and random_rotation draw from the generator they are given, each through a new
 // std::normal_distribution<double>(0, 1): 64 x 4 draws for far_pole, 4 for random_rotation; linking calls far_pole,
@@ -247,9 +248,10 @@ inline LinkResult linking(const std::vector<SpherePoint<4>>& A, const std::vecto
     return r;
 }
 
-// a picture of two loops: A blue, B red, stereographically projected from the given pole
+// a picture of two loops: A blue, B red, stereographically projected from the given pole; false if the file cannot be
+// written
 template <class Backend>
-inline void draw_pair(const char* fn, const std::vector<SpherePoint<4>>& A, const std::vector<SpherePoint<4>>& B, const double pole[4],
+inline bool draw_pair(const char* fn, const std::vector<SpherePoint<4>>& A, const std::vector<SpherePoint<4>>& B, const double pole[4],
                       const Side<Backend>& sd, const Letters<Backend>& L, double yaw = 30, double pitch = 20)
 {
     static_assert(Backend::N == 4, "the views of S^3 are for backends whose sphere at infinity is S^3");
@@ -268,7 +270,7 @@ inline void draw_pair(const char* fn, const std::vector<SpherePoint<4>>& A, cons
     v.clip = 1.02*rmax;
     s3::rot3(yaw, pitch, v.rot);
     std::vector<s3::Layer<Backend>> layers = {{&ra, {0.05, 0.15, 0.85}}, {&rb, {0.85, 0.08, 0.08}}};
-    s3::write_png(fn, 900, layers, v, {}, 2);
+    return s3::write_png(fn, 900, layers, v, {}, 2);
 }
 
 }  // namespace zippers

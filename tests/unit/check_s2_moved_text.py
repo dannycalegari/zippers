@@ -88,7 +88,7 @@ ZIPPER = [
     ('replace', '#ifdef ZIPPER_VIEWER\n        run_viewer(opt, mon, rep, argc, argv);\n        return 0;\n#else\n'
                 '        fprintf(stderr, "interactive viewer not built; rebuild with \'make\' (the default build has the viewer)\\n");\n'
                 '        return 1;\n#endif\n',
-                '        fprintf(stderr, "interactive viewer not built; rebuild with \'make\' (the default build has the viewer)\\n");\n'
+                '        fprintf(stderr, "this build of zipper has no interactive viewer (-v): the window is that of the original program, built in legacy/s2/ (macOS)\\n");\n'
                 '        return 1;\n'),
 ]
 
@@ -102,9 +102,18 @@ ZMOVIE = [
     ('replace', 'if (!png_write(outdir + name, A, W, H, 3))', 'if (!png::write_rgb_sub(outdir + name, A, W, H, 3))'),
 ]
 
+# ---- the changes of apps/s2/ztest.cc ----------------------------------------------------------------------------------
+ZTEST = [
+    ('replace', '    string w = argc > 1 ? argv[1] : "all";\n',
+                '    string w = argc > 1 ? argv[1] : "all";\n'
+                '    if (w != "same" && w != "depth" && w != "frame" && w != "all") {\n'
+                '        fprintf(stderr, "usage: ztest [same|depth|frame|all]\\n");\n'
+                '        return 1;\n    }\n'),
+]
+
 PAIRS = [('legacy/s2/zipper.cc', 'apps/s2/zipper.cc', ZIPPER),
          ('legacy/s2/movie/src/zmovie.cc', 'apps/s2/zmovie.cc', ZMOVIE),
-         ('legacy/s2/movie/src/ztest.cc', 'apps/s2/ztest.cc', [])]
+         ('legacy/s2/movie/src/ztest.cc', 'apps/s2/ztest.cc', ZTEST)]
 
 
 def main():

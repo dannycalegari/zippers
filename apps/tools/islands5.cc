@@ -35,7 +35,7 @@
 
     Usage:  islands5 [-f SUBST] [-R R1,R2,...] [-a ACC1,ACC2,...] [--only +|-] [--png PREFIX] [-s SIZE] [--list]
                      [--graph]
-            (defaults: subst5_2.30_4.50_t1_r0.txt in the working folder, as zipper5 (data/s4/), -R 1.32,1.8,2.1,
+            (defaults: subst5_2.30_4.50_t1_r0.txt, found as zipper5 finds it (data/s4/), -R 1.32,1.8,2.1,
             -a 0.02; --list prints every root outside the identity's component; --graph: the graph only, no drawing).
             Timings and memory on stderr.
 */
@@ -666,7 +666,7 @@ int main(int argc, char** argv)
         else if (a == "--cap") o.cap = (size_t)atof(next().c_str());
         else { fprintf(stderr, "unknown option %s (see the top of islands5.cc)\n", a.c_str()); return 1; }
     }
-    if (!o.subst_given && !z::tools::default_subst_readable(o.subst, false)) return 1;   // the programs' default
+    if (!z::tools::find_subst(o.subst, false, !o.subst_given, ZIPPERS_DATA_PLACES)) return 1;   // (the default: zipper5's)
     z::imm::setup();
     z::World<B> W;
     z::prepare<z::imm::RenderPolicy>(o.subst.c_str(), W);

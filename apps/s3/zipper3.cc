@@ -76,9 +76,14 @@
 
     THE DEFAULTS.
       the file      -f defaults to subst_4.00_9.50_t3_r1.txt (data/s3/: chz kernel 4 9.5 3 --roofs --jexcess 1, the roofs
-                    chosen at one letter of excess), and to subst_4.00_9.50_t3.txt (legacy/s3/) with --pairs: the linked
-                    pairs are loops of that file's base arcs, and with other roofs the arcs are other curves. Both are read
-                    from the working folder; when the default is missing the error says where it is;
+                    chosen at one letter of excess), and to subst_4.00_9.50_t3.txt (data/s3/, a copy of the file of
+                    legacy/s3/) with --pairs: the linked pairs are loops of that file's base arcs, and with other roofs the
+                    arcs are other curves. The file of -f (or the default) and that of --pairs are found by the search of
+                    core/data_files.h: a name with a '/' as given; else the working folder, the folders of ZIPPERS_DATA,
+                    then data/ of the source tree (installed: share/zippers/); the first place that holds an entry of the
+                    name is used, and an entry there that is not a readable file stops the program, which says what is
+                    there; when it is found nowhere the message says where it looked. A file found in the working folder
+                    keeps its name, so the program prints what it did when it read the working folder only;
       zoomed stills with -o and --zoom F, F > 1, and no viewer (-v, --snap, --movie) and no --pairs, the program behaves as
                     if --cull and --focus 1 had been given (K = CULL_K, render/cull.h), unless --cull, --cullk K or --focus M
                     says otherwise or --nocull / --nofocus turns the default off; a note on stderr says which default is on.
@@ -89,6 +94,7 @@
 
 #include "analysis/pairs.h"
 #include "analysis/separation.h"
+#include "core/data_files.h"
 #include "core/timing.h"
 #include "examples/cartwright_steger.h"
 #include "examples/cartwright_steger_render.h"
@@ -107,8 +113,8 @@ using namespace zippers;
 using std::string;
 using std::vector;
 
-// the default substitution files, read from the working folder: the roofs chosen at one letter of excess (data/s3/), and,
-// for --pairs, the file whose base arcs the linked pairs are loops of (legacy/s3/)
+// the default substitution files (data/s3/): the roofs chosen at one letter of excess, and, for --pairs, the file whose
+// base arcs the linked pairs are loops of (a copy of the file of legacy/s3/)
 static const char* const DEFAULT_SUBST = "subst_4.00_9.50_t3_r1.txt";
 static const char* const DEFAULT_PAIRS_SUBST = "subst_4.00_9.50_t3.txt";
 
@@ -169,9 +175,9 @@ static void usage()
 {
     fprintf(stderr,
 "usage: zipper3 [options]\n"
-"  -f FILE      substitution file from `chz kernel`, read from the working folder (default subst_4.00_9.50_t3_r1.txt, which\n"
-"               is in data/s3/ of the repository; with --pairs subst_4.00_9.50_t3.txt, in legacy/s3/: the linked pairs\n"
-"               are loops of its base arcs)\n"
+"  -f FILE      substitution file from `chz kernel` (default subst_4.00_9.50_t3_r1.txt; with --pairs subst_4.00_9.50_t3.txt:\n"
+"               the linked pairs are loops of its base arcs); a name without '/' is looked for in the working folder,\n"
+"               then in the folders of ZIPPERS_DATA, then in the data of the suite (data/s3/), as is that of --pairs\n"
 "  -R R         roots: the elements g with d(o, g o) <= R (default 0: the base arcs only;\n"
 "               the first shells of translates are at 2.553, 3.326, 3.983, ...)\n"
 "  -a ACC       accuracy: maximal chord on the unit S^3 (default 0.01)\n"
@@ -292,15 +298,12 @@ int main(int argc, char** argv)
     if (opt.zoomacc && !opt.cull) { fprintf(stderr, "--zoomacc needs --cull\n"); return 1; }
     if (opt.focus > 0 && !(opt.zoom > 1)) { fprintf(stderr, "--focus needs --zoom F with F > 1\n"); return 1; }
     if (opt.cull && !opt.pairs.empty()) { fprintf(stderr, "--cull is not for --pairs\n"); return 1; }
-    if (!opt.subst_given) {        // the default file is read from the working folder, and it is not in legacy/
-        FILE* f = fopen(opt.subst.c_str(), "r");
-        if (!f) {
-            fprintf(stderr, "cannot open %s\nthe default file %s is in %s of the repository: run there, or give -f\n",
-                    opt.subst.c_str(), opt.subst.c_str(), opt.pairs.empty() ? "data/s3/" : "legacy/s3/");
-            return 1;
-        }
-        fclose(f);
-    }
+    // the files: the working folder, then ZIPPERS_DATA, then the data of the suite (core/data_files.h)
+    if (!find_data(opt.subst, "s3", ZIPPERS_DATA_PLACES, opt.subst_given ? nullptr : "the default substitution file",
+                   "-f"))
+        return 1;
+    if (!opt.pairs.empty() && !find_data(opt.pairs, "s3", ZIPPERS_DATA_PLACES, "the file of linked pairs", "--pairs"))
+        return 1;
     World<PU21> W;
     prepare<cs::RenderPolicy>(opt.subst.c_str(), W);
     // the view of the zippers' picture (before the build, for culling and the focus ball; it prints nothing)

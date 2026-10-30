@@ -27,8 +27,8 @@
 
     usage: roofs -e cs|imm [-f FILE]
       -e cs|imm        the example: the Cartwright-Steger surface (S^3) or IMM's M5 (S^4)
-      -f FILE          its substitution file (default subst_4.00_9.50_t3_r1.txt or subst5_2.30_4.50_t1_r0.txt in the working
-                       folder, as zipper3 and zipper5: the files of data/s3/ and data/s4/)
+      -f FILE          its substitution file (default subst_4.00_9.50_t3_r1.txt or subst5_2.30_4.50_t1_r0.txt, as zipper3 and
+                       zipper5: the files of data/s3/ and data/s4/), found as they find theirs (src/core/data_files.h)
 
     Copyright Danny Calegari 2026, released under the terms of the GNU GPL.
 */
@@ -177,10 +177,9 @@ int main(int argc, char** argv)
     }
     if (ex == "cs" || ex == "imm") {
         const bool is_cs = ex == "cs";
-        if (file.empty()) {                        // the programs' default; it is not in the working folder by itself
-            file = tools::default_subst(is_cs);
-            if (!tools::default_subst_readable(file, is_cs)) return 1;
-        }
+        const bool default_file = file.empty();    // the programs' default
+        if (default_file) file = tools::default_subst(is_cs);
+        if (!tools::find_subst(file, is_cs, default_file, ZIPPERS_DATA_PLACES)) return 1;
         if (is_cs) {
             cs::setup();
             return run<cs::RenderPolicy>(file.c_str());

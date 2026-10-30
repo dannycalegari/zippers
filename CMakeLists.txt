@@ -2,12 +2,13 @@
 #
 # zippers: the top level of the build.
 #
-# This file sets up what the whole suite shares: the C++ standard, the options, zlib, the optional viewers and the
-# tests. It sets NO warning flags and NO optimisation flags of its own. Each program sets its own, so that the
-# imported programs (legacy/) build exactly as their old makefiles did. Settings that programs may share are offered
-# as targets to link against (zippers::warnings, zippers::gl) and as modules in cmake/.
+# This file sets up what the whole suite shares: the C++ standard, the options, zlib, the optional viewers, the tests
+# and the install. It sets NO warning flags and NO optimisation flags of its own. Each program sets its own, so that
+# the imported programs (legacy/) build exactly as their old makefiles did. Settings that programs may share are
+# offered as targets to link against (zippers::warnings, zippers::gl) and as modules in cmake/.
 #
-# Normally this is run through the Makefile (`make`, `make test`, `make clean`, `make sanitize`); see README.md.
+# Normally this is run through the Makefile (`make`, `make test`, `make install`, `make clean`, `make sanitize`); see
+# README.md.
 
 cmake_minimum_required(VERSION 3.20)
 
@@ -20,10 +21,15 @@ if(_zippers_src STREQUAL _zippers_bin)
 endif()
 
 project(zippers
+  VERSION 0.9
   DESCRIPTION "Zippers on the spheres at infinity of hyperbolic manifolds"
   LANGUAGES CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+# ---- where an install puts things: CMake's standard folders (bin/, libexec/, share/, share/doc/zippers/) ------------
+include(GNUInstallDirs)
+include(ZippersData)       # zippers_data_places: the places of the data files, for src/core/data_files.h
 
 # build/compile_commands.json lists the exact compile line of every file (useful for comparing with an old makefile)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -81,6 +87,13 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/film/CMakeLists.txt")
 endif()
 
 add_subdirectory(tests)
+
+# ---- install (cmake --install build --prefix P, or make install PREFIX=P) ------------------------------------------
+# P/bin/zippers and P/libexec/zippers/ (the programs that zippers runs) are installed by apps/; here the data and the
+# documents. Nothing of legacy/, film/ or apps/tools/ is installed.
+install(DIRECTORY data/s3 data/s4 DESTINATION "${CMAKE_INSTALL_DATADIR}/zippers")
+install(FILES data/README.md DESTINATION "${CMAKE_INSTALL_DATADIR}/zippers")
+install(FILES README.md COPYING CITATION.cff DESTINATION "${CMAKE_INSTALL_DOCDIR}")
 
 # ---- summary -------------------------------------------------------------------------------------------------------
 message(STATUS "zippers: build type '${CMAKE_BUILD_TYPE}', C++${CMAKE_CXX_STANDARD} with ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")

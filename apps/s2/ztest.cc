@@ -7,7 +7,9 @@
     Copyright Danny Calegari 2026, released under the terms of the GNU GPL.
 
     apps/s2/ztest.cc (the zippers suite): legacy/s2/movie/src/ztest.cc, unchanged
-    but for this paragraph.  It includes the film engine of this folder, apps/s2/zmovie.cc,
+    but for this paragraph and one check: a word other than same, depth, frame and all is
+    refused, with the usage line and exit status 1 (the legacy program ran nothing and exited
+    with 0).  It includes the film engine of this folder, apps/s2/zmovie.cc,
     which includes the program apps/s2/zipper.cc, so it checks the engine against the
     program as they are built on the shared library src/.
 */
@@ -179,6 +181,10 @@ static void test_frame() {
 int main(int argc, char** argv) {
     g_quiet = true;
     string w = argc > 1 ? argv[1] : "all";
+    if (w != "same" && w != "depth" && w != "frame" && w != "all") {
+        fprintf(stderr, "usage: ztest [same|depth|frame|all]\n");
+        return 1;
+    }
     if (w == "same" || w == "all") test_same();
     if (w == "depth" || w == "all") test_depth();
     if (w == "frame" || w == "all") test_frame();

@@ -4,6 +4,9 @@
 #
 #   make            configure into build/ if needed, then build
 #   make test       build, then run CTest (the fast tests: ctest -L fast)
+#   make install    build, then install under PREFIX (default /usr/local): bin/zippers, libexec/zippers/,
+#                   share/zippers/, share/doc/zippers/. DESTDIR is honoured, for packaging:
+#                   make install PREFIX=/usr DESTDIR=/tmp/package
 #   make clean      remove build/
 #   make sanitize   configure and build into build-sanitize/ with the address and undefined-behaviour sanitizers
 #
@@ -15,12 +18,14 @@
 
 CMAKE      ?= cmake
 CMAKE_ARGS ?=
+PREFIX     ?= /usr/local
+DESTDIR    ?=
 
 ifeq ($(origin JOBS),undefined)
   JOBS := $(shell n=$$(sysctl -n hw.ncpu 2>/dev/null || nproc 2>/dev/null || echo 2); [ "$$n" -gt 4 ] && n=4; echo $$n)
 endif
 
-.PHONY: all test clean sanitize
+.PHONY: all test install clean sanitize
 
 all: build/CMakeCache.txt
 	$(CMAKE) --build build --parallel $(JOBS)
@@ -32,6 +37,9 @@ build/CMakeCache.txt:
 
 test: all
 	ctest --test-dir build -L fast --output-on-failure
+
+install: all
+	DESTDIR="$(DESTDIR)" $(CMAKE) --install build --prefix "$(PREFIX)"
 
 clean:
 	rm -rf build

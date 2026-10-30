@@ -7,7 +7,7 @@ Italiano–Martelli–Migliorini.
 They are copied from their old folders, and CMake builds them with exactly the flags of their old makefiles, which are
 kept next to them as `makefile.original` (the one in `s3/` built S³ and S⁴ together). The READMEs inside the folders
 are the old ones, so they describe the old builds; `s3/README.md` is rewritten where it pointed to a file that is not
-here.
+here, and where it said that `link3` with no arguments lists all options (it runs the scan).
 
 **The programs are as imported, except for the lines listed below.** Three changes let the programs build on Linux
 (GCC and its standard library). The others remove names, paths of the machine they were written on, notes on how

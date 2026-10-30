@@ -9,8 +9,10 @@
 #
 # Compiled and linked exactly as the legacy original (legacy/s3/CMakeLists.txt explains each setting below), with
 # src/ on the include path (zippers::core, header only, which adds no flags). -std=c++17 comes from the top level.
-# chz writes its substitution file into the working directory; zipper3 and link3 read one from there (by default zipper3
-# reads subst_4.00_9.50_t3_r1.txt of data/s3/, and subst_4.00_9.50_t3.txt of legacy/s3/ with --pairs, which is also link3's).
+# chz writes its substitution file into the working directory. zipper3 and link3 find theirs by the search of
+# src/core/data_files.h, which CMake gives the places of (zippers_data_places): the working folder first, then
+# ZIPPERS_DATA, then data/ of the source tree (or, installed, share/zippers/). By default zipper3 reads
+# subst_4.00_9.50_t3_r1.txt, and with --pairs subst_4.00_9.50_t3.txt, which is also link3's (both in data/s3/).
 # zipper3 is the batch build of the legacy program (the legacy target s3_zipper3_nogui, without ZIPPER3_VIEWER): there is no
 # window in apps/.
 set(CMAKE_CXX_FLAGS_RELEASE "")
@@ -36,3 +38,9 @@ target_compile_options(apps_s3_link3 PRIVATE -O2 -Wall -Wextra)
 target_link_options(apps_s3_link3 PRIVATE -O2)
 target_link_libraries(apps_s3_link3 PRIVATE zippers::core ZLIB::ZLIB)
 set_target_properties(apps_s3_link3 PROPERTIES OUTPUT_NAME link3 RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+
+zippers_data_places(apps_s3_zipper3 "${CMAKE_INSTALL_FULL_LIBEXECDIR}/zippers")
+zippers_data_places(apps_s3_link3 "${CMAKE_INSTALL_FULL_LIBEXECDIR}/zippers")
+
+# installed into libexec/zippers/, where zippers runs them
+install(TARGETS apps_s3_chz apps_s3_zipper3 apps_s3_link3 RUNTIME DESTINATION "${CMAKE_INSTALL_LIBEXECDIR}/zippers")

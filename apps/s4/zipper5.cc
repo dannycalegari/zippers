@@ -1,42 +1,7 @@
 /*  zipper5.cc  --  draw approximations to the zippers Z+ and Z- on the 4-sphere at infinity of
     the fibered hyperbolic 5-manifold of Italiano-Martelli-Migliorini (rh5.h, zipcore5.h).
 
-    Usage:  zipper5 [options] -o FILE.png       a still
-      -f FILE      substitution file from `chz5 kernel`, read from the working folder (default
-                   subst5_2.30_4.50_t1_r0.txt, which is in data/s4/ of the repository: `chz5 kernel 2.3 4.5 3 --roofs`,
-                   the same t as subst5_2.30_4.50_t1.txt of legacy/s4/, with the roofs chosen at no extra length)
-      -R R         roots: the elements g of Gamma with d(o, g o) <= R (default 0: the base arcs)
-      -a ACC       accuracy: maximal chord on the unit S^4 (default 0.02)
-      -s SIZE      image size (default 840)
-      --clip RHO   clip R^4 to the ball of radius RHO (default 3)
-      --zoom F     magnify (default 1); a still (-o) with F > 1 is drawn with culling and the focus ball (--cull
-                   --focus 1) unless --nocull and --nofocus say otherwise
-      --yaw D --pitch D   rotate R^3 (degrees)
-      --turn D     turn the hidden direction: rotate R^4 in the plane of the third visible
-                   axis and the hidden one (degrees)
-      --turn2 D    the same in the plane of the first visible axis and the hidden one
-      --hidfog H   the hidden coordinate's fog scale (default 1.5)
-      --only +|-   draw only Z+ or only Z-
-      --thick N    thicker lines
-      --stats      after the build, the checks of the roots (one line, stderr): their number, the elements of
-                   W searched, and whether the checks pass (closed under the 16 facet reflections inside the
-                   searched ball, and every element descends to 1, both verified exactly: examples/imm_m5.h, the descent
-                   checks)
-      --overlap L  mark the sub-branches of each leaf down to L levels as drawn, 0..16 (default 0: off)
-      --centre P   centre the view at the point P of S^4: five numbers x1,...,x5 (normalised), or six, a null vector
-                   x1,...,x6 of R^{5,1} (the point x1/x6, ..., x5/x6), such as a cusp point of render/tips.h ("0,0,0,0,1,1")
-      --cull       draw only the branches whose curves may meet the window: the screen square and the clip ball,
-                   pulled back to S^4, with a margin of K times each branch's size; on by default for a still (-o) with
-                   --zoom above 1, off otherwise
-      --cullk K    the margin factor K (default 16: the K = 16 column of `cull --mode margin`, the largest stray among the
-                   branches of size below 1/16, is 1.4 sizes on the default file at R up to 2.1; the S^3 file _t1 strays up
-                   to 8.9 sizes, and zipper3 needs --cullk 32 there); implies --cull
-      --nocull     do not cull by default (refused with --cull, --cullk and --zoomacc)
-      --zoomacc    with culling: draw at ACC/zoom on the sphere, so that the accuracy on the screen is that of zoom 1
-      --focus M    add the focus ball h B(R), about the orbit point h o nearest to the point at distance
-                   M log(zoom) from o towards the centre of the view (M = 1 or 2; M = 1 by default for a still (-o)
-                   with --zoom above 1, off otherwise)
-      --nofocus    do not add the focus ball by default (refused with --focus)
+    Usage: zipper5 [options] -o FILE.png, a still; the options are in usage() below (zipper5 -h).
 
     Copyright Danny Calegari 2026, released under the terms of the GNU GPL.
 
@@ -65,6 +30,8 @@
     by one line of marking counts. In S^4 marking is not proved safe (there are no enclosures): its costs are in
     docs/developer_guide.md, "Marking and overdraw".
 
+    The usage text (usage(): -h, and after an unknown option) is new; the legacy program had none.
+
     THE DEEP ZOOM (the view is set up before the build, which prints nothing):
       --centre P   the view centred at P (the frame of init_view5 with the pole -P in place of -t^+);
       --cull, --cullk K   culling (render/renderer.h, render/cull.h): the window of the view (view/s4.h: window5) is
@@ -82,8 +49,13 @@
     THE DEFAULTS.
       the file      -f defaults to subst5_2.30_4.50_t1_r0.txt (data/s4/: chz5 kernel 2.3 4.5 3 --roofs, the same t, so the same
                     view, with the roofs chosen at no extra length: the two orientations of every involution arc are one
-                    arc), in place of subst5_2.30_4.50_t1.txt (legacy/s4/, which -f still reads, and which film5 keeps).
-                    The default is read from the working folder; when it is missing the error says where it is;
+                    arc), in place of subst5_2.30_4.50_t1.txt (legacy/s4/, copied into data/s4/, which -f still reads, and
+                    which film5 keeps). The file is found by the search of core/data_files.h: a name with a '/' as given;
+                    else the working folder, the folders of ZIPPERS_DATA, then data/ of the source tree (installed:
+                    share/zippers/); the first place that holds an entry of the name is used, and an entry there that
+                    is not a readable file stops the program, which says what is there; when it is found nowhere the
+                    message says where it looked. A file found in the
+                    working folder keeps its name, so the program prints what it did when it read the working folder only;
       zoomed stills with -o and --zoom F, F > 1, the program behaves as if --cull and --focus 1 had been given (K = CULL_K,
                     render/cull.h), unless --cull, --cullk K or --focus M says otherwise or --nocull / --nofocus turns the
                     default off; a note on stderr says which default is on. Without -o or at zoom 1 culling and the focus are
@@ -91,6 +63,7 @@
                     --zoomacc needs culling, which may be the default's.
 */
 
+#include "core/data_files.h"
 #include "examples/imm_m5.h"
 #include "examples/imm_m5_render.h"
 #include "render/world.h"
@@ -106,7 +79,7 @@ using namespace zippers;
 using std::string;
 using std::vector;
 
-// the default substitution file, read from the working folder: the roofs chosen at no extra length (data/s4/)
+// the default substitution file (data/s4/): the roofs chosen at no extra length
 static const char* const DEFAULT_SUBST = "subst5_2.30_4.50_t1_r0.txt";
 
 struct Opt5 {
@@ -148,6 +121,44 @@ static bool parse_numbers(const string& s, size_t n0, size_t n1, vector<double>&
         i = j + 1;
     }
     return v.size() == n0 || v.size() == n1;
+}
+
+static void usage()
+{
+    fprintf(stderr,
+"usage: zipper5 [options] -o FILE.png\n"
+"  -f FILE      substitution file from `chz5 kernel` (default subst5_2.30_4.50_t1_r0.txt: `chz5 kernel 2.3 4.5 3 --roofs`,\n"
+"               the t of subst5_2.30_4.50_t1.txt with the roofs chosen at no extra length); a name without '/' is looked\n"
+"               for in the working folder, then in the folders of ZIPPERS_DATA, then in the data of the suite (data/s4/)\n"
+"  -R R         roots: the elements g of Gamma with d(o, g o) <= R (default 0: the base arcs)\n"
+"  -a ACC       accuracy: maximal chord on the unit S^4 (default 0.02)\n"
+"  -o FILE.png  write a PNG; without it the zippers are built and nothing is written\n"
+"  -s SIZE      image size in pixels (default 840)\n"
+"  --clip RHO   clip R^4 to the ball of radius RHO (default 3)\n"
+"  --zoom F     magnify (default 1); a still (-o) with F > 1 is drawn with culling and the focus ball (--cull --focus 1)\n"
+"               unless --nocull and --nofocus say otherwise\n"
+"  --yaw D --pitch D     rotate R^3 (degrees; default 0, 15)\n"
+"  --turn D     turn the hidden direction: rotate R^4 in the plane of the third visible axis and the hidden one (degrees)\n"
+"  --turn2 D    the same in the plane of the first visible axis and the hidden one\n"
+"  --hidfog H   the hidden coordinate's fog scale (default 1.5)\n"
+"  --only +|-   draw only Z+ or only Z-\n"
+"  --thick N    thicker lines\n"
+"  --stats      after the build, the checks of the roots (one line, stderr): their number, the elements of W searched, and\n"
+"               whether the checks pass (closed under the 16 facet reflections inside the searched ball, and every element\n"
+"               descends to 1, both verified exactly)\n"
+"  --overlap L  mark the sub-branches of each leaf down to L levels as drawn, 0..16 (default 0: off)\n"
+"  --centre P   centre the view at the point P of S^4: five numbers x1,...,x5 (normalised), or six, a null vector\n"
+"               x1,...,x6 of R^{5,1} (the point x1/x6, ..., x5/x6), such as a cusp point (\"0,0,0,0,1,1\")\n"
+"  --cull       draw only the branches whose curves may meet the window (margin K x size); on by default for a still\n"
+"               (-o) with --zoom above 1, off otherwise\n"
+"  --cullk K    the margin factor K (default 16: the K = 16 column of `cull --mode margin`, the largest stray among the\n"
+"               branches of size below 1/16, is 1.4 sizes on the default file at R up to 2.1); implies --cull\n"
+"  --nocull     do not cull by default (refused with --cull, --cullk and --zoomacc)\n"
+"  --zoomacc    with culling: draw at ACC/zoom on the sphere, so that the accuracy on the screen is that of zoom 1\n"
+"  --focus M    with --zoom: add the focus ball h B(R), about the orbit point h o nearest to the point at distance\n"
+"               M log(zoom) from o towards the centre of the view; M = 1 by default for a still (-o) with --zoom above 1\n"
+"  --nofocus    do not add the focus ball by default (refused with --focus)\n"
+"  --cap N      stop after N leaves per zipper (default 2e7)\n");
 }
 
 int main(int argc, char** argv)
@@ -208,7 +219,8 @@ int main(int argc, char** argv)
         }
         else if (a == "--nocull") o.nocull = true;
         else if (a == "--nofocus") o.nofocus = true;
-        else { fprintf(stderr, "unknown option %s (see the comment at the top of zipper5.cc)\n", a.c_str()); return 1; }
+        else if (a == "-h" || a == "--help") { usage(); return 0; }
+        else { fprintf(stderr, "unknown option %s\n", a.c_str()); usage(); return 1; }
     }
     // --nocull and --nofocus turn off what a zoomed still has by default; they contradict the options that turn it on
     if (o.nocull && (o.cull || o.zoomacc)) {
@@ -223,15 +235,9 @@ int main(int argc, char** argv)
     if (zoomed_still && !(o.focus > 0) && !o.nofocus) { o.focus = 1; o.focus_default = true; }
     if (o.zoomacc && !o.cull) { fprintf(stderr, "--zoomacc needs --cull\n"); return 1; }
     if (o.focus > 0 && !(o.zoom > 1)) { fprintf(stderr, "--focus needs --zoom F with F > 1\n"); return 1; }
-    if (!o.subst_given) {          // the default file is read from the working folder, and it is not in legacy/
-        FILE* f = fopen(o.subst.c_str(), "r");
-        if (!f) {
-            fprintf(stderr, "cannot open %s\nthe default file %s is in data/s4/ of the repository: run there, or give -f\n",
-                    o.subst.c_str(), o.subst.c_str());
-            return 1;
-        }
-        fclose(f);
-    }
+    // the file: the working folder, then ZIPPERS_DATA, then the data of the suite (core/data_files.h)
+    if (!find_data(o.subst, "s4", ZIPPERS_DATA_PLACES, o.subst_given ? nullptr : "the default substitution file", "-f"))
+        return 1;
     World<imm::O51> W;
     prepare<imm::RenderPolicy>(o.subst.c_str(), W);
     // the view (before the build, for culling and the focus ball; it prints nothing)

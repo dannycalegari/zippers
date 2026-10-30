@@ -43,8 +43,8 @@
 
     usage: overdraw -e cs|imm [options]
       -e cs|imm        the example: the Cartwright-Steger surface (S^3) or IMM's M5 (S^4)
-      -f FILE          its substitution file (default subst_4.00_9.50_t3_r1.txt or subst5_2.30_4.50_t1_r0.txt in the working
-                       folder, as zipper3 and zipper5: the files of data/s3/ and data/s4/)
+      -f FILE          its substitution file (default subst_4.00_9.50_t3_r1.txt or subst5_2.30_4.50_t1_r0.txt, as zipper3 and
+                       zipper5: the files of data/s3/ and data/s4/), found as they find theirs (src/core/data_files.h)
       -R R             the radius of the roots (default 0)
       -a ACC           the accuracy of the picture (default 0.02)
       -k K             the pieces are refined to ACC/K (default 16)
@@ -1168,10 +1168,9 @@ int main(int argc, char** argv)
          o.mode != "missing" && o.mode != "picture") || o.acc <= 0 ||
         o.k < 1 || o.overlap < 0 || o.overlap > 16 || o.keyshift < 0 || o.keyshift > 30 || o.geoshift < 0 ||
         o.geoshift > 30 || o.tol <= 0 || o.prune <= 0 || o.cwords < 0 || o.cwords > 3) { usage(); return 1; }
-    if (o.subst.empty()) {                         // the programs' default; it is not in the working folder by itself
-        o.subst = tools::default_subst(o.example == "cs");
-        if (!tools::default_subst_readable(o.subst, o.example == "cs")) return 1;
-    }
+    const bool default_file = o.subst.empty();     // the programs' default
+    if (default_file) o.subst = tools::default_subst(o.example == "cs");
+    if (!tools::find_subst(o.subst, o.example == "cs", default_file, ZIPPERS_DATA_PLACES)) return 1;
     double t0 = now();
     if (o.example == "cs") { cs::setup(); run<cs::RenderPolicy>(o); }
     else { imm::setup(); run<imm::RenderPolicy>(o); }

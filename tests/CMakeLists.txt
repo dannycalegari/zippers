@@ -29,6 +29,12 @@ set_tests_properties(smoke PROPERTIES LABELS fast TIMEOUT 60)
 #   reference_apps_fast (label fast):   the fast runs whose programs the map names;
 #   reference_apps (label reference):   all the runs whose programs the map names.
 # Every program is mapped, so both are run with --complete: a run that the map leaves out is a failure.
+# The command line zippers (apps/cli/zippers) is held to the same references through the table
+# reference/zippers_runs.json, which gives the zippers command line of every run that has one (run_references.py
+# --zippers), and the reason for the others; with --complete, a run that the table does not name is a failure:
+#   reference_zippers_fast (label fast):   the fast runs, through zippers;
+#   reference_zippers (label reference):   all the runs, through zippers.
+set(_zippers_runs_table "${CMAKE_CURRENT_SOURCE_DIR}/reference/zippers_runs.json")
 set(_zippers_apps_map "${CMAKE_CURRENT_SOURCE_DIR}/reference/programs_apps.json")
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${_zippers_apps_map}")
 file(READ "${_zippers_apps_map}" _zippers_apps_json)
@@ -36,7 +42,7 @@ string(JSON _zippers_apps_n ERROR_VARIABLE _zippers_apps_err LENGTH "${_zippers_
 if(_zippers_apps_err)
   message(FATAL_ERROR "zippers: ${_zippers_apps_map}: ${_zippers_apps_err}")
 endif()
-set(_zippers_ref_tests reference_fast reference)
+set(_zippers_ref_tests reference_fast reference reference_zippers_fast reference_zippers)
 if(_zippers_apps_n GREATER 0)
   list(APPEND _zippers_ref_tests reference_apps_fast reference_apps)
 endif()
@@ -62,6 +68,14 @@ if(Python3_Interpreter_FOUND)
                      --programs "${_zippers_apps_map}" --complete --work "${PROJECT_BINARY_DIR}/reference_work/apps_all")
     set_tests_properties(reference_apps PROPERTIES LABELS reference TIMEOUT 3600 RUN_SERIAL TRUE)
   endif()
+  add_test(NAME reference_zippers_fast
+           COMMAND "${Python3_EXECUTABLE}" "${_zippers_ref}" --build "${PROJECT_BINARY_DIR}" --subset fast
+                   --zippers "${_zippers_runs_table}" --complete --work "${PROJECT_BINARY_DIR}/reference_work/zippers_fast")
+  set_tests_properties(reference_zippers_fast PROPERTIES LABELS fast TIMEOUT 600)
+  add_test(NAME reference_zippers
+           COMMAND "${Python3_EXECUTABLE}" "${_zippers_ref}" --build "${PROJECT_BINARY_DIR}" --subset all
+                   --zippers "${_zippers_runs_table}" --complete --work "${PROJECT_BINARY_DIR}/reference_work/zippers_all")
+  set_tests_properties(reference_zippers PROPERTIES LABELS reference TIMEOUT 3600 RUN_SERIAL TRUE)
 else()
   # Without Python 3 the reference tests cannot run. They are registered anyway, as tests that fail and say why, so
   # that `make test` cannot pass without them.

@@ -7,6 +7,7 @@
 #   - the files and folders of the skeleton are all there;
 #   - COPYING is the text of the GNU GPL, version 3;
 #   - CITATION.cff names the licence and the Zippers paper;
+#   - the copies in data/ of the three default files kept in legacy/ are those files, byte for byte;
 #   - git tracks no recordings (the rule is: no music and no recordings in this repository).
 #
 # usage:        smoke.sh [SOURCE_DIR]        (default: the folder above this script)
@@ -52,6 +53,14 @@ if [ -f "$root/CITATION.cff" ]; then
   grep -q 'GPL-3.0-or-later' "$root/CITATION.cff" || problem "CITATION.cff does not name the licence GPL-3.0-or-later"
   grep -q '2411.15610' "$root/CITATION.cff" || problem "CITATION.cff does not cite arXiv:2411.15610"
 fi
+
+# data/ holds copies of three files of legacy/ (the defaults of link3, zipper3 --pairs and film5, and the linked
+# pairs), so that the programs find every default file in one place; each must stay its legacy file, byte for byte
+for f in s3/subst_4.00_9.50_t3.txt s3/linked_pairs.txt s4/subst5_2.30_4.50_t1.txt
+do
+  checked=$((checked + 1))
+  cmp -s "$root/legacy/$f" "$root/data/$f" || problem "data/$f is not a copy of legacy/$f, byte for byte"
+done
 
 # no recordings among the files that git tracks (a plain copy of the tree without .git is not checked)
 checked=$((checked + 1))

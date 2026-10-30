@@ -3,7 +3,7 @@
 """run_references.py: re-run the reference runs and compare their outputs with tests/reference/.
 
     run_references.py [--build DIR] [--work DIR] [--subset all|fast] [--no-heavy] [--only ID,...]
-                      [--mode auto|exact|portable] [--programs MAP.json]
+                      [--mode auto|exact|portable] [--programs MAP.json | --zippers RUNS.json] [--complete]
     run_references.py --record [--once] [--build DIR] [--work DIR] [--no-heavy] [--only ID,...]
 
 tests/README.md explains the runs, the fields of runs.json, and which comparisons are made on which machine.
@@ -26,6 +26,15 @@ same arguments and inputs, and compared with the same references; a run whose pr
 of the map's values: a run recorded from the new program itself, such as the S4 pictures of apps/s4/zipper5) is made as it
 is; the other runs are left out, and listed. This is how the reorganised programs are held to the outputs of the
 legacy ones. tests/reference/programs_apps.json is the map of apps/.
+
+Through zippers: with --zippers RUNS.json, where RUNS.json holds {"runs": {run id: zippers' arguments}, "without":
+{run id: why the run has no zippers form}}, every run that the table names is made with the command line of zippers
+(apps/cli/zippers in the build folder) that it gives, with the same inputs, and compared with the same references. The
+runs listed under "without" are left out, and listed with their reasons; with --complete a run that the table does not
+name at all is a failure. tests/reference/zippers_runs.json is the table of zippers.
+
+The programs run with the environment of this script, but LC_ALL=C and without ZIPPERS_DATA, so that the folders that
+variable names cannot change what a program reads (the programs look in it after the working folder).
 
 Which comparisons are made (--mode):
   exact      everything: exit status, the masked text, the hash of every output file, and the portable results.
@@ -58,6 +67,7 @@ import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
+ZIPPERS = 'apps/cli/zippers'               # the command line of the suite, in the build folder (--zippers)
 REFDIR = os.path.join(HERE, 'reference')
 RUNS_JSON = os.path.join(REFDIR, 'runs.json')
 
@@ -133,6 +143,7 @@ def run_program(cmd, cwd, out_path, err_path, timeout):
     The exit status is negative for a signal. The peak memory is the child's own (wait4)."""
     env = dict(os.environ)
     env['LC_ALL'] = 'C'
+    env.pop('ZIPPERS_DATA', None)          # the programs' search for data files: the working folder and their own data
     with open(out_path, 'wb') as so, open(err_path, 'wb') as se:
         t0 = time.monotonic()
         p = subprocess.Popen(cmd, cwd=cwd, stdout=so, stderr=se, stdin=subprocess.DEVNULL, env=env)
@@ -553,11 +564,15 @@ def main():
     ap.add_argument('--record', action='store_true', help='record the references (on the reference machine only)')
     ap.add_argument('--once', action='store_true', help='with --record: one run each instead of two that must agree')
     ap.add_argument('--complete', action='store_true',
-                    help='with --programs: fail if the map leaves any selected run out (once every program is mapped)')
+                    help='with --programs: fail if the map leaves any selected run out (once every program is mapped); '
+                         'with --zippers: fail if the table names neither a command line nor a reason for a run')
     ap.add_argument('--programs', metavar='MAP.json',
                     help='run the new programs named in this map instead of the legacy ones: only the runs '
                          'whose program the map names, or is already one of its new programs, are made, and they are '
                          'compared with the same references')
+    ap.add_argument('--zippers', metavar='RUNS.json',
+                    help='make the runs through zippers (apps/cli/zippers), with the command lines that this table '
+                         'gives, and compare them with the same references; the runs it lists without one are left out')
     args = ap.parse_args()
 
     build = os.path.abspath(args.build)
@@ -612,6 +627,37 @@ def main():
                                               (' (%d of them recorded from the new program itself: %s)' %
                                                (len(own), ', '.join(own))) if own else '',
                                               len(left), (': ' + ', '.join(left)) if left else ''))
+    if args.zippers:
+        if args.record or args.programs:
+            print('--zippers goes neither with --record nor with --programs')
+            return 2
+        with open(args.zippers, encoding='utf-8') as f:
+            zdoc = json.load(f)
+        zruns, without = zdoc.get('runs', {}), zdoc.get('without', {})
+        kept, left, unnamed = [], [], []
+        for r in runs:
+            if r['id'] in zruns:
+                r = dict(r)
+                r['recorded_program'] = r['program']
+                r['program'] = ZIPPERS
+                r['args'] = list(zruns[r['id']])
+                kept.append(r)
+            elif r['id'] in without:
+                left.append(r['id'])
+            else:
+                unnamed.append(r['id'])
+        if args.complete and unnamed:
+            print('--complete: %d run(s) have neither a zippers command line nor a reason in %s: %s'
+                  % (len(unnamed), args.zippers, ', '.join(unnamed)))
+            return 1
+        if not kept:
+            print('no selected run has a zippers command line in %s' % args.zippers)
+            return 2
+        runs = kept
+        mapped_note = ('programs: zippers (%s), with the command lines of %s, for %d run(s); left out, with no zippers '
+                       'form: %s%s' % (ZIPPERS, args.zippers, len(kept),
+                                      '; '.join('%s (%s)' % (x, without[x]) for x in left) if left else 'none',
+                                      ('; not named in the table: ' + ', '.join(unnamed)) if unnamed else ''))
     work = os.path.abspath(args.work or os.path.join(build, 'reference_work', 'record' if args.record else args.subset))
     os.makedirs(work, exist_ok=True)
 

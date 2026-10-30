@@ -40,6 +40,14 @@
     through one-letter roofs (render/renderer.h, set_lookthrough). None of the reference runs changes, and no linking
     number in them.
 
+    The substitution file (the default subst_4.00_9.50_t3.txt, of data/s3/, or that of -f) is found by the search of
+    core/data_files.h: a name with a '/' as given; else the working folder, the folders of ZIPPERS_DATA, then data/ of
+    the source tree (installed: share/zippers/); the first place that holds an entry of the name is used, and an entry
+    there that is not a readable file stops the program, which says what is there; when it is found nowhere the message
+    says where it looked. A file found
+    in the working folder keeps its name, so the program prints what it did when it read the working folder only. A
+    picture that cannot be written (the scan's go into the folder pictures/, which must exist) is reported as such.
+
     --stats: the checks of the translates h, the elements of Pi in B(R) for R = --hr
     (examples/cartwright_steger_roots.h: certify_roots), on stderr before anything else is computed: one
     line, and a second when R is within 1e-6 of a shell distance. It compares the checked roots with those of
@@ -49,6 +57,7 @@
 
 #include "analysis/linking.h"
 #include "analysis/relations.h"
+#include "core/data_files.h"
 #include "core/timing.h"
 #include "examples/cartwright_steger.h"
 #include "examples/cartwright_steger_render.h"
@@ -130,7 +139,8 @@ static void usage()
     fprintf(stderr,
 "usage: link3 selftest\n"
 "       link3 [options]\n"
-"  -f FILE      substitution file (default subst_4.00_9.50_t3.txt)\n"
+"  -f FILE      substitution file (default subst_4.00_9.50_t3.txt); a name without '/' is looked for in the working\n"
+"               folder, then in the folders of ZIPPERS_DATA, then in the data of the suite (data/s3/)\n"
 "  -a ACC       accuracy of the loops (default 0.005)\n"
 "  --rr R       find relations inside the hyperbolic ball B(R) (default 7.5)\n"
 "  --maxlen N   longest relation (default 6)\n"
@@ -152,11 +162,11 @@ int main(int argc, char** argv)
     uint64_t seed = 1;
     int pairA = -1, pairB = -1, pairH = -1, nproj = 20;
     string pngout, exportfrom;
-    bool hinfo = false, stats = false;
+    bool hinfo = false, stats = false, subst_given = false;
     for (int i = 1; i < argc; i++) {
         string a = argv[i];
         auto next = [&]() -> string { if (i + 1 >= argc) { usage(); exit(1); } return argv[++i]; };
-        if (a == "-f") opt.subst = next();
+        if (a == "-f") { opt.subst = next(); subst_given = true; }
         else if (a == "-a") opt.acc = atof(next().c_str());
         else if (a == "--rr") rr = atof(next().c_str());
         else if (a == "--maxlen") maxlen = atoi(next().c_str());
@@ -171,6 +181,9 @@ int main(int argc, char** argv)
         else if (a == "--stats") stats = true;
         else { usage(); return 1; }
     }
+    // the file: the working folder, then ZIPPERS_DATA, then the data of the suite (core/data_files.h)
+    if (!find_data(opt.subst, "s3", ZIPPERS_DATA_PLACES, subst_given ? nullptr : "the default substitution file", "-f"))
+        return 1;
     World<PU21> W;
     prepare<cs::RenderPolicy>(opt.subst.c_str(), W);
     if (stats) {                       // the translates checked, against those of roots_info, bit for bit
@@ -242,8 +255,8 @@ int main(int argc, char** argv)
             for (double yaw : {0.0, 60.0, 120.0}) {
                 char fn[200];
                 snprintf(fn, sizeof fn, "%s_yaw%03d.png", pngout.c_str(), (int)yaw);
-                draw_pair(fn, A, B, pole0, W.plus, W.L, yaw, 15);
-                fprintf(stderr, "wrote %s\n", fn);
+                if (draw_pair(fn, A, B, pole0, W.plus, W.L, yaw, 15)) fprintf(stderr, "wrote %s\n", fn);
+                else fprintf(stderr, "cannot write %s\n", fn);
             }
         return 0;
     }
@@ -342,8 +355,8 @@ int main(int argc, char** argv)
         if (stable && pic < 6) {
             char fn[80];
             snprintf(fn, sizeof fn, "pictures/link_w%zu_w%zu_h%zu.png", x.a, x.b, x.hi);
-            draw_pair(fn, Afin, Bfin, pole, W.plus, W.L);
-            fprintf(stderr, "wrote %s\n", fn);
+            if (draw_pair(fn, Afin, Bfin, pole, W.plus, W.L)) fprintf(stderr, "wrote %s\n", fn);
+            else fprintf(stderr, "cannot write %s (the scan writes its pictures into the folder pictures/)\n", fn);
             pic++;
         }
     }

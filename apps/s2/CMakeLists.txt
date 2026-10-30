@@ -32,3 +32,6 @@ foreach(_prog zmovie ztest)
   target_link_libraries(apps_s2_${_prog} PRIVATE zippers::core ZLIB::ZLIB)
   set_target_properties(apps_s2_${_prog} PROPERTIES OUTPUT_NAME ${_prog} RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 endforeach()
+
+# zipper and zmovie are installed into libexec/zippers/, where zippers runs them; ztest is not installed.
+install(TARGETS apps_s2_zipper apps_s2_zmovie RUNTIME DESTINATION "${CMAKE_INSTALL_LIBEXECDIR}/zippers")

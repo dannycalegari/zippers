@@ -34,9 +34,9 @@
     file with png::write_rows (src/output/), and the memory guard reads resident_bytes and
     calls release_memory of src/core/memory.h.  Everything else (the character-variety
     solver, the ball search, the renderer, the Catherine wheel, the EPS writer) is the legacy
-    code, unchanged.  The window is not built: as in the legacy nogui build, -v says so and
-    exits with status 1.  The film engine apps/s2/zmovie.cc
-    includes this file, with main renamed.
+    code, unchanged.  The window is not built: as in the legacy nogui build, -v says so (that
+    this build has no viewer, and where the original program's window is built) and exits with
+    status 1.  The film engine apps/s2/zmovie.cc includes this file, with main renamed.
 */
 
 #include <complex>
@@ -4330,7 +4330,7 @@ int main(int argc, char** argv) {
     if (opt.wheel && !check_wheel(opt, rep)) return 1;
 
     if (opt.view) {
-        fprintf(stderr, "interactive viewer not built; rebuild with 'make' (the default build has the viewer)\n");
+        fprintf(stderr, "this build of zipper has no interactive viewer (-v): the window is that of the original program, built in legacy/s2/ (macOS)\n");
         return 1;
     }
     return render_file(opt, mon, rep, make_view(opt.yaw, opt.pitch, opt.roll));

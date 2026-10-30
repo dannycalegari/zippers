@@ -118,7 +118,8 @@ This is the scan:
 This writes the verified pairs to `linked_pairs.txt`.
 
 `--pair A B H` computes one pair in many projections, `--hinfo` lists the translates h with
-φ(h) and their words, and `link3` with no arguments lists all options.
+φ(h) and their words, and `link3 -h` lists `selftest` and the options of the scan and of `--pair`
+(not `--png`, `--hinfo` and `--export`); with no arguments it runs the scan at its own defaults.
 
 ## How it works
 

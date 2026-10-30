@@ -200,21 +200,65 @@ if(TARGET apps_s3_chz AND TARGET apps_s4_chz5)
   target_compile_definitions(test_roof_choice PRIVATE "ZIPPERS_CHZ=\"$<TARGET_FILE:apps_s3_chz>\""
                              "ZIPPERS_CHZ5=\"$<TARGET_FILE:apps_s4_chz5>\"")
 endif()
-# Which substitution file each program and tool reads without -f (zipper3 the _t3_r1 file of data/s3/, with --pairs
-# and link3 the _t3 file of legacy/s3/; zipper5 the _t1_r0 file of data/s4/; the tools follow the programs; film5 keeps _t1),
-# that -f wins, and what a missing default says (where it is). The programs and tools themselves are run, in folders that
-# hold only the files chosen, so it depends on them all. It compares names, never a stored file; ZIPPERS_REPO lets it read
-# the files that it copies.
+# Which data files each program, tool and zippers reads, and how they find them (the search of src/core/data_files.h):
+# the defaults (zipper3 the _t3_r1 file, with --pairs and link3 the _t3 file and linked_pairs.txt; zipper5 the _t1_r0 file;
+# the tools follow the programs; film5 _t1, all in data/), that -f wins, the working folder first, ZIPPERS_DATA, the data of
+# the source tree for the programs of the build, and the message of copies outside the build that find nothing. The
+# programs, the tools and zippers themselves are run, in folders that hold only the files chosen, so it depends on them all
+# (film5 only when it is built, with --list, which opens no window). It compares names, never a stored file; ZIPPERS_REPO
+# lets it read the files that it copies.
 zippers_unit_test(test_default_files test_default_files.cc)
 target_compile_definitions(test_default_files PRIVATE "ZIPPERS_REPO=\"${PROJECT_SOURCE_DIR}\"")
 if(TARGET apps_s3_zipper3 AND TARGET apps_s3_link3 AND TARGET apps_s4_zipper5 AND TARGET apps_tools_roofs AND
-   TARGET apps_tools_cull AND TARGET apps_tools_strays AND TARGET apps_tools_overdraw AND TARGET apps_tools_islands5)
+   TARGET apps_tools_cull AND TARGET apps_tools_strays AND TARGET apps_tools_overdraw AND TARGET apps_tools_islands5 AND
+   TARGET apps_cli_zippers)
   add_dependencies(test_default_files apps_s3_zipper3 apps_s3_link3 apps_s4_zipper5 apps_tools_roofs apps_tools_cull
-                   apps_tools_strays apps_tools_overdraw apps_tools_islands5)
+                   apps_tools_strays apps_tools_overdraw apps_tools_islands5 apps_cli_zippers)
   target_compile_definitions(test_default_files PRIVATE
                              "ZIPPERS_ZIPPER3=\"$<TARGET_FILE:apps_s3_zipper3>\"" "ZIPPERS_LINK3=\"$<TARGET_FILE:apps_s3_link3>\""
                              "ZIPPERS_ZIPPER5=\"$<TARGET_FILE:apps_s4_zipper5>\"" "ZIPPERS_ROOFS=\"$<TARGET_FILE:apps_tools_roofs>\""
                              "ZIPPERS_CULL=\"$<TARGET_FILE:apps_tools_cull>\"" "ZIPPERS_STRAYS=\"$<TARGET_FILE:apps_tools_strays>\""
                              "ZIPPERS_OVERDRAW=\"$<TARGET_FILE:apps_tools_overdraw>\""
-                             "ZIPPERS_ISLANDS5=\"$<TARGET_FILE:apps_tools_islands5>\"")
+                             "ZIPPERS_ISLANDS5=\"$<TARGET_FILE:apps_tools_islands5>\""
+                             "ZIPPERS_CLI=\"$<TARGET_FILE:apps_cli_zippers>\"")
+  if(TARGET apps_s4_film5)
+    add_dependencies(test_default_files apps_s4_film5)
+    target_compile_definitions(test_default_files PRIVATE "ZIPPERS_FILM5=\"$<TARGET_FILE:apps_s4_film5>\"")
+  endif()
 endif()
+
+# zippers, the command line (apps/cli/zippers), and its install (Python 3):
+#   test_zippers_cli      with --dry-run, the program command line that zippers would run for every option of its table,
+#                         its translations and defaults, its refusals and its usage texts; an S2 picture without -o on a
+#                         terminal; and four messages of the programs (zipper5 -h, zipper -v, ztest with an unknown word,
+#                         link3 when a picture cannot be written);
+#   test_zippers_tables   the option table of zippers against the programs, both ways: each option it passes on is
+#                         accepted by its program, and each option of the programs' parsers is in the table;
+#   test_zippers_check    zippers check itself, with stand-ins for its programs (shell scripts beside a copy of zippers):
+#                         a failure in each check's output reported as FAIL, exit status 1; the checks run without
+#                         ZIPPERS_DATA; an interrupted check (SIGINT, SIGTERM, SIGHUP) ends by the signal, its running
+#                         check stopped and its temporary folder removed; a signal ignored when zippers starts stays
+#                         ignored; and when what reads its output stops, it ends by SIGPIPE, its folder removed;
+#   test_install          cmake --install into build/install_test/ (nowhere else), the list of installed files, the
+#                         installed zippers run from an empty folder (list, three pictures byte for byte as the build's
+#                         programs draw them, check), the installed tree moved, and an install with DESTDIR.
+if(Python3_Interpreter_FOUND)
+  add_test(NAME test_zippers_cli
+           COMMAND "${Python3_EXECUTABLE}" -I "${CMAKE_CURRENT_SOURCE_DIR}/test_zippers_cli.py" "${PROJECT_BINARY_DIR}")
+  add_test(NAME test_zippers_tables
+           COMMAND "${Python3_EXECUTABLE}" -I "${CMAKE_CURRENT_SOURCE_DIR}/test_zippers_tables.py" "${PROJECT_SOURCE_DIR}"
+                   "${PROJECT_BINARY_DIR}")
+  add_test(NAME test_zippers_check
+           COMMAND "${Python3_EXECUTABLE}" -I "${CMAKE_CURRENT_SOURCE_DIR}/test_zippers_check.py" "${PROJECT_SOURCE_DIR}"
+                   "${PROJECT_BINARY_DIR}")
+  add_test(NAME test_install
+           COMMAND "${Python3_EXECUTABLE}" -I "${CMAKE_CURRENT_SOURCE_DIR}/test_install.py" "${CMAKE_COMMAND}"
+                   "${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}" "${CMAKE_INSTALL_BINDIR}" "${CMAKE_INSTALL_LIBEXECDIR}"
+                   "${CMAKE_INSTALL_DATADIR}" "${CMAKE_INSTALL_DOCDIR}")
+else()
+  foreach(_t test_zippers_cli test_zippers_tables test_zippers_check test_install)
+    add_test(NAME ${_t} COMMAND sh -c "echo '${_t}: needs Python 3, and CMake found none' >&2; exit 1")
+  endforeach()
+endif()
+set_tests_properties(test_zippers_cli test_zippers_tables test_zippers_check PROPERTIES LABELS fast TIMEOUT 300)
+set_tests_properties(test_install PROPERTIES LABELS fast TIMEOUT 600)

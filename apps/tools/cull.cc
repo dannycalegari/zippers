@@ -45,8 +45,8 @@
 
     usage: cull -e cs|imm [options]
       -e cs|imm        the example: the Cartwright-Steger surface (S^3) or IMM's M5 (S^4)
-      -f FILE          its substitution file (default subst_4.00_9.50_t3_r1.txt or subst5_2.30_4.50_t1_r0.txt in the working
-                       folder, as zipper3 and zipper5: the files of data/s3/ and data/s4/)
+      -f FILE          its substitution file (default subst_4.00_9.50_t3_r1.txt or subst5_2.30_4.50_t1_r0.txt, as zipper3 and
+                       zipper5: the files of data/s3/ and data/s4/), found as they find theirs (src/core/data_files.h)
       --mode margin|window|focus|density|tips
       -R R             the radius of the roots (default 0)
       -a ACC           the accuracy (default 0.02); with --zoomacc ACC/zoom on the sphere, as the programs
@@ -789,10 +789,9 @@ int main(int argc, char** argv)
         return 1;
     }
     if (o.centre && o.c.size() == 6) o.c.resize(5);           // a null vector: the point x/x6, normalised below
-    if (o.subst.empty()) {                         // the programs' default; it is not in the working folder by itself
-        o.subst = tools::default_subst(o.example == "cs");
-        if (!tools::default_subst_readable(o.subst, o.example == "cs")) return 1;
-    }
+    const bool default_file = o.subst.empty();     // the programs' default
+    if (default_file) o.subst = tools::default_subst(o.example == "cs");
+    if (!tools::find_subst(o.subst, o.example == "cs", default_file, ZIPPERS_DATA_PLACES)) return 1;
     if (o.example == "cs") {
         cs::setup();
         return run<cs::RenderPolicy>(o);

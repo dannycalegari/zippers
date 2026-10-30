@@ -56,3 +56,10 @@ target_compile_options(apps_tools_roofs PRIVATE -O2 -Wall -Wextra)
 target_link_options(apps_tools_roofs PRIVATE -O2)
 target_link_libraries(apps_tools_roofs PRIVATE zippers::core)
 set_target_properties(apps_tools_roofs PROPERTIES OUTPUT_NAME roofs RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+
+# The tools find their substitution file by the search of src/core/data_files.h, as zipper3 and zipper5 do
+# (default_file.h); they are not installed, so in practice they read the working folder, ZIPPERS_DATA, or data/ of the
+# source tree.
+foreach(_tool strays islands5 overdraw cull roofs)
+  zippers_data_places(apps_tools_${_tool} "${CMAKE_INSTALL_FULL_LIBEXECDIR}/zippers")
+endforeach()

@@ -4,11 +4,17 @@ The tests are registered with CTest in `tests/CMakeLists.txt`. Each one carries 
 
 | test | label | what it does | time on an Apple M2 |
 |---|---|---|---|
-| `smoke` | `fast` | checks the layout of the repository | under 1 s |
+| `smoke` | `fast` | checks the layout of the repository, and that the copies in `data/` of three files of `legacy/` are those files, byte for byte | under 1 s |
 | `reference_fast` | `fast` | re-runs the 45 fast reference runs (all but the `link3` scan) and compares them with `reference/` | about 47 s |
 | `reference` | `reference` | re-runs all 46 reference runs and compares them with `reference/` | about 9 min |
 | `test_*`, `check_*` (in `unit/`) | `fast` | unit tests of the shared library `src/`: most compare moved code with its legacy original, bit for bit (`check_*`: token for token); `test_reader_imm` holds the S⁴ word reader to `chz5`'s data; `test_tips_imm` checks the tips of the S⁴ zippers exactly and that drawing through them changes no leaf, and `test_lookthrough_cs` the look-ahead through one-letter roofs in S³; `test_roots_imm` and `test_roots_cs` the descent checks of the S⁴ and S³ root balls (`test_roots_cs` also runs `zipper3` and `link3`); `test_record` that the recorder (`run_references.py --record`, run on a temporary copy) writes no commit hash; the others, the options of the programs (`tests/unit/CMakeLists.txt` says what each one does) | a few minutes together |
 | `reference_apps_fast`, `reference_apps` | `fast`, `reference` | the same reference runs, made with the new programs of `apps/`, through `reference/programs_apps.json` | as above |
+| `reference_zippers_fast`, `reference_zippers` | `fast`, `reference` | the same reference runs, made through the command line `zippers`, with the command lines of `reference/zippers_runs.json` (42 of the 46 runs; the other 4 are listed there with their reasons) | about 46 s, 9 min |
+| `test_zippers_cli` (in `unit/`) | `fast` | `zippers --dry-run`: the program command line that `zippers` would run, for every option of its table, its translations and defaults, its refusals (a value that looks like an option among them) and its usage texts; the quoting of the printed line, read back by `sh -c`; an S² picture without `-o` on a terminal; and four messages of the programs (`zipper5 -h`, `zipper -v`, `ztest` with an unknown word, `link3` when a picture cannot be written) | about 4 s |
+| `test_zippers_check` (in `unit/`) | `fast` | `zippers check` itself, with shell scripts in the place of its programs (beside a copy of `zippers`): a failure in each check's output reported as FAIL, exit status 1; the checks run without `ZIPPERS_DATA`; an interrupted `zippers check` (SIGINT, SIGTERM, SIGHUP) stops its running check, removes its temporary folder and ends by the signal, and a signal ignored when it starts (SIGHUP under `nohup`) stays ignored; when what reads its output stops (`\| head`), it ends by SIGPIPE and removes the folder | about 10 s |
+| `test_zippers_tables` (in `unit/`) | `fast` | the option table of `zippers` against the programs, both ways: every option it passes on is accepted by its program, and every option of the programs' own parsers is in the table | about 6 s |
+| `test_default_files` (in `unit/`) | `fast` | which data files the programs, the tools and `zippers` read, and how they find them: the working folder first, then `ZIPPERS_DATA`, then the data of the source tree; an entry of the name that is not a readable file (a folder, a file that cannot be read, a link to nothing) stops the search; copies of the programs outside the build say where they looked | about 10 s |
+| `test_install` (in `unit/`) | `fast` | `cmake --install` into `build/install_test/` (nowhere else): the installed files, the installed `zippers` run from an empty folder (`list`, three pictures byte for byte as the build's programs draw them, `check`), the installed tree moved, an install with `DESTDIR` | about 27 s |
 
 - `make test` (and the automatic runs on GitHub) run the tests labelled `fast`: `ctest --test-dir build -L fast`.
 - The test labelled `reference` is slow and is run by hand: `ctest --test-dir build -L reference`.
@@ -90,6 +96,19 @@ CTest's `reference_apps_fast` and `reference_apps` use it, since every program i
 runs (`--record --only ...`) keeps the machine block of the first recording and adds a dated line to its
 `also_recorded` list.
 
+`--zippers RUNS.json` makes the runs through the command line `zippers` (`apps/cli/zippers` of the build folder): the
+table `reference/zippers_runs.json` gives, for each run that has one, the `zippers` command line that does what the
+recorded program did (for instance `draw fig8 -n 2 --memlimit 2 -o fig8_n2.eps` for `zipper -m fig8 -n 2 --memlimit 2
+-o fig8_n2.eps`), and, under `without`, the reason of each run that has none (the three selftests, which `zippers check`
+runs with verdicts of its own, and `chz5 ball 3`). The runs are compared with the same references. With `--complete`, a
+run that the table names neither way is a failure; CTest's `reference_zippers_fast` and `reference_zippers` use it.
+`zippers` replaces itself by the program it runs, so its runs are those of the program: byte for byte in exact mode.
+
+The programs run with the environment of the script, with `LC_ALL=C` and without `ZIPPERS_DATA`. They look for their
+data files in the working folder first (`src/core/data_files.h`), where every run has its `inputs`, under their plain
+names, so what they print and write is what they printed and wrote when they read the working folder only. A file
+missing from a run's `inputs` would be found in `data/` of the source tree instead, and printed with its full path.
+
 `--build DIR` names another build folder, and `--work DIR` another scratch folder. The outputs of the last test stay
 in the scratch folder, one folder per run, so a difference can be looked at.
 
@@ -97,8 +116,8 @@ in the scratch folder, one folder per run, so a difference can be looked at.
 
 - **`runs.json`**, the list from which the test re-runs everything. For each run:
   - `program`, a path in the build folder, and `args`, its arguments;
-  - `inputs`: the files of the repository copied into the run's folder first (the programs of S³ and S⁴ read their
-    data from the working folder); `mkdirs`: empty folders made there first;
+  - `inputs`: the files of the repository copied into the run's folder first (the programs of S³ and S⁴ look for their
+    data files in the working folder first); `mkdirs`: empty folders made there first;
   - `timeout`, in seconds;
   - `fast`: whether the run belongs to the fast subset; `heavy`: whether it is a heavy run (minutes, or much memory:
     below);

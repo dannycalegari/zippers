@@ -10,9 +10,9 @@ Cartwright–Steger complex hyperbolic surface (on S³), and a fibered hyperboli
 
 **The state of the suite.** The three programs run on one shared library (`src/`): the batch programs are in `apps/`,
 with the command lines of the original programs, which are in `legacy/` with their windows (the new programs have no
-window yet). The tests in `tests/` re-run 46 reference runs (45 of them with the fast tests) and compare every output
-with the recorded one. `docs/developer_guide.md` has the measurements and the traps of the code; each folder's
-`README.md` says what is in it.
+window yet). The command `zippers` runs them by the names of the examples (below). The tests in `tests/` re-run 46
+reference runs (45 of them with the fast tests) and compare every output with the recorded one. `docs/developer_guide.md`
+has the measurements and the traps of the code; each folder's `README.md` says what is in it.
 
 ## Building
 
@@ -25,6 +25,7 @@ Then:
 
     make            # configure into build/ if needed, then build
     make test       # build, then run the fast tests
+    make install    # build, then install (below)
     make clean      # remove build/
     make sanitize   # build into build-sanitize/ with the address and undefined-behaviour sanitizers
 
@@ -41,6 +42,32 @@ The options (give them with `-D` to `cmake`, or through `make CMAKE_ARGS=...`):
 | `ZIPPERS_VIEWERS` | ON | build the GLUT viewers |
 | `ZIPPERS_SANITIZE` | OFF | build with the address and undefined-behaviour sanitizers |
 | `ZIPPERS_FILM` | ON on macOS, OFF elsewhere | build the Swift film tools |
+
+## Installing
+
+    make install                     # under /usr/local
+    make install PREFIX=$HOME/.local # under another prefix
+
+(or `cmake --install build --prefix P`). This puts `zippers` in `P/bin/`, the programs it runs in
+`P/libexec/zippers/`, the data files in `P/share/zippers/`, and this README, `COPYING` and `CITATION.cff` in
+`P/share/doc/zippers/`. `DESTDIR` is honoured, for packaging. The programs of a build also run from the build folder
+itself: `build/apps/cli/zippers`.
+
+## Using it
+
+    zippers list                                          # the examples
+    zippers draw fig8 -n 3 -o fig8.png                    # S2: the figure-eight monodromy, cone order 3
+    zippers draw cartwright-steger -R 2.554 -o cs.png     # S3: the Cartwright-Steger surface
+    zippers draw imm-m5 -R 1.8 -o imm.png                 # S4: the 5-manifold of Italiano-Martelli-Migliorini
+    zippers check                                         # the exact checks (about half a minute)
+
+The examples are `fig8`, or any word in R and L such as `RRL` (the monodromy, with `-n N` the order of the cone point,
+or `-n inf`), `cartwright-steger` (or `cs`) and `imm-m5` (or `imm`). The commands are `list`, `draw`, `view` (the
+window, not in this version), `search` (the substitution and its certificate), `link` (linking numbers, S3), `film`
+(the S2 film engine) and `check`; `zippers COMMAND --help` lists the options of each, and `zippers --dry-run ...` prints
+the command of the program that `zippers` would run. The data files are looked for in the working folder, then in the
+folders of the environment variable `ZIPPERS_DATA`, then in the installed data (or `data/` of the source tree, for a
+build), and the first place that holds an entry of the name is used; `zippers list EXAMPLE` says where each is found.
 
 ## Licence
 
