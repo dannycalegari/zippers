@@ -9,22 +9,28 @@ Cartwright–Steger complex hyperbolic surface (on S³), and a fibered hyperboli
 (on S⁴), together with the tools that make films of them.
 
 **The state of the suite.** The three programs run on one shared library (`src/`): the batch programs are in `apps/`,
-with the command lines of the original programs, which are in `legacy/` with their windows (the new programs have no
-window yet). The command `zippers` runs them by the names of the examples (below). The tests in `tests/` re-run 46
-reference runs (45 of them with the fast tests) and compare every output with the recorded one. `docs/developer_guide.md`
-has the measurements and the traps of the code; each folder's `README.md` says what is in it.
+with the command lines of the original programs, which are in `legacy/` with their windows; the new window, on all three
+spheres, is `zippers view`. The command `zippers` runs them by the names of the examples (below). The tests in `tests/` re-run 46
+reference runs (45 of them with the fast tests) and compare every output with the recorded one. `docs/user_guide.md` is the
+user guide: every option of every command, the files, and what is checked and what is only measured.
+`docs/developer_guide.md` has the measurements and the traps of the code; each folder's `README.md` says what is in it.
 
 ## Building
 
 You need CMake 3.20 or later, a C++17 compiler and zlib, on macOS or Linux, and Python 3 (3.6 or later) for the
-tests. The viewers also need GLUT and OpenGL: macOS has them; on Ubuntu or Debian install them with
+tests. The viewers of `legacy/` also need GLUT and OpenGL: macOS has them; on Ubuntu or Debian install them with
 
     sudo apt-get install zlib1g-dev freeglut3-dev libglu1-mesa-dev
+
+The window of `zippers view` needs GLFW 3.3 or later and OpenGL 3.3 (`brew install glfw` on macOS with Homebrew;
+`sudo apt-get install libglfw3-dev` on Ubuntu or Debian). Without GLFW everything else builds as before, and
+`zippers view` says that the build has no window; the configure step says which it found.
 
 Then:
 
     make            # configure into build/ if needed, then build
     make test       # build, then run the fast tests
+    make test-gui   # build, then run the test that opens the window on the screen (about half a minute)
     make install    # build, then install (below)
     make clean      # remove build/
     make sanitize   # build into build-sanitize/ with the address and undefined-behaviour sanitizers
@@ -40,6 +46,7 @@ The options (give them with `-D` to `cmake`, or through `make CMAKE_ARGS=...`):
 | option | default | meaning |
 |---|---|---|
 | `ZIPPERS_VIEWERS` | ON | build the GLUT viewers |
+| `ZIPPERS_WINDOW` | AUTO | the window of `zippers view`: `AUTO` builds it when GLFW and OpenGL are found, `ON` requires them, `OFF` leaves it out |
 | `ZIPPERS_SANITIZE` | OFF | build with the address and undefined-behaviour sanitizers |
 | `ZIPPERS_FILM` | ON on macOS, OFF elsewhere | build the Swift film tools |
 
@@ -49,7 +56,7 @@ The options (give them with `-D` to `cmake`, or through `make CMAKE_ARGS=...`):
     make install PREFIX=$HOME/.local # under another prefix
 
 (or `cmake --install build --prefix P`). This puts `zippers` in `P/bin/`, the programs it runs in
-`P/libexec/zippers/`, the data files in `P/share/zippers/`, and this README, `COPYING` and `CITATION.cff` in
+`P/libexec/zippers/` (with the window, `zview` among them), the data files in `P/share/zippers/`, and this README, `COPYING` and `CITATION.cff` in
 `P/share/doc/zippers/`. `DESTDIR` is honoured, for packaging. The programs of a build also run from the build folder
 itself: `build/apps/cli/zippers`.
 
@@ -60,10 +67,11 @@ itself: `build/apps/cli/zippers`.
     zippers draw cartwright-steger -R 2.554 -o cs.png     # S3: the Cartwright-Steger surface
     zippers draw imm-m5 -R 1.8 -o imm.png                 # S4: the 5-manifold of Italiano-Martelli-Migliorini
     zippers check                                         # the exact checks (about half a minute)
+    zippers view cs                                       # the window on S3 (? prints its keys)
 
 The examples are `fig8`, or any word in R and L such as `RRL` (the monodromy, with `-n N` the order of the cone point,
 or `-n inf`), `cartwright-steger` (or `cs`) and `imm-m5` (or `imm`). The commands are `list`, `draw`, `view` (the
-window, not in this version), `search` (the substitution and its certificate), `link` (linking numbers, S3), `film`
+window), `search` (the substitution and its certificate), `link` (linking numbers, S3), `film`
 (the S2 film engine) and `check`; `zippers COMMAND --help` lists the options of each, and `zippers --dry-run ...` prints
 the command of the program that `zippers` would run. The data files are looked for in the working folder, then in the
 folders of the environment variable `ZIPPERS_DATA`, then in the installed data (or `data/` of the source tree, for a

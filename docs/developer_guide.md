@@ -1,8 +1,233 @@
 # Developer guide
 
-For those who change the code: what has been measured, and the traps. Each section names the code it is about; the
-comments of the code point here where a fact is too long for them. The user's side of the programs is in the
+For those who change the code: how it is built, how to add an example or a geometry, and then what has been measured
+and the traps, by part of the code. Each measurement section names the code it is about; the comments of the code
+point here where a fact is too long for them. The user's side of the programs is in `docs/user_guide.md` and in the
 READMEs of `apps/`, `legacy/` and `film/`, and the tests are described in `tests/README.md`.
+
+Contents: [the architecture](#the-architecture), [one picture, from the command line to the file](#one-picture-from-the-command-line-to-the-file),
+[adding an example](#adding-an-example), [adding a geometry](#adding-a-geometry), [the tests](#the-tests-to-add),
+then the measurements and traps: [building and testing](#building-and-testing), [the renderer](#the-renderer-srcrender),
+[the examples](#the-examples-srcexamples), [the roofs of `data/`](#the-roofs-of-data).
+
+## The architecture
+
+### The folders
+
+| folder | what it holds |
+|---|---|
+| `src/` | the shared library, header only: programs and tests link the CMake target `zippers::core`, which puts `src/` on the include path. `src/README.md` has one line per header |
+| `apps/` | the programs (`apps/s2/`, `apps/s3/`, `apps/s4/`), `zippers` (`apps/cli/`), the window `zview` with its model, its jobs and its drawing (`apps/gui/`), and the measuring tools (`apps/tools/`) |
+| `tests/` | the tests and the reference runs (`tests/README.md`) |
+| `data/` | the substitution files (`data/s3/`, `data/s4/`) and the file of linked pairs; installed to `share/zippers/` |
+| `legacy/` | the programs as they were before the shared library, with their makefiles, kept as the specification: moved code must reproduce them bit for bit (`legacy/README.md`) |
+| `film/` | the tools that make the joined film (Swift tools, scripts) |
+| `docs/` | the user guide and this guide |
+
+### The folders of `src/`
+
+- **`src/geometry/`: the backends.** `backend.h` says what a geometry backend must provide and checks it
+  (`is_backend<B>()`); `sphere.h` has `SpherePoint<N>`, `chord` and `segment_distance`; `pu21/` is `PU21` (PU(2,1)
+  over Z[zeta_12], the sphere S³, with the matrix type `M3`); `on1/on1.h` is `ON1<n>` (O(n,1) over (1/2)Z; `ON1<5>`
+  is S⁴). The S² programs do not use a backend: they keep the renderer of `legacy/s2/zipper.cc` (`apps/s2/zipper.cc`).
+- **`src/core/`.** `hash.h` (`fingerprint`, the renderer's key of a branch), `keyset.h` (`KeySet`), `timing.h`,
+  `memory.h`, `sha256.h`, and `data_files.h` (`find_data_file`, `find_data`: where a data file is found).
+- **`src/store/store.h`.** `Store<B, Label>`: exact group elements, packed, with a hash table on their keys. The
+  searches and the root balls are built on it.
+- **`src/examples/`: an example is a data header, a search policy and a render policy.** For Cartwright-Steger (namespace `cs`) and
+  IMM's M5 (namespace `imm`): `cartwright_steger.h` and `imm_m5.h` (the group's data, its words, balls, roots and
+  `shell_radii`); `*_search.h` (the search policy: what `chz` and `chz5` each do differently); `*_render.h` (the
+  render policy `RenderPolicy`: the example's file dialect, words, roots, tips and look-ahead); and the exact checks of
+  the root balls (`cartwright_steger_roots.h`, the end of `imm_m5.h`, both behind `--stats`).
+- **`src/search/`.** `kernel_search.h` is the block-filling kernel search, written once as `kernel_search(Policy&, ...)`
+  over a search policy; `roof_choice.h` chooses the roofs (`--roofs`) and measures a system of roofs.
+- **`src/render/`: the renderer.** `substitution.h` reads a substitution file (`load_substitution`, a
+  `SubstitutionDialect` per example); `renderer.h` has `Letters<B>`, `Side<B>` (one zipper), `make_side` and
+  `Renderer<B>` (the polylines of a zipper); `world.h` has `World<B>`, `prepare<P>` and `build<P>`; `cull.h`
+  (`CullWindow<N>`), `tips.h` (the tips of S⁴'s parabolic chains), and `arcs.h` (`arc_points` and `loop_points`: complete
+  arcs and loops, for the analysis).
+- **`src/view/`: the views.** `s3.h` and `s4.h` are the cameras and the PNG painters of S³ and S⁴ (`s3::write_png`,
+  `s4::write_png5`), with the windows of zoomed views (`s3::window3`, `s4::window5`); `s2.h` is the camera of S²;
+  `options.h` is what `--colour` and `--viewmatrix` share.
+- **`src/output/`: the outputs.** `png.h` (`png::write_rgb` and the other writers), `raster.h` (the depth-sorted
+  segment painter `raster::paint_segments`), `polylines.h` (the polyline file), `session.h` (the session file).
+- **`src/analysis/`.** The separation of Z⁺ and Z⁻ (`separation.h`), relations and their loops (`relations.h`), linking
+  numbers (`linking.h`), and the linked pairs (`pairs.h`).
+
+The dependencies run one way: a backend knows nothing of the renderer; the renderer, the store and the search are
+templates over a backend and (for the search and the render) over an example's policy; the views and the analysis use
+the renderer's output; the programs of `apps/` put them together. Every inner loop is a template instantiated for one
+backend, so there are no virtual calls.
+
+### The programs
+
+`apps/s3/` has `chz` (the kernel search), `zipper3` (the pictures) and `link3` (linking numbers); `apps/s4/` has `chz5`,
+`zipper5` and `film5`; `apps/s2/` has `zipper`, `zmovie` and `ztest`. Each program of `apps/s2/` to `apps/s4/` has
+the command line of its legacy original; those that have reference runs (all but `ztest` and `film5`) are listed in
+`tests/reference/programs_apps.json`. `apps/cli/zippers.cc`
+is `zippers`: it checks the options against its table (`OPTIONS`), and replaces itself by the program (`execv`).
+`apps/gui/jobs.h` runs `zippers draw` as child processes for a window. `apps/tools/` holds the measuring programs
+(`strays`, `overdraw`, `roofs`, `cull`, `islands5`), which change nothing in `src/`.
+
+## One picture, from the command line to the file
+
+The picture of the default S³ example, `zippers draw cartwright-steger -o PIC.png`, with the place of each step.
+
+1. **`zippers`** (`apps/cli/zippers.cc`). `main` (line 1237) reads the command; `draw` (1015) finds the example
+   (`find_example`, 182), checks every option against `OPTIONS` (`parse`, 408), and builds the program's argument list
+   (`pass_on`, 465; `program_of`, 351, names `zipper3` for S³). `run` (476) replaces `zippers` by that program
+   (`execv`, 492), so everything after it is the program's.
+2. **The program** (`apps/s3/zipper3.cc`). `main` (344) calls `cs::setup` (346: the group's matrices,
+   `src/examples/cartwright_steger.h:58`) and reads its options.
+3. **The data file.** `find_data` (`zipper3.cc:486`; `src/core/data_files.h:244`, over `find_data_file`, 191) looks in
+   the working folder, then `ZIPPERS_DATA`, then the data of the build or install (`apps/README.md`, "How the programs
+   find their data files").
+4. **`prepare<cs::RenderPolicy>`** (`zipper3.cc:492`; `src/render/world.h:106`). It reads the file
+   with `load_substitution` (`src/render/substitution.h:52`, in the policy's dialect), turns each word into an exact
+   element with `P::word` (`parse_word`, `cartwright_steger.h:171`), finds each letter's inverse (it stops if the
+   letters are not closed under inversion), and builds the two zippers with `make_side` (`src/render/renderer.h:201`),
+   which checks every roof exactly. Then it calls the policy's hook `P::sides` (the look-ahead of S³, the tips of S⁴)
+   and `P::prepared` (the line it prints).
+5. **The view** (`zipper3.cc:495`): `s3::init_view` (`src/view/s3.h:145`) puts the camera's pole at the attracting
+   point of t (`W.plus.V`); with a zoom, `s3::window3` (`s3.h:164`) makes the window that culling and the focus ball use.
+6. **The roots and the build.** `build<cs::RenderPolicy>` (`zipper3.cc:526`; `world.h:137`) asks the policy for the
+   roots (`P::roots`, which calls `roots_info`, `cartwright_steger.h:205`: the elements of the lattice in B(R), nearest
+   first), makes a `Renderer<B>` for Z⁺ and one for Z⁻, and calls `Renderer::draw` (`renderer.h:421`) for each root and
+   each base arc.
+7. **The renderer.** `draw` keeps a stack of branches; `visit` (`renderer.h:454`) maps a branch's ends by its element to
+   the sphere (`B::to_double`, `B::act`, `B::boundary`), splits it into its roof's children while its chord exceeds the
+   accuracy (the children's keys, `B::product_key` and `fingerprint`, keep a branch from being drawn twice), and
+   otherwise emits the leaf (`emit`, 392) as a segment of a polyline. The output is the polylines of the renderer:
+   points of S³ as floats, with the root and the letter of each.
+8. **The polylines file, if asked** (`zipper3.cc:573`): `write_polylines` (the same file, 229) gives them to
+   `polylines::write` (`src/output/polylines.h`).
+9. **The painter.** `s3::write_png` (`zipper3.cc:607`; `src/view/s3.h:238`) projects every point (`s3::eye`, 130:
+   stereographic projection from the pole, then the rotation of R³), fogs it by depth, and collects `raster::Segment`s;
+   `raster::paint_segments` (`src/output/raster.h:99`) sorts them by depth and draws them at twice the size,
+   `raster::downsample_rgb` halves it, and `png::write_rgb` (`src/output/png.h`) writes the file.
+
+S⁴ is the same with `zipper5` (`apps/s4/zipper5.cc`, `main` at 249), `imm::RenderPolicy`, `s4::write_png5`
+(`src/view/s4.h:198`) and `find_roots5`. In S² the program `apps/s2/zipper.cc` has its own renderer.
+
+## Adding an example
+
+An example is a lattice Γ in the isometries of a backend, with a homomorphism φ: Γ → Z and its kernel K. It is drawn
+(`zipper3`, `zipper5`), found (`chz`, `chz5`) and checked. The model is Cartwright-Steger; every item below names where
+it is done there.
+
+### What an example supplies
+
+1. **The group's data** (`src/examples/cartwright_steger.h`, namespace `cs`): `setup()` builds the generators as exact
+   backend elements; `parse_word` reads a word of the files; `geogens(rho)` gives the generators of Γ's ball;
+   `roots_info(R)` (and `find_roots`) lists the elements of Γ in B(R), nearest first, with their distances;
+   `shell_radii` lists the radii at which the roots change; `focus_centre3` gives a lattice element near a point of the
+   sphere, for the focus ball of a zoomed view. The group must act freely, so that an element's `B::key` determines it.
+2. **A search policy** (`cartwright_steger_search.h`, `cs::SearchPolicy`): the class that the
+   comment at the top of `src/search/kernel_search.h` lists member by member (the small ball, `pick_t`, `kernel_indices`,
+   the K-store's labels, `write_file`, ...). `kernel_search` does the rest, and the program (`apps/s3/chz.cc`) only
+   builds the policy and calls it.
+3. **A render policy** (`cartwright_steger_render.h`, `cs::RenderPolicy`): `B`, the file `dialect`
+   (`SubstitutionDialect`: the number of fields before a letter's word, and whether a `member` section is skipped),
+   `word`, `sides` (the hook that sets the tips or the look-ahead; empty where none applies), `prepared` (the line
+   printed) and `roots`. Its list is the comment at the top of `src/render/world.h`.
+4. **The root-ball check** (`cartwright_steger_roots.h`, `stats_lines`): `--stats` makes the search of the roots again
+   and compares it with the roots drawn, bit for bit; a check of the descent alone passes a search that skipped a step
+   (see "The root balls" below).
+5. **Substitution files** (`data/s3/`): the kernel search writes them; they are the example's data, with their
+   hashes in sessions.
+
+### Where it is registered
+
+- **The programs.** The draw program (`apps/s3/zipper3.cc`) includes the policy and calls `prepare<cs::RenderPolicy>`
+  and `build<cs::RenderPolicy>`; the search program calls `kernel_search`. The programs name their example's policies directly (`cs::RenderPolicy`
+  in `zipper3.cc`), so a new example gets programs of its own, with a target in the CMake file of their folder
+  (`apps/s3/CMakeLists.txt`). `link3` and the tools use the same policies (`apps/tools/*.cc`).
+- **`zippers`** (`apps/cli/zippers.cc`): `find_example` (the names of the example), `program_of` (which program draws
+  it and searches), the `OPTIONS` table (which options it takes, for which spheres; `program_of` and `OPTIONS` are
+  keyed by sphere, not by example, so a second example on one sphere needs them keyed by example), `checks_of` (its exact checks, run
+  by `zippers check`), `list` (its default files) and the usage texts. The same names are in
+  `src/output/session.h`: `sphere_of_example` and the `KEYS` table (the session's keys and their defaults per sphere).
+- **The data files** (`data/s3/`): the file, and its line in `data/README.md`; the default files are named in
+  `apps/s3/zipper3.cc` (`DEFAULT_SUBST`), in the `KEYS` table of `src/output/session.h`, and in `zippers`' `list`.
+  `data/s3` and `data/s4` are installed as folders (`CMakeLists.txt`): a new folder needs its own `install` line, and `find_data` takes the folder's name as its `sphere` argument
+  (`src/core/data_files.h`).
+- **The tests and the references** (below, "The tests to add"): `tests/reference/runs.json` (the run), and the same run in
+  `tests/reference/programs_apps.json` (the program that makes it) and `tests/reference/zippers_runs.json` (its
+  `zippers` command line, or the reason it has none); a session in `tests/sessions/`; the unit tests. These tests and
+  documents name the examples too, and must learn a new one: `tests/unit/test_default_files.cc`, `test_zippers_cli.py`,
+  `test_install.py`, `test_gui_session.cc` and `test_gui_jobs.cc`; `README.md`, `apps/README.md` and
+  `docs/user_guide.md`.
+- **A new header** of `src/` gets its line in `src/README.md`.
+
+### What must be checked
+
+The tests of the two existing examples compare the moved code with the legacy programs bit for bit (`test_search_cs.cc`,
+`test_render_cs.cc`, `test_pu21.cc`, ...); a new example has no legacy original, so its checks are exact ones, stored
+data and independent computations:
+- `prepare` stops on a roof that fails the exact check (`make_side`) or on letters not closed under inversion.
+- The backend satisfies `is_backend`, and its operations are tested against exact values (`test_pu21.cc`, `test_on1.cc`
+  are the models, there against the legacy functions).
+- The root balls: `--stats` makes the search of the roots again and checks it exactly, and the checks themselves are
+  tested (`test_roots_cs.cc`, `test_roots_imm.cc`); the curves of a smaller R are the first polylines of those of a
+  larger one (`test_shells.cc`).
+- The search writes its stored files again, byte for byte on the reference machine (a reference run of `chz kernel`),
+  and its certificate (every roof found, every generator in the group generated) is printed by the program.
+- A picture: a reference run, byte for byte on the reference machine, with a `portable` result that does not depend on
+  rounding (the count of letters, for instance); see "Building and testing" below. `zippers check` runs the exact checks.
+- Where a word format can fail silently, a reader test (`test_reader_imm.cc` is the model: the word "1" is facet 1 and
+  also the empty word of `chz5`).
+
+## Adding a geometry
+
+A geometry is a family of isometries with an action on a sphere at infinity S^{N-1} ⊂ R^N. It is a backend
+(`src/geometry/backend.h`), and everything above it is templated, so the renderer, the store and the search need no
+change. The models are `PU21` (`src/geometry/pu21/pu21.h`, S³) and `ON1<n>` (`src/geometry/on1/on1.h`, S⁴ for n = 5).
+
+### What a backend provides
+
+The comment at the top of `backend.h` lists it with the legacy function each member replaces; in short:
+- **Types and constants:** `Elem` (an exact element, trivially copyable), `N`, `Point` (= `SpherePoint<N>`), `key_size`,
+  `Key` (an `std::array<int64_t, key_size>` that determines the element: Γ acts freely, so the image of the base point
+  does), `packed_size`, `DMat` and `DVec`.
+- **Exact operations:** `identity`, `mul`, `inv`, `normal`, `eq`, `same`, `max_coefficient` (the growth guard),
+  `key`, `product_key` (the key of a product, without the whole product), `displacement` and `key_displacement`
+  (d(o, g o)), and `pack`, `unpack` and `packed_key` (the store's layout).
+- **Double operations:** `to_double`, `act`, `boundary` (a null vector to its point of the sphere), `attracting` (the
+  fixed point of a loxodromic element).
+
+The header of the backend ends with `static_assert(zippers::is_backend<B>(), "...")` (as `pu21.h` and `on1.h` do);
+each requirement that fails gives its own message. `is_backend` checks the shape, not the arithmetic: the exactness
+and the agreement of `key`, `product_key` and the products is checked by the backend's test.
+
+### What else a new sphere needs
+
+- **A view and a painter.** `src/view/s3.h` and `s4.h` are the models: the camera (`ViewState`, `View5`: a frame and a
+  pole, stereographic projection to R³ by `eye`/`eye5`), `init_view`, the window of a zoom (`window3`, `window5`: a
+  `CullWindow<N>`), and `write_png`/`write_png5`, which project the renderer's polylines and give segments to
+  `raster::paint_segments`. `s3::write_png` has `static_assert(B::N == 4, ...)`; `s4::write_png5` is for `ON1<5>`.
+- **The tips** (`src/render/tips.h`) are for backends with parabolic elements: `find_tips` and `set_tips` take
+  `Side<ON1<n>>`. A cocompact lattice needs none (`cs::RenderPolicy::sides` uses the look-ahead only).
+- **The polyline file** (`src/output/polylines.h`) has the key `sphere N` for N = 2, 3 or 4, so a sphere of another
+  dimension needs the format extended and its version raised.
+- **The session** (`src/output/session.h`): `sphere_of_example`, `sphere_bit` and the per-sphere defaults of `KEYS`.
+- **`zippers`:** the `Sphere` enum, `OPTIONS` and `program_of`.
+- **The checks of the root balls and of the kernel search** are the example's, not the geometry's.
+
+### What to test
+
+`tests/unit/test_backend_contract.cc` checks `is_backend` with a mock; `test_pu21.cc` and `test_on1.cc` hold the real
+backends bit for bit to their legacy originals (random elements, every operation); `test_sphere.cc` holds `chord` and
+`segment_distance`. A new backend needs its own test of this kind, and, if it has a view, tests of the view and the
+painter (`test_view_s3.cc`, `test_output_s3.cc`).
+
+## The tests to add
+
+`tests/README.md` has the table of tests, and says how to run them. For an example: a unit test of its policy against
+what it replaces or an independent computation (`test_search_*`, `test_render_*`, `test_roots_*`), a reference run
+(`runs.json`, with `programs_apps.json` and `zippers_runs.json`: `run_references.py --complete` fails if a run is
+named by neither table), and a session in `tests/sessions/` (held by `test_gui_session`). For a geometry: the backend's
+test, the view's test, and the contract test for the new shape. Register a unit test with `zippers_unit_test` in
+`tests/unit/CMakeLists.txt`.
 
 ## Building and testing
 

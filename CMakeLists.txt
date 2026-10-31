@@ -2,8 +2,8 @@
 #
 # zippers: the top level of the build.
 #
-# This file sets up what the whole suite shares: the C++ standard, the options, zlib, the optional viewers, the tests
-# and the install. It sets NO warning flags and NO optimisation flags of its own. Each program sets its own, so that
+# This file sets up what the whole suite shares: the C++ standard, the options, zlib, the optional viewers and window,
+# the tests and the install. It sets NO warning flags and NO optimisation flags of its own. Each program sets its own, so that
 # the imported programs (legacy/) build exactly as their old makefiles did. Settings that programs may share are
 # offered as targets to link against (zippers::warnings, zippers::gl) and as modules in cmake/.
 #
@@ -66,6 +66,7 @@ include(ZippersWarnings)   # defines zippers::warnings (applied to nothing by it
 # ---- libraries -----------------------------------------------------------------------------------------------------
 find_package(ZLIB REQUIRED)  # provides ZLIB::ZLIB
 include(ZippersViewers)      # with ZIPPERS_VIEWERS=ON: finds GLUT and OpenGL, defines zippers::gl
+include(ZippersWindow)       # ZIPPERS_WINDOW (AUTO, ON, OFF): finds GLFW and OpenGL, defines zippers::window
 
 # ---- tests and programs --------------------------------------------------------------------------------------------
 enable_testing()
@@ -98,3 +99,8 @@ install(FILES README.md COPYING CITATION.cff DESTINATION "${CMAKE_INSTALL_DOCDIR
 # ---- summary -------------------------------------------------------------------------------------------------------
 message(STATUS "zippers: build type '${CMAKE_BUILD_TYPE}', C++${CMAKE_CXX_STANDARD} with ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
 message(STATUS "zippers: viewers ${ZIPPERS_VIEWERS}, sanitizers ${ZIPPERS_SANITIZE}, film tools ${ZIPPERS_FILM}")
+if(ZIPPERS_WINDOW_BUILT)
+  message(STATUS "zippers: window ON")
+else()
+  message(STATUS "zippers: window OFF (${ZIPPERS_WINDOW_WHY})")
+endif()

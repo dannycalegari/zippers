@@ -189,6 +189,116 @@ if(TARGET apps_tools_strays)
   add_dependencies(test_cull_programs apps_tools_strays)
   target_compile_definitions(test_cull_programs PRIVATE "ZIPPERS_STRAYS=\"$<TARGET_FILE:apps_tools_strays>\"")
 endif()
+# The polyline file (src/output/polylines.h) and the options --polylines, --viewmatrix and --colour of zipper3 and zipper5:
+# the format (files written and read back, bit for bit; what the reader and the writer refuse); the pictures painted in
+# the test from the programs' files alone, against the programs' own pictures, byte for byte (default and turned views,
+# zoomed stills, linked pairs); a view given as matrices draws the picture of the view it is; the default colours given
+# again draw the same pictures, and another colour changes only its layer; the write by rename; the refusals. It runs
+# the two programs, so it depends on them.
+zippers_unit_test(test_polylines test_polylines.cc)
+if(TARGET apps_s3_zipper3 AND TARGET apps_s4_zipper5)
+  add_dependencies(test_polylines apps_s3_zipper3 apps_s4_zipper5)
+  target_compile_definitions(test_polylines PRIVATE "ZIPPERS_ZIPPER3=\"$<TARGET_FILE:apps_s3_zipper3>\""
+                             "ZIPPERS_ZIPPER5=\"$<TARGET_FILE:apps_s4_zipper5>\"")
+endif()
+set_tests_properties(test_polylines PROPERTIES TIMEOUT 300)
+# The shells: in S3 and S4 the curves of a smaller R are exactly the first polylines of those of a larger R, at every
+# shell up to 5.5 (S3) and 2.5 (S4), on the default files; -R exactly at a shell includes it; separate runs of the
+# programs at a few shells are the first part of the run at the largest; and the programs' polyline files are the
+# library's builds. It uses src/ and the two programs; ZIPPERS_REPO lets it read the data files.
+zippers_unit_test(test_shells test_shells.cc)
+target_compile_definitions(test_shells PRIVATE "ZIPPERS_REPO=\"${PROJECT_SOURCE_DIR}\"")
+if(TARGET apps_s3_zipper3 AND TARGET apps_s4_zipper5)
+  add_dependencies(test_shells apps_s3_zipper3 apps_s4_zipper5)
+  target_compile_definitions(test_shells PRIVATE "ZIPPERS_ZIPPER3=\"$<TARGET_FILE:apps_s3_zipper3>\""
+                             "ZIPPERS_ZIPPER5=\"$<TARGET_FILE:apps_s4_zipper5>\"")
+endif()
+set_tests_properties(test_shells PROPERTIES TIMEOUT 300)
+# --polylines and --colour of zipper (S2): the pictures painted from its files with its own painters (the test includes
+# apps/s2/zipper.cc, with main renamed, and is compiled with the program's -O3) against its pictures, byte for byte (PNG,
+# EPS, turned and zoomed, the whole sphere, the wheel); no picture without -o; the colours. It runs zipper.
+zippers_unit_test(test_polylines_s2 test_polylines_s2.cc apps/s2)
+target_compile_options(test_polylines_s2 PRIVATE -O3)
+if(TARGET apps_s2_zipper)
+  add_dependencies(test_polylines_s2 apps_s2_zipper)
+  target_compile_definitions(test_polylines_s2 PRIVATE "ZIPPERS_ZIPPER=\"$<TARGET_FILE:apps_s2_zipper>\"")
+endif()
+# The S2 camera of src/view/s2.h: make_view against legacy/s2/zipper.cc (which the test includes), bit for bit, and what
+# the functions moved from the program's window do (their text: check_output_moved_text).
+zippers_unit_test(test_view_s2 test_view_s2.cc legacy/s2)
+# The session file (src/output/session.h) and zippers draw --session: round trips (every number bit for bit, every key
+# of every example), the reader's refusals and warnings, options after a session, the stored sessions of
+# tests/sessions/ (each remakes, byte for byte, the picture of its command line given directly: both made here), the
+# hashes of the data files. It runs zippers, so it depends on it (and zippers on the programs).
+zippers_unit_test(test_gui_session test_gui_session.cc)
+target_compile_definitions(test_gui_session PRIVATE "ZIPPERS_REPO=\"${PROJECT_SOURCE_DIR}\"")
+if(TARGET apps_cli_zippers)
+  add_dependencies(test_gui_session apps_cli_zippers)
+  target_compile_definitions(test_gui_session PRIVATE "ZIPPERS_ZIPPERS=\"$<TARGET_FILE:apps_cli_zippers>\"")
+endif()
+# The jobs of apps/gui/jobs.h, with the build's zippers: curves jobs against zippers draw run directly, cancelling, the
+# debounce, a picture job and the one-child rule, quitting, the memory limit, and the signals (through gui_jobs_probe,
+# whose jobs handle them). It runs zippers and the probe, so it depends on them.
+add_executable(gui_jobs_probe gui_jobs_probe.cc)
+target_compile_options(gui_jobs_probe PRIVATE -O2 -Wall -Wextra)
+target_link_libraries(gui_jobs_probe PRIVATE apps_gui_jobs)
+set_target_properties(gui_jobs_probe PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+# gui_jobs_child stands in for zippers, to tell what a child got (its descriptors, signals, mask, folder and
+# environment); gui_find_zippers prints what find_zippers finds, from the build and when copied into an install's
+# layout.
+add_executable(gui_jobs_child gui_jobs_child.cc)
+target_compile_options(gui_jobs_child PRIVATE -O2 -Wall -Wextra)
+set_target_properties(gui_jobs_child PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+add_executable(gui_find_zippers gui_find_zippers.cc)
+target_compile_options(gui_find_zippers PRIVATE -O2 -Wall -Wextra)
+target_link_libraries(gui_find_zippers PRIVATE apps_gui_jobs)
+set_target_properties(gui_find_zippers PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+zippers_data_places(gui_find_zippers "${CMAKE_INSTALL_FULL_LIBEXECDIR}/zippers")
+file(RELATIVE_PATH _gui_to_bin "${CMAKE_INSTALL_FULL_LIBEXECDIR}/zippers" "${CMAKE_INSTALL_FULL_BINDIR}")
+target_compile_definitions(gui_find_zippers PRIVATE "ZIPPERS_INSTALLED_RELATIVE=\"${_gui_to_bin}\"")
+zippers_unit_test(test_gui_jobs test_gui_jobs.cc)
+target_link_libraries(test_gui_jobs PRIVATE apps_gui_jobs)
+zippers_data_places(test_gui_jobs "${CMAKE_INSTALL_FULL_LIBEXECDIR}/zippers")
+add_dependencies(test_gui_jobs gui_jobs_probe gui_jobs_child gui_find_zippers)
+target_compile_definitions(test_gui_jobs PRIVATE "ZIPPERS_PROBE=\"$<TARGET_FILE:gui_jobs_probe>\""
+                           "ZIPPERS_CHILD=\"$<TARGET_FILE:gui_jobs_child>\"" "ZIPPERS_FIND=\"$<TARGET_FILE:gui_find_zippers>\""
+                           "ZIPPERS_INSTALLED_RELATIVE=\"${_gui_to_bin}\""
+                           "ZIPPERS_LAYOUT=\"${PROJECT_BINARY_DIR}/find_zippers_test\"")
+if(TARGET apps_cli_zippers)
+  add_dependencies(test_gui_jobs apps_cli_zippers)
+  target_compile_definitions(test_gui_jobs PRIVATE "ZIPPERS_ZIPPERS=\"$<TARGET_FILE:apps_cli_zippers>\"")
+  target_compile_definitions(gui_find_zippers PRIVATE "ZIPPERS_ZIPPERS=\"$<TARGET_FILE:apps_cli_zippers>\"")
+endif()
+# The window's model (apps/gui/model.h), with no window: the keys against the legacy windows' arithmetic, the jobs each
+# starts, the shells, p's pictures against the commands it prints, its sessions loaded again, the detail. It runs
+# zippers, so it depends on it.
+zippers_unit_test(test_gui_model test_gui_model.cc)
+target_link_libraries(test_gui_model PRIVATE apps_gui_model)
+zippers_data_places(test_gui_model "${CMAKE_INSTALL_FULL_LIBEXECDIR}/zippers")
+set_tests_properties(test_gui_model PROPERTIES TIMEOUT 600)
+if(TARGET apps_cli_zippers)
+  add_dependencies(test_gui_model apps_cli_zippers)
+  target_compile_definitions(test_gui_model PRIVATE "ZIPPERS_ZIPPERS=\"$<TARGET_FILE:apps_cli_zippers>\"")
+endif()
+# The window's drawing (apps/gui/draw.h), its CPU half, with no OpenGL: the shaders' formulas written again in C++
+# from the uniforms, against the painters of view/s2.h, s3.h and s4.h. Built in every build (draw.cc loads OpenGL's
+# functions at run time, so it links no OpenGL library).
+zippers_unit_test(test_gui_draw test_gui_draw.cc)
+target_link_libraries(test_gui_draw PRIVATE apps_gui_draw)
+# The window itself, on the screen (label gui, not fast): zview driven by a short key feed, and its grabs. Built only
+# with the window; it skips itself (status 77) unless ZIPPERS_GUI_TESTS=1, which make test-gui sets, so that a plain
+# ctest never opens a window.
+if(ZIPPERS_WINDOW_BUILT AND Python3_Interpreter_FOUND)
+  add_test(NAME test_gui_window
+           COMMAND "${Python3_EXECUTABLE}" -I "${CMAKE_CURRENT_SOURCE_DIR}/test_gui_window.py" "${PROJECT_BINARY_DIR}")
+  set_tests_properties(test_gui_window PROPERTIES LABELS gui TIMEOUT 600 SKIP_RETURN_CODE 77)
+endif()
+# The SHA-256 of src/core/sha256.h, through the tool sha256_tool, against Python's hashlib (test_sha256.py, below).
+add_executable(sha256_tool sha256_tool.cc)
+target_compile_options(sha256_tool PRIVATE -O2 -Wall -Wextra)
+target_link_libraries(sha256_tool PRIVATE zippers::core)
+set_target_properties(sha256_tool PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+
 # The options of the presentation in the kernel search (search/kernel_search.h, search/roof_choice.h): the words
 # and THE FACT on a toy alphabet, the junctions of the stored files, the candidates for t, and chz and chz5 themselves
 # with --tlist, --tcand, --roofs and --noinv on light cases (so it depends on the two programs, as test_roots_cs does).
@@ -239,9 +349,14 @@ endif()
 #                         ZIPPERS_DATA; an interrupted check (SIGINT, SIGTERM, SIGHUP) ends by the signal, its running
 #                         check stopped and its temporary folder removed; a signal ignored when zippers starts stays
 #                         ignored; and when what reads its output stops, it ends by SIGPIPE, its folder removed;
+#   test_zview            zview --headless (the window's model, its jobs and the key feed, with no window): every key in
+#                         every geometry and mode, random sequences from fixed seeds, the feed's refusals; and zippers
+#                         view: its table, its refusals, --dry-run, its default example, the message without a window.
+#                         With the window it never opens it (ZIPPERS_NO_WINDOW); its second argument says whether the
+#                         build has the window, as test_install's last;
 #   test_install          cmake --install into build/install_test/ (nowhere else), the list of installed files, the
 #                         installed zippers run from an empty folder (list, three pictures byte for byte as the build's
-#                         programs draw them, check), the installed tree moved, and an install with DESTDIR.
+#                         programs draw them, check, zview), the installed tree moved, and an install with DESTDIR.
 if(Python3_Interpreter_FOUND)
   add_test(NAME test_zippers_cli
            COMMAND "${Python3_EXECUTABLE}" -I "${CMAKE_CURRENT_SOURCE_DIR}/test_zippers_cli.py" "${PROJECT_BINARY_DIR}")
@@ -251,14 +366,25 @@ if(Python3_Interpreter_FOUND)
   add_test(NAME test_zippers_check
            COMMAND "${Python3_EXECUTABLE}" -I "${CMAKE_CURRENT_SOURCE_DIR}/test_zippers_check.py" "${PROJECT_SOURCE_DIR}"
                    "${PROJECT_BINARY_DIR}")
+  add_test(NAME test_sha256
+           COMMAND "${Python3_EXECUTABLE}" -I "${CMAKE_CURRENT_SOURCE_DIR}/test_sha256.py" "$<TARGET_FILE:sha256_tool>"
+                   "${PROJECT_SOURCE_DIR}")
+  if(ZIPPERS_WINDOW_BUILT)
+    set(_zippers_window_arg ON)
+  else()
+    set(_zippers_window_arg OFF)
+  endif()
+  add_test(NAME test_zview
+           COMMAND "${Python3_EXECUTABLE}" -I "${CMAKE_CURRENT_SOURCE_DIR}/test_zview.py" "${PROJECT_BINARY_DIR}"
+                   ${_zippers_window_arg})
   add_test(NAME test_install
            COMMAND "${Python3_EXECUTABLE}" -I "${CMAKE_CURRENT_SOURCE_DIR}/test_install.py" "${CMAKE_COMMAND}"
                    "${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}" "${CMAKE_INSTALL_BINDIR}" "${CMAKE_INSTALL_LIBEXECDIR}"
-                   "${CMAKE_INSTALL_DATADIR}" "${CMAKE_INSTALL_DOCDIR}")
+                   "${CMAKE_INSTALL_DATADIR}" "${CMAKE_INSTALL_DOCDIR}" ${_zippers_window_arg})
 else()
-  foreach(_t test_zippers_cli test_zippers_tables test_zippers_check test_install)
+  foreach(_t test_zippers_cli test_zippers_tables test_zippers_check test_install test_sha256 test_zview)
     add_test(NAME ${_t} COMMAND sh -c "echo '${_t}: needs Python 3, and CMake found none' >&2; exit 1")
   endforeach()
 endif()
-set_tests_properties(test_zippers_cli test_zippers_tables test_zippers_check PROPERTIES LABELS fast TIMEOUT 300)
-set_tests_properties(test_install PROPERTIES LABELS fast TIMEOUT 600)
+set_tests_properties(test_zippers_cli test_zippers_tables test_zippers_check test_sha256 PROPERTIES LABELS fast TIMEOUT 300)
+set_tests_properties(test_install test_zview PROPERTIES LABELS fast TIMEOUT 600)

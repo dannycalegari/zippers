@@ -61,12 +61,34 @@
                     default off; a note on stderr says which default is on. Without -o or at zoom 1 culling and the focus are
                     off unless asked for. --nocull is refused with --cull, --cullk and --zoomacc, --nofocus with --focus.
                     --zoomacc needs culling, which may be the default's.
+
+    THREE OPTIONS FOR OTHER PROGRAMS (a window, among them), which change nothing when they are not given:
+      --polylines FILE   the curves as data, a polyline file (output/polylines.h; write_polylines below says what its header
+                    holds): the layers Z+ and Z-, the renderers' points with the root and the letter of each polyline; for
+                    each layer, whether its renderer reached the cap of leaves (so its curves are incomplete). Written
+                    after the build (and --stats), before the picture; without -o it is the only output. An argument that
+                    holds a line break is refused at the start, since the header's command line cannot hold it, and so is
+                    a FILE that cannot be written (a folder of the name, a folder that may not be written in).
+      --viewmatrix N1,...,N34   the view as its matrices: the frame Q of R^5 (25 numbers, row by row) and the rotation of
+                    R^3 (9 numbers, row by row), comma-separated, in place of the view of --yaw, --pitch and --centre (which
+                    it does not go with); the hidden direction U is still that of --turn and --turn2, and --zoom, --clip
+                    and --hidfog are as usual. Both must be orthonormal to within 1e-9 (view/options.h); either
+                    determinant is accepted: the program's own frames have determinant -1, and since the picture does not
+                    see the sign of the hidden coordinate (it is a fog, even in it), a reflection of the frame or of the
+                    rotation draws what a rotation of the frame draws: a mirror image of a view is itself a view that the
+                    program makes (--turn2 180 draws the mirror image of the default view). The view is then exactly the
+                    one given, bit for bit (the header of a polyline file gives the view drawn in these numbers).
+      --colour L=R,G,B   the colour of the zippers Z+ or Z- in the picture, three numbers in [0, 1]; when one is given
+                    twice, the last one counts. The defaults are the colours the program always had, so the same numbers
+                    given again draw the same picture, byte for byte.
 */
 
 #include "core/data_files.h"
 #include "examples/imm_m5.h"
 #include "examples/imm_m5_render.h"
 #include "render/world.h"
+#include "output/polylines.h"
+#include "view/options.h"
 #include "view/s4.h"
 
 #include <cmath>
@@ -103,7 +125,65 @@ struct Opt5 {
     bool nofocus = false;          // --nofocus: neither is the focus ball
     bool cull_default = false;     // culling is on because of the default (a zoomed still), not because of an option
     bool focus_default = false;    // so is the focus ball
+    // for other programs: the curves as data, the exact view, the colours
+    string polylines;              // --polylines FILE (output/polylines.h)
+    string command;                // the command line, for the header of --polylines
+    bool viewmatrix = false;       // --viewmatrix: the frame Q and the rotation of R^3, as given
+    double vm[34] = {0};           // Q row by row, then the rotation row by row
+    bool view_options = false;     // --yaw, --pitch or --centre was given
+    bool colour_given[2] = {false, false};                   // --colour: Z+, Z-
+    double colour[2][3] = {{0, 0, 0}, {0, 0, 0}};
 };
+
+// the colours of the picture, unless --colour gives others
+static const double PLUS[3] = {0.05, 0.15, 0.85}, MINUS[3] = {0.85, 0.08, 0.08};
+
+// --polylines FILE: the curves as data (output/polylines.h). The layers Z+ and Z-, the renderers' points with the root and
+// the letter of each polyline (roots: W.rootd, the distances of the roots; with the focus ball, the first roots.main are
+// B(R)'s). The header: the program and its command line, the example, the file (as found), R, the accuracy drawn, the
+// cap, marking, the zippers drawn (only), culling (its K, or off) and the focus ball (its M, or off), the view
+// (viewmatrix: the numbers of --viewmatrix; turn and turn2, in degrees, and U, the rotation of R^4 that they give, row by
+// row; zoom; clip; hidfog), the marks t+ and t- (mark NAME x1 ... x5), and for each layer whether its renderer reached
+// the cap of leaves (capped NAME yes|no).
+static bool write_polylines(const Opt5& o, const World<imm::O51>& W, const s4::View5& v, double acc)
+{
+    namespace pl = zippers::polylines;
+    pl::File f;
+    f.sphere = 4;
+    f.add("program", "zipper5");
+    f.add("command", o.command);
+    f.add("example", "imm-m5");
+    f.add("file", o.subst);
+    f.add("R", pl::exact(o.R));
+    f.add("acc", pl::exact(acc));
+    f.add("cap", std::to_string(o.cap));
+    f.add("overlap", std::to_string(o.overlap));
+    f.add("only", o.which == 1 ? "+" : o.which == 2 ? "-" : "both");
+    f.add("cull", W.cull ? pl::exact(o.cullk) : string("off"));
+    f.add("focus", W.focus ? pl::exact(o.focus) : string("off"));
+    if (W.focus) f.add("roots.main", std::to_string(W.nmain));
+    double vm[34];
+    for (int r = 0; r < 5; r++) for (int k = 0; k < 5; k++) vm[5*r + k] = v.Q[r][k];
+    for (int i = 0; i < 9; i++) vm[25 + i] = v.rot[i];
+    f.add("viewmatrix", pl::exact_list(vm, 34, ','));
+    f.add("turn", pl::exact(o.turn));
+    f.add("turn2", pl::exact(o.turn2));
+    f.add("U", pl::exact_list(&v.U[0][0], 16));
+    f.add("zoom", pl::exact(v.zoom));
+    f.add("clip", pl::exact(v.clip));
+    f.add("hidfog", pl::exact(v.hidfog));
+    f.add("mark", "t+ " + pl::exact_list(W.plus.V.x, 5));
+    f.add("mark", "t- " + pl::exact_list(W.minus.V.x, 5));
+    f.add("capped", string("Z+ ") + (W.rp->capped ? "yes" : "no"));
+    f.add("capped", string("Z- ") + (W.rn->capped ? "yes" : "no"));
+    f.layers.push_back(pl::layer_of("Z+", *W.rp));
+    f.layers.push_back(pl::layer_of("Z-", *W.rn));
+    f.rootd = W.rootd;
+    string err;
+    if (!pl::write(o.polylines, f, &err)) { fprintf(stderr, "%s\n", err.c_str()); return false; }
+    fprintf(stderr, "wrote %s\n", o.polylines.c_str());
+    return true;
+}
 
 // a comma-separated list of numbers; false unless it has n0 or n1 of them
 static bool parse_numbers(const string& s, size_t n0, size_t n1, vector<double>& v)
@@ -158,7 +238,12 @@ static void usage()
 "  --focus M    with --zoom: add the focus ball h B(R), about the orbit point h o nearest to the point at distance\n"
 "               M log(zoom) from o towards the centre of the view; M = 1 by default for a still (-o) with --zoom above 1\n"
 "  --nofocus    do not add the focus ball by default (refused with --focus)\n"
-"  --cap N      stop after N leaves per zipper (default 2e7)\n");
+"  --cap N      stop after N leaves per zipper (default 2e7)\n"
+"  --polylines FILE  write the curves as data (a polyline file): Z+ and Z-\n"
+"  --viewmatrix N1,...,N34   the view as its matrices: the frame of R^5 (25 numbers, row by row), then the rotation\n"
+"               of R^3 (9), comma-separated and orthonormal; in place of --yaw, --pitch and --centre\n"
+"  --colour L=R,G,B  the colour of the zippers Z+ or Z-, three numbers in [0, 1] (defaults Z+=0.05,0.15,0.85\n"
+"               Z-=0.85,0.08,0.08); given twice, the last counts\n");
 }
 
 int main(int argc, char** argv)
@@ -175,8 +260,8 @@ int main(int argc, char** argv)
         else if (a == "-s") o.size = atoi(next().c_str());
         else if (a == "--clip") o.clip = atof(next().c_str());
         else if (a == "--zoom") o.zoom = atof(next().c_str());
-        else if (a == "--yaw") o.yaw = atof(next().c_str());
-        else if (a == "--pitch") o.pitch = atof(next().c_str());
+        else if (a == "--yaw") { o.yaw = atof(next().c_str()); o.view_options = true; }
+        else if (a == "--pitch") { o.pitch = atof(next().c_str()); o.view_options = true; }
         else if (a == "--turn") o.turn = atof(next().c_str());
         else if (a == "--turn2") o.turn2 = atof(next().c_str());
         else if (a == "--hidfog") o.hidfog = atof(next().c_str());
@@ -205,6 +290,7 @@ int main(int argc, char** argv)
             if (!(nn > 0)) { fprintf(stderr, "--centre: the zero vector\n"); return 1; }
             for (int k = 0; k < 5; k++) o.c[k] = v[k]/std::sqrt(nn);
             o.centre = true;
+            o.view_options = true;
         }
         else if (a == "--cull") o.cull = true;
         else if (a == "--cullk") {
@@ -219,8 +305,58 @@ int main(int argc, char** argv)
         }
         else if (a == "--nocull") o.nocull = true;
         else if (a == "--nofocus") o.nofocus = true;
+        else if (a == "--polylines") o.polylines = next();
+        else if (a == "--viewmatrix") {
+            vector<double> v;
+            bool ok = parse_numbers(next(), 34, 34, v);
+            for (size_t k = 0; ok && k < v.size(); k++) ok = std::isfinite(v[k]);
+            if (!ok) {
+                fprintf(stderr, "--viewmatrix: 34 numbers, comma-separated: the frame of R^5 (25, row by row), then the "
+                        "rotation of R^3 (9, row by row)\n");
+                return 1;
+            }
+            for (int k = 0; k < 34; k++) o.vm[k] = v[k];
+            o.viewmatrix = true;
+        }
+        else if (a == "--colour") {
+            string v = next(), name;
+            double c[3];
+            int k = -1;
+            if (viewopt::parse_colour(v, name, c)) k = name == "Z+" ? 0 : name == "Z-" ? 1 : -1;
+            if (k < 0) {
+                fprintf(stderr, "--colour %s: a name (Z+ or Z-) and three numbers in [0, 1], as Z+=0.05,0.15,0.85\n",
+                        v.c_str());
+                return 1;
+            }
+            for (int j = 0; j < 3; j++) o.colour[k][j] = c[j];
+            o.colour_given[k] = true;
+        }
         else if (a == "-h" || a == "--help") { usage(); return 0; }
         else { fprintf(stderr, "unknown option %s\n", a.c_str()); usage(); return 1; }
+    }
+    o.command = polylines::command_line(argc, argv);
+    if (!o.polylines.empty() && !polylines::recordable(o.command)) {
+        fprintf(stderr, "--polylines: an argument holds a line break, which the command line in the file's header cannot "
+                "hold\n");
+        return 1;
+    }
+    if (!o.polylines.empty()) {                          // a file that cannot be written: refused before the build
+        const string wp = polylines::write_problem(o.polylines);
+        if (!wp.empty()) { fprintf(stderr, "cannot write %s: %s\n", o.polylines.c_str(), wp.c_str()); return 1; }
+    }
+    // --viewmatrix: the whole view (but U), orthonormal; of either determinant (the top of the file says why)
+    if (o.viewmatrix && o.view_options) {
+        fprintf(stderr, "--viewmatrix gives the whole view: it does not go with --yaw, --pitch or --centre\n");
+        return 1;
+    }
+    if (o.viewmatrix) {
+        double eq = viewopt::orthonormal_error(o.vm, 5), er = viewopt::orthonormal_error(o.vm + 25, 3);
+        if (!(eq <= viewopt::VIEWMATRIX_TOL) || !(er <= viewopt::VIEWMATRIX_TOL)) {
+            fprintf(stderr, "--viewmatrix: the %s is not orthonormal: the largest entry of |M M^T - I| is %g, above %g\n",
+                    !(eq <= viewopt::VIEWMATRIX_TOL) ? "frame of R^5 (the first 25 numbers)" : "rotation of R^3 (the last 9)",
+                    !(eq <= viewopt::VIEWMATRIX_TOL) ? eq : er, viewopt::VIEWMATRIX_TOL);
+            return 1;
+        }
     }
     // --nocull and --nofocus turn off what a zoomed still has by default; they contradict the options that turn it on
     if (o.nocull && (o.cull || o.zoomacc)) {
@@ -247,6 +383,10 @@ int main(int argc, char** argv)
         double p[5];
         for (int k = 0; k < 5; k++) p[k] = -o.c[k];
         s4::orthonormal_frame(p, v.Q);
+    }
+    if (o.viewmatrix) {                        // the view as given: the frame, then the rotation of R^3
+        for (int r = 0; r < 5; r++) for (int k = 0; k < 5; k++) v.Q[r][k] = o.vm[5*r + k];
+        for (int i = 0; i < 9; i++) v.rot[i] = o.vm[25 + i];
     }
     v.clip = o.clip; v.zoom = o.zoom; v.hidfog = o.hidfog;
     s4::turn4(v.U, 2, 3, o.turn*s4::PI/180);
@@ -298,10 +438,13 @@ int main(int argc, char** argv)
                     "focus ball\n", nr,
                     W.roots.size() - nr);
     }
+    if (!o.polylines.empty() && !write_polylines(o, W, v, acc)) return 1;
     if (o.out.empty()) return 0;
     vector<s4::Layer5> layers;
-    if (o.which & 1) layers.push_back({W.rp, {0.05, 0.15, 0.85}, 1});
-    if (o.which & 2) layers.push_back({W.rn, {0.85, 0.08, 0.08}, 1});
+    const double* c0 = o.colour_given[0] ? o.colour[0] : PLUS;
+    const double* c1 = o.colour_given[1] ? o.colour[1] : MINUS;
+    if (o.which & 1) layers.push_back({W.rp, {c0[0], c0[1], c0[2]}, 1});
+    if (o.which & 2) layers.push_back({W.rn, {c1[0], c1[1], c1[2]}, 1});
     vector<imm::O51::Point> marks = {W.plus.V, W.minus.V};
     if (!s4::write_png5(o.out.c_str(), o.size, layers, v, marks, o.thick)) { fprintf(stderr, "cannot write %s\n", o.out.c_str()); return 1; }
     fprintf(stderr, "wrote %s\n", o.out.c_str());

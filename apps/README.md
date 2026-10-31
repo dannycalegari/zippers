@@ -8,6 +8,7 @@ The programs built on the shared library `src/`.
 | `s3/` | `chz` (the kernel search), `zipper3` (without its window), `link3` (linking numbers) |
 | `s4/` | `chz5` (the kernel search), `zipper5`, and `film5`, the film's ending on S⁴ (a window) |
 | `cli/` | `zippers`, the command line of the suite: it runs the programs above by name (below) |
+| `gui/` | the window's program `zview` (GLFW and OpenGL 3.3; without GLFW only `--headless`) and what it stands on: its drawing (`draw.h`, OpenGL only); and with no OpenGL, its model (`model.h`), the state and the handlers of the keys and the mouse; its key feed (`feed.h`); its jobs (`jobs.h`), `zippers draw` run as child processes, one at a time (below) |
 | `tools/` | the measuring programs, which change nothing in `src/` and are **not** part of the reference runs: `strays` (how far the true curves stray from the drawn chords; with `--window --cull`, inside the window of a zoomed view), `islands5` (the islands of the finite S⁴ zippers), `overdraw` (the ink drawn twice, with and without the renderer's marking), `roofs` (the measures of a system of roofs), and `cull` (how far a branch's curve strays from the points of its cull test, in units of its size; a picture with culling against the same picture without it, in the window; the focus centres; the density of the focus ball; the cusp points of the tips). The options of each are in the comment at the top of its source |
 
 Each program of `s2/`, `s3/` and `s4/` has the command line of its legacy original (`legacy/`), and is listed in
@@ -25,7 +26,8 @@ and L (S², with `-n N`), `cartwright-steger` or `cs` (S³), `imm-m5` or `imm` (
 |---|---|
 | `list [EXAMPLE]` | (itself) the examples, and where each default file is found |
 | `draw EXAMPLE [options]` | `zipper -m EXAMPLE` (S²), `zipper3` (S³) or `zipper5` (S⁴) |
-| `view EXAMPLE` | nothing: the window is not in this version |
+| `draw --session FILE [options]` | the same, with the example and the options of a session file (below) |
+| `view [EXAMPLE] [options]` | `zview`, the window on the curves of `draw EXAMPLE [options]` (by default `fig8 -n 2 -R 6`), or `view --session FILE [options]`; a build without GLFW has no window, and `zview` says so (below) |
 | `search EXAMPLE [C R [TPHI]]` | `chz kernel C R [TPHI]` (S³), `chz5 kernel C R RHO [TPHI]` (S⁴; RHO is `--rho`, default 3); without numbers the search that made the example's default file |
 | `link cartwright-steger` | `link3`, with `-a 0.01 --nrel 20 --hr 2.6` unless given (the scan that made the stored pairs) |
 | `film SHOT.txt` | `zmovie`, with the arguments unchanged |
@@ -42,6 +44,136 @@ the only φ of `cartwright-steger` in this version, is checked and dropped. Then
 and `zippers COMMAND --help` the options. It runs the programs of its own build when it runs from its build folder, and
 those of `../libexec/zippers/` when it is installed, never any program found in `PATH`. The top of `cli/zippers.cc`
 says more.
+
+### Session files
+
+A session file (format 1, `src/output/session.h`) holds the draw command of a picture with every option written out,
+so that `zippers draw --session FILE -o PIC` remakes the picture:
+
+```
+zippers session 1
+made_by = zippers 0.9, Darwin arm64, AppleClang 21.0.0.21000101
+example = cartwright-steger
+phi = 1,0
+f = subst_4.00_9.50_t3_r1.txt
+sha256.f = (64 hexadecimal digits)
+R = 2.554
+a = 0.05
+...
+colour = Z+=0.05,0.15,0.85
+```
+
+- **The lines** are `KEY = VALUE`, with `#` for comments. The draw keys are the options of `zippers draw` without their
+  dashes, with their values as on a command line (`pole = 10 5`; a flag is `C = yes` or `C = no`; one `colour` line for
+  each colour). Every option of the picture is written, its default included, so that a later version that changes a
+  default still remakes the picture. For a picture (`-o`), a zoomed still's culling and focus ball are written as the
+  options they stand for. A command line without `-o` (curves) is written as it is: its session, replayed without
+  `-o`, gives the command's curves. Replayed with `-o`, it makes a still with the culling and focus ball of the
+  `zippers` that replays it (at a zoom above 1), which a later version may change; to keep those of today, make the
+  session from the command line with `-o`. In S² `--stats` is a draw key (`stats = yes`): the memory of its tables
+  counts against the drawing's limit, so it can change a picture that reaches the limit. The limit is written as the
+  command had it: 6 GB with `--stats` (zipper's default then), else 4. A picture whose drawing reaches the limit can
+  still differ from run to run, since zipper's guard reads the memory the process holds. In S³ and S⁴ `--stats` only
+  prints. The outputs
+  (`-o`, `--polylines`), the options that only print (`--check`, `--timing`, and `--stats` in S³ and S⁴) and
+  `--format` are not draw keys. Numbers are the shortest decimals that read back to the same doubles.
+- **`sha256.f`** is the SHA-256 of the substitution file that the data search found when the session was written, and
+  `sha256.pairs` that of the file of `--pairs`. `zippers draw --session` finds the files as always, and refuses one
+  whose hash differs, saying which file it found, where, and both hashes; so a file of the same name in the working
+  folder cannot change the picture silently.
+- **Options given after `--session`** replace the session's: a key by its name, a colour by its colour's name; the view
+  by `--viewmatrix` and the view by the angles replace each other (`--yaw` after a session of a matrix drops the
+  matrix, and the angles not given are then the programs' defaults); `--nocull` drops the session's culling; `-f` (and
+  `--pairs`) replace the file and its check.
+- **Versions:** a later format is refused ("this session is of format 2, written by a newer zippers; this one reads
+  format 1"); an unknown draw key is an error, since it would change the picture; the window's own keys (`window.`)
+  are kept, and an unknown one is ignored with a warning.
+- `zippers --dry-run draw --session FILE` prints the program's command line. `tests/sessions/` holds sessions of each
+  sphere and of a pair picture; `tests/unit/test_gui_session.cc` checks that each still remakes its picture.
+
+### The jobs of a window
+
+`gui/jobs.h` runs `zippers draw` as child processes for a window (with no OpenGL and no window of its own), so that the
+curves it shows and the pictures it saves are `zippers draw` commands' outputs: a curves job writes `--polylines` into
+the jobs' own temporary folder and is read back in a thread; a new request for curves ends a running curves job and
+starts 0.3 s after the last request (`cancel_curves` ends a curves job and leaves the pictures); a picture job is ended only by a cancel or by quitting, which remove its partial
+files; one child runs at a time; the child's standard error is kept and its memory sampled 4 times a second; a memory
+limit (by default 40% of the machine's memory) is passed to S² jobs as `--memlimit` and ends S³ and S⁴ jobs that pass
+it; a child is ended by `SIGTERM`, then `SIGKILL`, and always waited for, and inherits no descriptor but its standard
+streams. The jobs' folder is removed when they end, and, when they handle the signals (`handle_signals`: one `Jobs` at a
+time), on `SIGINT`, `SIGTERM` and `SIGHUP`; without it a signal that ends the process leaves the folder. The top of
+`gui/jobs.h` says more.
+
+### The window's model and keys
+
+`gui/model.h` is the window's state and the handlers of its keys and its mouse, with no OpenGL and no window, so that
+they are the same with a window and without one. The curves it shows are those of `zippers draw ... --polylines`, run by
+the jobs, for the whole sphere; the first ones give the start view, the program's own (the header of the polyline
+file). The keys:
+
+| key | S² | S³ | S⁴ |
+|---|---|---|---|
+| ← → ↑ ↓ | rotate the sphere 6° about the screen's axes | move the pole 4° toward the screen's axes | as S³ |
+| `w` `s` | — | the pole toward, away from the viewer | as S³ |
+| `+` `=` `-` `_` | R ± 0.5 (R ≥ 1; `+` checked at once against the program's limit), new curves | the next, the previous shell of roots: within the R of the curves shown, their first polylines (no job); beyond it, or in detail, new curves | as S³ |
+| `]` `[` | the accuracy ÷ 1.5, × 1.5: new curves | as S² | as S² |
+| `z` `Z` `x` `X`, the scroll wheel | the zoom × 1.5, ÷ 1.5, in [0.1, 10⁷] | as S² | as S² |
+| `c` `C` | the zippers → and the wheel → the wheel | both → Z⁺ → Z⁻ | as S³ |
+| `b` | — | the clip radius 3 → 6 → 12 → 1.5 | as S³ |
+| `r` | the start view | as S² (with a pair: its view) | as S² |
+| `n` `N` `l` | — | with `--pairs`: the next, the previous linked pair; the zippers faintly behind it | — |
+| `h` `H` `j` `J` | — | — | turn the hidden direction ±5°: `--turn2` (with the horizontal axis), `--turn` (with the depth axis) |
+| `p` `P` | save the picture of the view: `NAME.png` and `NAME.zsession`, never overwriting a file | as S² | as S² |
+| `f` | the curves of this view in detail (culled, at the accuracy on the screen); `f` again, or a change of the view, for the whole picture | as S² (not of a pair) | as S² |
+| `?` | the keys | as S² | as S² |
+| `q` Esc | quit; a picture not yet written is removed | as S² | as S² |
+| a drag | rotate, 0.4° a pixel | rotate R³, 0.4° a pixel | as S³ |
+
+A key that does nothing in the geometry shown says so; Tab does nothing (the window has no panel).
+
+**`p`** writes the session of the view first (`src/output/session.h`), then runs `zippers draw --session NAME.zsession
+-o NAME.png` as a picture job, so that the picture is the output of the command it prints, byte for byte; zoomed, it
+also prints the command of the full detail (S²: `-a` divided by the zoom, down to 10⁻⁶; S³, S⁴: `--zoomacc`). NAME is
+the stem of `-o` (by default the example's name), then `NAME_1`, `NAME_2`, ... S²'s picture frames the window's square
+(at least 1024 pixels, `s2::export_framing`) at the angles of `s2::command_angles`; S³ and S⁴ give the view as
+`--viewmatrix`, S⁴ with `--turn` and `--turn2`. A session also holds the window's own keys (`window.stem`,
+`window.size`, `window.layers`, and in S² `window.zoom` and `window.view`), so that `zippers view --session NAME.zsession`
+opens on the same state. In S² with the wheel alone shown, the picture draws the zippers with the wheel (no command draws
+the wheel alone).
+
+**The jobs' memory limit** is the jobs' default, 40% of the machine's memory.
+
+### The window
+
+`gui/zview.cc` opens a GLFW window with an OpenGL 3.3 core context and draws it with `gui/draw.h`. GLFW's character
+callback gives the keys (with shift applied), its key callback the arrows, Esc and Tab; the drag, the scroll wheel (a
+notch at a time) and the window's size are in the window's points, and the picture is drawn in the framebuffer's
+pixels (twice the points on a Retina screen). The loop waits for events at most 0.1 s, takes the jobs' results, and
+draws again only when something changed. The title shows the example, R, the zoom and whether a job runs; the messages
+are on the standard error. On macOS GLFW is kept from changing the working folder (`GLFW_COCOA_CHDIR_RESOURCES`).
+
+`gui/draw.h`: one vertex buffer for each layer, uploaded once for each set of curves, and each segment an instanced
+quad, whose vertex shader projects both ends as the painters do (S²: the front hemisphere; S³: `s3::eye` and its fog;
+S⁴: `s4::eye5`, its two fogs, and the painter's sort key `z + 10 fh` as the depth), drops it unless both ends pass, and
+widens it to the layer's width (1 point; S³'s linked pair 2.5, over its context, the depth buffer cleared between the
+two). S²'s silhouette circle and the crosses of t⁺ and t⁻ are drawn as the pictures draw them. Lines are smoothed by
+4x multisampling. Its OpenGL functions are loaded through `glfwGetProcAddress`, so the same code runs on macOS and
+Linux and `draw.cc` links no OpenGL library. The view's change needs no pass over the points; beyond a zoom of about
+10⁵ the single precision of the GPU shows as steps (the pictures are computed in double).
+
+The build: `ZIPPERS_WINDOW` (`AUTO`, the default, builds the window when GLFW 3.3 or later and OpenGL are found; `ON`
+requires them; `OFF`), `cmake/ZippersWindow.cmake`. With the window `zview` is installed into `libexec/zippers/`.
+
+**`zview --headless`** (for the tests; not in the usage texts) runs the model and its jobs with no window: it computes
+the first curves, feeds the tokens of the environment variable `ZIPPERS_KEYS` to the handlers (`gui/feed.h`: one
+character, `<L>` `<R>` `<U>` `<D>`, `<E>`, `<T>`, `<W>` a pause of `ZIPPERS_KEYDELAY` ms, `<sWxH>`, `<drag DX,DY>`,
+`<scroll N>`, `<wait>` until no job runs, `<S>` the state into `STATE_NN.zsession`; `<G>` is refused), and exits at
+their end, or at `q` or Esc, with status 1 if a token was refused. `zview` is built in every build and needs no window
+system for it. The same tokens drive the window when `ZIPPERS_KEYS` is set, one every `ZIPPERS_KEYDELAY` ms once the
+first curves have come, `<G>` reading the picture area back into `GRAB_NN.png`; `zview` then exits at their end. With
+`ZIPPERS_NO_WINDOW` set (for the tests), `zview` without `--headless` checks its options and exits with status 1 without
+opening the window. Without GLFW `zview` is not installed: `zippers view` finds it as it finds the programs, and an
+installed `zippers view` says that the installation has no window.
 
 ## How the programs find their data files
 
@@ -62,11 +194,78 @@ printed when it read the working folder only, and no reference run changes; a fi
 at which it was found (in the line `FILE: |S| = ...`): a full path, or, through a relative folder of `ZIPPERS_DATA`, a
 relative one. When the file is found nowhere, the program says where it looked, and exits with status 1.
 
+## The curves as data, the exact view, the colours
+
+Three options of `zipper`, `zipper3` and `zipper5` (and of `zippers draw`), which change nothing when they are not given:
+
+- **`--polylines FILE`** writes the curves that the program drew as a polyline file (format 1, `src/output/polylines.h`):
+  a text header of `KEY VALUE` lines, from `zippers polylines 1` to `data`, then little-endian blocks. Each layer holds,
+  for each polyline, its first point, its root and its letter, and then the points as the renderer stores them (floats),
+  so that a reader has exactly the points that the program drew; the file ends with the distances of the roots.
+  - The layers: `Z+`, `Z-`; with `zipper -C`, `wheel`; with `zipper3 --pairs`, `pair.Z+` and `pair.Z-`, whose polyline
+    k is the loop of pair k. In S³ and S⁴ every polyline records its root and its letter; in S² none (−1: the polylines
+    are joined across roots).
+  - The header: `program`, `command` (the command line), `example`, the parameters (`order`, `file`, `R`, `acc`, `cap`,
+    `overlap`, `only`, ...), whether the curves were culled to the view (`cull`: S² `on` or `off`, S³ and S⁴ the margin
+    factor or `off`) and the focus ball (`focus`), and the view. S²: `view` (the rotation, row by row), `yaw`, `pitch`,
+    `roll`, `zoom`, and the largest R that the program accepts for the example (`maxR`; `maxR.focus` with the focus
+    ball; `maxR.wheel` with `-C`). S³: `viewmatrix` (the 25 numbers of `--viewmatrix`), `zoom`, `clip`, the marks
+    (`mark t+ ...`, `mark t- ...`), and with `--pairs`, `pairs` and for each pair K `pair.K.pole`, `pair.K.clip`,
+    `pair.K.lk`, `pair.K.line`. S⁴: `viewmatrix` (34 numbers), `turn`, `turn2`, `U` (the rotation of R⁴ that they give),
+    `zoom`, `clip`, `hidfog`, the marks. In all three, for each layer, `capped NAME yes` or `capped NAME no`: whether
+    its curves are incomplete because a cap was reached (S³ and S⁴: the renderer's cap of leaves, `--cap`; S²: the
+    memory limit of the drawing, or the cap of the root search; the wheel when a zipper is).
+  - The `file` key gives the data file as the program found it: its plain name when it was found in the working folder,
+    and otherwise its full path.
+  - `zipper` without `-o` then writes no picture (not even EPS on the standard output); with `-o` it writes both.
+    `zipper3` and `zipper5` write the file after the build (and `--pairs`, `--check`, `--stats`), before any picture.
+    All three refuse a FILE that they cannot write (a folder of the name, a folder that does not exist or may not be
+    written in) before they compute anything, and at the start an argument that holds a line break, which the
+    header's command line cannot hold.
+  - The file is written under a temporary name in its folder and renamed at the end: a write that fails leaves nothing
+    behind, an older file of the name stays as it was, and the message gives the system's reason. So the folder must
+    be one that may be written in, even when the file itself may be written; such a file is refused, and the message
+    says so. A name that is a symbolic link is written through: its target is written (the temporary name beside the
+    target), and the link stays a link. A program ended while it writes leaves its temporary file, `FILE.tmpPID_K`
+    (PID its process), beside the name.
+  - In S³ and S⁴ the polylines come in the order of their roots, nearest first, and without the focus ball the curves
+    of a smaller R are exactly the first polylines of those of a larger R; `-R` exactly at a shell's radius includes
+    that shell (on the default files, at every shell up to R = 5.5 in S³ at ACC 0.1 and up to 3.33 at the default 0.01,
+    and up to 2.48 in S⁴ at ACC 0.05 and at the default 0.02: `tests/unit/test_shells.cc`). The shells are `cs::shell_radii` (S³) and `imm::shell_radii` (S⁴).
+    With the focus ball the roots of fh B(R) come after all of B(R), so there they are not.
+- **`--viewmatrix N1,...`** (`zipper3`, `zipper5`): the view as its matrices, comma-separated: in S³ the frame Q of R⁴
+  (16 numbers, row by row) and the rotation of R³ (9); in S⁴ the frame of R⁵ (25) and the rotation of R³ (9), the
+  hidden direction staying that of `--turn` and `--turn2`. It replaces the view of `--yaw`, `--pitch`, `--pole` and
+  `--centre`, which it does not go with; `--zoom`, `--clip` and `--hidfog` are as usual. The view is then the one given,
+  bit for bit: the `viewmatrix` of a polyline file's header draws the picture of the zippers in that view again. The
+  frame and the rotation must be orthonormal to within 1e-9 (the largest entry of |M Mᵀ − I|), which leaves room for
+  the rounding of millions of turns and refuses a number mistyped anywhere but in its last few digits.
+  - In S³ both must have determinant +1: a frame or a rotation of determinant −1 would draw the mirror image, on which
+    every linking number has the other sign, and no option or turn makes one.
+  - In S⁴ either determinant is accepted. The program's own frames have determinant −1, and the picture does not see
+    the sign of the hidden coordinate (its fog is even in it), so a reflection of the frame or of the rotation draws
+    what some rotation of the frame draws.
+  - With `zipper3 --pairs -o` the pair is drawn in the view given, with `--zoom` and `--clip`, in place of its own. Its
+    own view, which the picture without `--viewmatrix` has, is the frame of the pair's pole (`pair.K.pole`), its clip
+    radius (`pair.K.clip`) and zoom 1; the header's `viewmatrix` is still the view of the zippers.
+- **`--colour L=R,G,B`**: the colour of what L names, three numbers in [0, 1], one option for each L. The names are
+  the polyline file's layer names, and the zippers behind a pair:
+  - `Z+` and `Z-`, the zippers: `zipper` `0,0,1` and `1,0,0`; `zipper3` and `zipper5` `0.05,0.15,0.85` and
+    `0.85,0.08,0.08`;
+  - `wheel`, the wheel (`zipper -C`): `0,0.6,0`;
+  - `pair.Z+` and `pair.Z-`, the loops of a pair (`zipper3 --pairs -o`): the zippers' colours;
+  - `context.Z+` and `context.Z-`, the zippers drawn faintly behind a pair (`--context`): `0.70,0.75,0.95` and
+    `0.95,0.72,0.72`.
+
+  A name that the picture does not draw is accepted and changes nothing (the zippers' colours in a pair picture, the
+  wheel's without `-C`); the names of another program are refused. When one is given twice, the last one counts. The
+  defaults given as options draw the same pictures, byte for byte.
+
 ## Installing
 
 `cmake --install build --prefix P` (or `make install PREFIX=P`) puts `zippers` in `P/bin/`, the seven programs it runs
 (`zipper`, `zmovie`, `chz`, `zipper3`, `link3`, `chz5`, `zipper5`) in `P/libexec/zippers/`, and the files of `data/` in
-`P/share/zippers/`. `ztest`, `film5` and the tools are not installed.
+`P/share/zippers/`. `ztest`, `film5`, `zview` and the tools are not installed.
 
 ## Differences from the legacy programs
 
@@ -85,6 +284,8 @@ relative one. When the file is found nowhere, the program says where it looked, 
   radius in use), with a second line when R is within 10⁻⁶ of a shell. Without `--stats` nothing printed changes.
   `link3 --pair` refuses indices out of range, which the legacy program read past the end.
 - **The data files** are found by the search above; the legacy programs read the working folder only.
+- **`--polylines`, `--viewmatrix` and `--colour`** (above) are new. Without them nothing that the programs print or write
+  changes; their usage texts have a few more lines.
 - **The messages.** `zipper5` has a usage text (`-h`, and after an unknown option), where the legacy program had none.
   `link3` says "cannot write FILE" for a picture it cannot write (the legacy program said "wrote FILE" all the same:
   the scan writes its pictures into the folder `pictures/`, which must exist). `zipper -v` says that this build has no

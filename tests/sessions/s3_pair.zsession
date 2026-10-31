@@ -1,0 +1,32 @@
+zippers session 1
+# zippers draw --session s3_pair.zsession -o s3_pair.png remakes s3_pair.png
+made_by = zippers 0.9, Darwin arm64, AppleClang 21.0.0.21000101
+example = cartwright-steger
+phi = 1,0
+f = subst_4.00_9.50_t3.txt
+sha256.f = aced7a4829b88b949575ce4e5305c55a7e0d39ed7db9b204bca34d4f993f2572
+pairs = linked_pairs.txt
+sha256.pairs = cbff07afb0f394f0e4521af217d8cfa3076038efca78aeed68f6935c33fc55cc
+pairindex = 5
+context = yes
+R = 0
+a = 0.01
+s = 300
+zoom = 1
+yaw = 0
+pitch = 20
+pole = 0 0
+clip = 3
+overlap = 0
+cap = 8000000
+thick = 0
+cull = no
+zoomacc = no
+nocull = no
+nofocus = no
+colour = Z+=0.05,0.15,0.85
+colour = Z-=0.85,0.08,0.08
+colour = pair.Z+=0.05,0.15,0.85
+colour = pair.Z-=0.85,0.08,0.08
+colour = context.Z+=0.7,0.75,0.95
+colour = context.Z-=0.95,0.72,0.72

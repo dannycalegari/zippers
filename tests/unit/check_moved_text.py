@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""check_moved_text: every function of src/output/png.h and src/output/raster.h is its legacy original, token for token.
+"""check_moved_text: every function of src/output/png.h and src/output/raster.h, and the S2 camera of src/view/s2.h, is its
+legacy original, token for token.
 
 The moved code changes no expression. The unit tests test_output_*.cc show
 that the moved functions BEHAVE like the legacy ones; this check shows that they ARE the legacy ones, up to the mechanical
@@ -158,6 +159,30 @@ for f in (Z3, P4):
 pal = undo(tokens(function_text(ras, "inline std::vector<uint8_t> downsample_palette_rows(")), {})
 report(contains(pal, tokens(between(read(P2), "const size_t rowlen = 1 + (size_t)W*3;", "(uint8_t)(sum/(SS*SS));\n        }\n    }"))),
        "raster::downsample_palette_rows contains the 2x2 loops of write_png in %s" % P2)
+
+print("view/s2.h: the S2 camera, from the program and its window (%s)" % P2)
+s2h, leg2 = read("src/view/s2.h"), read(P2)
+report(struct_tokens(s2h, "View") == struct_tokens(leg2, "View"), "s2::View  =  View")
+for name, ret in [("make_view", "View"), ("mul3", "View"), ("rotx", "View"), ("roty", "View"), ("wrap180", "double"),
+                  ("view_angles", "void"), ("fmt_num", "string"), ("export_name", "string")]:
+    new_ret = "std::string" if ret == "string" else ret
+    new = undo(tokens(function_text(s2h, "inline %s %s(" % (new_ret, name))), {})
+    report(new == tokens(function_text(leg2, "static %s %s(" % (ret, name))), "s2::%s  =  %s" % (name, name))
+# command_angles: the statements of the window's print_command that choose the angles
+ca = undo(tokens(function_text(s2h, "inline bool command_angles(")), {})
+report(contains(ca, tokens("view_angles(gview, y, p, r);")) and "view_angles(gview, y, p, r);" in leg2,
+       "s2::command_angles contains print_command's call of view_angles")
+report(contains(ca, tokens(between(leg2, "for (double t : {1e-12, 0.0}) {", "if (e <= 1e-3*px) break;\n        }"))),
+       "s2::command_angles contains print_command's loop over the two tolerances")
+# export_framing: the statements of the window's key 'p' that frame the picture, the window's variables renamed
+ef = undo(tokens(function_text(s2h, "inline void export_framing(")), {})
+for st in ["if (o.size < 1024) o.size = 1024;", "o.zoom = opt->zoom * (double)o.size / ((o.size - 4.0) * 1.1);",
+           "o.size = std::min(o.size, PNG_MAX_SIZE); o.zoom = std::min(o.zoom, MAX_ZOOM);"]:
+    t = tokens(st)
+    for old, new_ in [(["o", ".", "size"], ["size"]), (["o", ".", "zoom"], ["zoom"]), (["opt", "->", "zoom"], ["window_zoom"]),
+                      (["PNG_MAX_SIZE"], ["max_size"]), (["MAX_ZOOM"], ["max_zoom"])]:
+        t = replace_seq(t, old, new_)
+    report(st in leg2 and contains(ef, t), "s2::export_framing contains  %s  (the key 'p')" % st)
 
 print("\n%d pair(s) differ" % failures)
 sys.exit(1 if failures else 0)

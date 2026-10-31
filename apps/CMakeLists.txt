@@ -8,12 +8,16 @@
 #   s3/   chz (its kernel search in src/search/), zipper3 and link3
 #   s4/   chz5 (likewise), zipper5, film5
 #   cli/  zippers, the command line of the suite, which runs the programs above
+#   gui/  the window zview: its model, its key feed and its jobs (zippers draw run as child processes), with no OpenGL
+#         and no GLFW; and its drawing and its loop, built when ZIPPERS_WINDOW finds GLFW and OpenGL
 #
 # Installed (cmake --install): zippers in bin/, and the seven programs it runs (zipper, zmovie, chz, zipper3, link3,
-# chz5, zipper5) in libexec/zippers/. Not installed: ztest, film5 and the tools of tools/.
+# chz5, zipper5) in libexec/zippers/, with zview when the build has the window. Not installed: ztest, film5 and the
+# tools of tools/.
 
 add_subdirectory(s2)
 add_subdirectory(s3)
 add_subdirectory(s4)
 add_subdirectory(tools)
 add_subdirectory(cli)
+add_subdirectory(gui)

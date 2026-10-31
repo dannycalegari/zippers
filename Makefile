@@ -4,6 +4,8 @@
 #
 #   make            configure into build/ if needed, then build
 #   make test       build, then run CTest (the fast tests: ctest -L fast)
+#   make test-gui   build, then run the tests of the window that OPEN IT ON THE SCREEN (ctest -L gui, with
+#                   ZIPPERS_GUI_TESTS=1), about half a minute; only in a build with the window
 #   make install    build, then install under PREFIX (default /usr/local): bin/zippers, libexec/zippers/,
 #                   share/zippers/, share/doc/zippers/. DESTDIR is honoured, for packaging:
 #                   make install PREFIX=/usr DESTDIR=/tmp/package
@@ -25,7 +27,7 @@ ifeq ($(origin JOBS),undefined)
   JOBS := $(shell n=$$(sysctl -n hw.ncpu 2>/dev/null || nproc 2>/dev/null || echo 2); [ "$$n" -gt 4 ] && n=4; echo $$n)
 endif
 
-.PHONY: all test install clean sanitize
+.PHONY: all test test-gui install clean sanitize
 
 all: build/CMakeCache.txt
 	$(CMAKE) --build build --parallel $(JOBS)
@@ -37,6 +39,9 @@ build/CMakeCache.txt:
 
 test: all
 	ctest --test-dir build -L fast --output-on-failure
+
+test-gui: all
+	ZIPPERS_GUI_TESTS=1 ctest --test-dir build -L gui --output-on-failure
 
 install: all
 	DESTDIR="$(DESTDIR)" $(CMAKE) --install build --prefix "$(PREFIX)"

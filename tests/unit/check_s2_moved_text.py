@@ -59,17 +59,69 @@ def cut_block(text, start, end, new, what):
     return text[:a] + new + text[b + len(end):]
 
 
+# the function that --polylines adds before render_file (comments are not compared)
+WRITE_POLYLINES = (
+    'static bool write_polylines(const Options& opt, const Rep& rep, const View& v, bool culled, const Renderer& rp,\n'
+    '                            const Renderer& rn, const Renderer* rw, bool roots_capped) {\n'
+    '    namespace pl = zippers::polylines;\n'
+    '    pl::File f;\n'
+    '    f.sphere = 2;\n'
+    '    f.add("program", "zipper");\n'
+    '    f.add("command", opt.command);\n'
+    '    f.add("example", opt.monodromy);\n'
+    '    f.add("order", opt.order <= 0 ? string("inf") : std::to_string(opt.order));\n'
+    '    f.add("R", pl::exact(opt.radius));\n'
+    '    f.add("acc", pl::exact(opt.accuracy));\n'
+    '    f.add("overlap", std::to_string(opt.overlap));\n'
+    '    f.add("chains", opt.chains ? "on" : "off");\n'
+    '    if (opt.wheel) f.add("wheelres", std::to_string(opt.wheelres));\n'
+    '    f.add("view", pl::exact_list(v.m, 9));\n'
+    '    f.add("yaw", pl::exact(opt.yaw));\n'
+    '    f.add("pitch", pl::exact(opt.pitch));\n'
+    '    f.add("roll", pl::exact(opt.roll));\n'
+    '    f.add("zoom", pl::exact(opt.zoom));\n'
+    '    f.add("cull", culled ? "on" : "off");\n'
+    '    f.add("focus", will_focus(opt) ? "on" : "off");\n'
+    '    f.add("maxR", pl::exact(max_radius(rep, false)));\n'
+    '    f.add("maxR.focus", pl::exact(max_radius(rep, true)));\n'
+    '    f.add("maxR.wheel", pl::exact(max_radius(rep, false, wheel_large_order(opt.order) ? WHEEL_ROOTS_LARGE_N : WHEEL_ROOTS)));\n'
+    '    const bool cp = roots_capped || rp.memFull, cn = roots_capped || rn.memFull;\n'
+    '    f.add("capped", string("Z+ ") + (cp ? "yes" : "no"));\n'
+    '    f.add("capped", string("Z- ") + (cn ? "yes" : "no"));\n'
+    '    if (rw) f.add("capped", string("wheel ") + (cp || cn ? "yes" : "no"));\n'
+    '    const Renderer* rs[3] = {&rp, &rn, rw};\n'
+    '    const char* names[3] = {"Z+", "Z-", "wheel"};\n'
+    '    for (int k = 0; k < 3; ++k) {\n'
+    '        if (!rs[k]) continue;\n'
+    '        const Renderer& r = *rs[k];\n'
+    '        pl::Layer L;\n'
+    '        L.name = names[k];\n'
+    '        L.first.assign(r.pstart.begin(), r.pstart.end());\n'
+    '        L.root.assign(r.pstart.size(), -1);\n'
+    '        L.letter.assign(r.pstart.size(), -1);\n'
+    '        L.pts.resize(3*r.px.size());\n'
+    '        for (size_t i = 0; i < r.px.size(); ++i) { L.pts[3*i] = r.px[i]; L.pts[3*i+1] = r.py[i]; L.pts[3*i+2] = r.pz[i]; }\n'
+    '        f.layers.push_back(std::move(L));\n'
+    '    }\n'
+    '    string err;\n'
+    '    if (!pl::write(opt.polylines, f, &err)) { fprintf(stderr, "%s\\n", err.c_str()); return false; }\n'
+    '    fprintf(stderr, "wrote %s\\n", opt.polylines.c_str());\n'
+    '    return true;\n'
+    '}\n')
+
 # ---- the changes of apps/s2/zipper.cc ---------------------------------------------------------------------------------
 ZIPPER = [
     ('replace', '#ifdef __APPLE__\n#include <mach/mach.h>            // current resident memory (the drawing\'s memory guard)\n'
                 '#include <malloc/malloc.h>\n#elif defined(__GLIBC__)\n#include <malloc.h>\n#endif\n',
                 '#include "core/memory.h"\n'),
-    ('replace', '#include <zlib.h>                 // PNG output\n', '#include "output/png.h"\n#include "output/raster.h"\n'),
+    ('replace', '#include <zlib.h>                 // PNG output\n', '#include "output/png.h"\n#include "output/raster.h"\n'
+                '#include "output/polylines.h"\n#include "view/options.h"\n#include "view/s2.h"\n'),
     ('replace', '#ifdef ZIPPER_VIEWER\n#define GL_SILENCE_DEPRECATION\n#include <GLUT/glut.h>            // interactive on-screen viewer (macOS frameworks)\n'
                 '#include <OpenGL/glu.h>\n#endif\n', ''),
     ('replace', 'typedef std::complex<double> cpx;\n',
                 'typedef std::complex<double> cpx;\nusing zippers::resident_bytes;\nusing zippers::release_memory;\n'
-                'namespace png = zippers::png;\nnamespace raster = zippers::raster;\n'),
+                'namespace png = zippers::png;\nnamespace raster = zippers::raster;\n'
+                'using zippers::s2::View;\nusing zippers::s2::make_view;\n'),
     ('cut', 'static double resident_bytes() {', '    malloc_trim(0);\n#endif\n}\n', ''),
     ('cut', 'static void png_chunk(FILE* f, const char* type, const uint8_t* data, size_t len) {',
             '        if (e2 <= dx) { err += dx; y0 += sy; }\n    }\n}\n', ''),
@@ -90,6 +142,52 @@ ZIPPER = [
                 '        return 1;\n#endif\n',
                 '        fprintf(stderr, "this build of zipper has no interactive viewer (-v): the window is that of the original program, built in legacy/s2/ (macOS)\\n");\n'
                 '        return 1;\n'),
+    # View and make_view moved to src/view/s2.h (the using declarations above bring them back)
+    ('cut', 'struct View { double m[9]; };', '    return w;\n}\n', ''),
+    # --polylines FILE and --colour L=R,G,B
+    ('replace', '    string outfile;\n};\n',
+                '    string outfile;\n    string polylines;\n    string command;\n'
+                '    double colour[3][3] = {{0,0,1}, {1,0,0}, {0,0.6,0}};\n};\n'),
+    ('replace', '    if (opt.zippers) layers = {{&rp,{0,0,1}}, {&rn,{1,0,0}}};\n',
+                '    if (opt.zippers) layers = {{&rp,{opt.colour[0][0],opt.colour[0][1],opt.colour[0][2]}},\n'
+                '                               {&rn,{opt.colour[1][0],opt.colour[1][1],opt.colour[1][2]}}};\n'),
+    ('replace', '        layers.push_back({rw.get(), {0.0, 0.6, 0.0}});',
+                '        layers.push_back({rw.get(), {opt.colour[2][0], opt.colour[2][1], opt.colour[2][2]}});'),
+    ('replace', '    bool ok = true;\n    tlog("(wheel)");\n    g_visible = 0;\n    if (opt.format == FMT_PNG) {\n',
+                '    if (!opt.polylines.empty() && !write_polylines(opt, rep, v, cull, rp, rn, rw.get(), zs.capHit)) return 1;\n'
+                '    bool ok = true;\n    tlog("(wheel)");\n    g_visible = 0;\n'
+                '    const bool picture = !opt.outfile.empty() || opt.polylines.empty();\n'
+                '    if (!picture) {}\n'
+                '    else if (opt.format == FMT_PNG) {\n'),
+    ('replace', '    if (opt.zippers && g_visible == 0)\n', '    if (picture && opt.zippers && g_visible == 0)\n'),
+    ('replace', 'static int render_file(const Options& opt, const Monodromy& mon, const Rep& rep, const View& v) {\n',
+                WRITE_POLYLINES +
+                'static int render_file(const Options& opt, const Monodromy& mon, const Rep& rep, const View& v) {\n'),
+    ('replace', '"  -o FILE    output file (default stdout for eps)\\n"\n',
+                '"  -o FILE    output file (default stdout for eps)\\n"\n'
+                '"  --polylines FILE  also write the curves as data (a polyline file); without -o, only that\\n"\n'
+                '"  --colour L=R,G,B  the colour of L: Z+, Z- or wheel, three numbers in [0, 1]\\n"\n'
+                '"             (default Z+=0,0,1 Z-=1,0,0 wheel=0,0.6,0); given twice, the last counts\\n"\n'),
+    ('replace', '    Options opt;\n    bool fmt_set = false;\n',
+                '    Options opt;\n    bool fmt_set = false;\n    opt.command = zippers::polylines::command_line(argc, argv);\n'),
+    ('replace', '        else if (s=="-o") opt.outfile = need("-o");\n',
+                '        else if (s=="-o") opt.outfile = need("-o");\n'
+                '        else if (s=="--polylines") opt.polylines = need("--polylines");\n'
+                '        else if (s=="--colour") { string v = need("--colour"), name; double c[3]; int k = -1;\n'
+                '                                  if (zippers::viewopt::parse_colour(v, name, c))\n'
+                '                                      k = name=="Z+" ? 0 : name=="Z-" ? 1 : name=="wheel" ? 2 : -1;\n'
+                '                                  if (k < 0) { fprintf(stderr, "--colour %s: a name (Z+, Z- or wheel) and three "\n'
+                '                                                       "numbers in [0, 1], as Z+=0,0,1\\n", v.c_str()); return 1; }\n'
+                '                                  for (int i = 0; i < 3; ++i) opt.colour[k][i] = c[i]; }\n'),
+    ('replace', '    if (!opt.view && !writable(opt.outfile)) { fprintf(stderr, "cannot write %s\\n", opt.outfile.c_str()); return 1; }\n',
+                '    if (!opt.view && !writable(opt.outfile)) { fprintf(stderr, "cannot write %s\\n", opt.outfile.c_str()); return 1; }\n'
+                '    if (!opt.view && !opt.polylines.empty()) {\n'
+                '        const string wp = zippers::polylines::write_problem(opt.polylines);\n'
+                '        if (!wp.empty()) { fprintf(stderr, "cannot write %s: %s\\n", opt.polylines.c_str(), wp.c_str()); return 1; }\n'
+                '        if (!zippers::polylines::recordable(opt.command)) {\n'
+                '            fprintf(stderr, "--polylines: an argument holds a line break, which the command line in the file\'s "\n'
+                '                    "header cannot hold\\n"); return 1; }\n'
+                '    }\n'),
 ]
 
 # ---- the changes of apps/s2/zmovie.cc ---------------------------------------------------------------------------------

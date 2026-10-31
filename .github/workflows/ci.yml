@@ -4,7 +4,7 @@
 # request. (This runs only once the repository is on GitHub.)
 #
 # The fast tests are the ones labelled "fast" (ctest -L fast), the same as `make test`. The slow "reference" tests
-# are run by hand.
+# are run by hand, and so is the test that opens the window (label gui, make test-gui).
 
 name: CI
 
@@ -28,14 +28,20 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v5
 
-      - name: Install zlib, GLUT and OpenGL (Linux)
+      - name: Install zlib, GLUT, OpenGL and GLFW (Linux)
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y zlib1g-dev freeglut3-dev libglu1-mesa-dev
+          sudo apt-get install -y zlib1g-dev freeglut3-dev libglu1-mesa-dev libglfw3-dev
 
+      - name: Install GLFW (macOS)
+        if: runner.os == 'macOS'
+        run: brew install glfw
+
+      # The window is required here (ZIPPERS_WINDOW=ON), so that it is compiled on both systems. No test opens it: its
+      # test (label gui) skips itself unless ZIPPERS_GUI_TESTS=1.
       - name: Configure
-        run: cmake -S . -B build
+        run: cmake -S . -B build -DZIPPERS_WINDOW=ON
 
       - name: Build
         run: cmake --build build --parallel 4

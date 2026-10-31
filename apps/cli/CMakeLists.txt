@@ -10,8 +10,10 @@
 #   - the paths of the programs in this build (ZIPPERS_PROGRAM_<name>), which it runs when it runs from this folder;
 #   - ZIPPERS_INSTALLED_PROGRAMS, libexec/zippers/ relative to bin/, where it finds them when it is installed;
 #   - the places of the data files (zippers_data_places, cmake/ZippersData.cmake), for zippers list;
-#   - ZIPPERS_VERSION, the version of the project.
-# It depends on the seven programs, so that building zippers builds them. Installed into bin/.
+#   - ZIPPERS_VERSION, the version of the project;
+#   - ZIPPERS_HAVE_WINDOW when the build has the window (cmake/ZippersWindow.cmake), for its usage texts.
+# It depends on the seven programs and on zview (the window's program, apps/gui/), so that building zippers builds them.
+# Installed into bin/.
 set(CMAKE_CXX_FLAGS_RELEASE "")
 if(APPLE)
   set(CMAKE_CXX_LINK_FLAGS "")
@@ -32,7 +34,8 @@ set(_zippers_programs
   zipper3 apps_s3_zipper3
   link3   apps_s3_link3
   chz5    apps_s4_chz5
-  zipper5 apps_s4_zipper5)
+  zipper5 apps_s4_zipper5
+  zview   apps_gui_zview)
 set(_defs)
 set(_deps)
 while(_zippers_programs)
@@ -44,5 +47,8 @@ file(RELATIVE_PATH _rel "${CMAKE_INSTALL_FULL_BINDIR}" "${CMAKE_INSTALL_FULL_LIB
 target_compile_definitions(apps_cli_zippers PRIVATE ${_defs}
   "ZIPPERS_INSTALLED_PROGRAMS=\"${_rel}\"" "ZIPPERS_VERSION=\"${PROJECT_VERSION}\"")
 add_dependencies(apps_cli_zippers ${_deps})
+if(ZIPPERS_WINDOW_BUILT)
+  target_compile_definitions(apps_cli_zippers PRIVATE ZIPPERS_HAVE_WINDOW=1)
+endif()
 
 install(TARGETS apps_cli_zippers RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")

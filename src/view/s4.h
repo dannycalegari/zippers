@@ -11,6 +11,8 @@
 //   rot3                the rotation of R^3: yaw about the vertical, then pitch about the horizontal (degrees)
 //   turn4               U <- G U, G the rotation of R^4 in the plane of coordinates (i, j)
 //   move_pole5          move the pole P toward the frame direction E_a: a rotation of S^4
+//   move_pole5_toward   move the pole P toward any direction a = sum a_i E_i of the frame (a unit vector of R^4): the
+//                       rotation of S^4 in the plane of P and a, as s3::move_pole does on S^3 (view/s3.h)
 //   eye5                a point of S^4 -> eye coordinates and the hidden coordinate; false outside the clip ball
 //   init_view5          the pole opposite t^+, so that t^+ is at the centre of the picture
 // THE PAINTER. write_png5: the polylines of renderers (render/renderer.h), one colour and priority per layer, as
@@ -19,9 +21,11 @@
 // THE WINDOW. window5: what write_png5 shows of S^4, pulled back to the sphere for the renderer's culling
 // (render/cull.h): the points that eye5() keeps and that land in the screen square.
 //
-// Moved from legacy/s4/zipcore5.h (View5, orthonormal_frame, rot3, turn4, move_pole5, eye5, init_view5, PI) and
-// legacy/s4/zipper5.cc (Layer5, write_png5), with their names, in namespace zippers::s4 (the S^3 view has its own
-// rot3). Every expression is the legacy one, in the same order (tests/unit/test_render_imm.cc). Changes of form:
+// move_pole5_toward is new: the five-dimensional form of s3::move_pole, with its expressions (for a = E_a it is
+// move_pole5, up to rounding). The rest is moved from legacy/s4/zipcore5.h (View5, orthonormal_frame, rot3, turn4,
+// move_pole5, eye5, init_view5, PI) and legacy/s4/zipper5.cc (Layer5, write_png5), with their names, in namespace
+// zippers::s4 (the S^3 view has its own rot3). Every expression is the legacy one, in the same order
+// (tests/unit/test_render_imm.cc). Changes of form:
 //   - init_view5 takes the World of the generic renderer (render/world.h), and Layer5 its Renderer, in place of the
 //     legacy World5 and Renderer5;
 //   - write_png5 is assembled from src/output/ as the end of the header of raster.h shows: the projection, the two
@@ -111,6 +115,20 @@ inline void move_pole5(double Q[5][5], int a, double th)
         Q[a][k] = c*e - s*p;
         Q[4][k] = s*e + c*p;
     }
+}
+
+// move the pole P toward the direction a = sum a_i E_i of the frame (a unit vector of R^4) by th: in the frame,
+// e5 -> c e5 + s a and a -> -s e5 + c a, as s3::move_pole; the rows transform accordingly
+inline void move_pole5_toward(double Q[5][5], const double a[4], double th)
+{
+    double A5[5] = {0,0,0,0,0};
+    for (int i = 0; i < 4; i++) for (int k = 0; k < 5; k++) A5[k] += a[i]*Q[i][k];
+    double P[5];
+    for (int k = 0; k < 5; k++) P[k] = Q[4][k];
+    double c = std::cos(th), s = std::sin(th);
+    for (int i = 0; i < 4; i++)
+        for (int k = 0; k < 5; k++) Q[i][k] += a[i]*((c - 1)*A5[k] - s*P[k]);
+    for (int k = 0; k < 5; k++) Q[4][k] = c*P[k] + s*A5[k];
 }
 
 // a point of S^4 -> eye coordinates (3) and the hidden coordinate; false outside the clip ball

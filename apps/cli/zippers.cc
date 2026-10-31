@@ -7,7 +7,7 @@
 
       list [EXAMPLE]                        the examples, and where their data files are found
       draw EXAMPLE [options] [-o FILE]      a picture (zipper, zipper3 or zipper5)
-      view EXAMPLE                          the window: not in this version
+      view [EXAMPLE] [options] [-o STEM]    the window (zview)
       search EXAMPLE [C R [TPHI]] [options] the substitution and its certificate (chz or chz5)
       link cartwright-steger [options]      linking numbers of loops in the zippers (link3)
       film SHOT.txt [options]               the frames of a shot of the S^2 film engine (zmovie)
@@ -31,7 +31,17 @@
         its options unless options are given;
       - link adds the settings of the scan that made the stored linked pairs, -a 0.01 --nrel 20 --hr 2.6, for those
         not given, and before a scan makes the folder pictures/ where link3 writes its pictures;
-      - --phi 1,0 (cartwright-steger) is checked and not passed on: it is the only phi in this version.
+      - --phi 1,0 (cartwright-steger) is checked and not passed on: it is the only phi in this version;
+      - draw --session FILE [options] takes the example and its options from a session file (src/output/session.h),
+        the options given after it in place of the session's; the substitution file (and the file of --pairs) that the
+        data search finds must have the SHA-256 the session gives, or zippers refuses, saying which file it found,
+        where, and both hashes;
+      - view runs zview, the window's program (apps/gui/), with the example and the options unchanged (fig8 -n 2 -R 6
+        without an example), or with --session FILE and the options after it. Its options are draw's, less the outputs
+        and those that only print (VIEW_LEFT_OUT), and -o STEM is the stem of the pictures that the window saves. zview
+        runs zippers draw itself for the curves it shows and the pictures it saves. A build without GLFW has no window
+        (ZIPPERS_HAVE_WINDOW is not defined): zview says so, and so do the usage texts. view's -o STEM and --session
+        FILE have help texts of their own (VIEW_HELP).
     Then it runs the program that does the work, replacing itself by it (execv), so that the program's exit status,
     its output and its handling of signals are exactly the program's. check runs its programs as child processes,
     each in a temporary folder of its own and without ZIPPERS_DATA, and removes the folders, also when it is
@@ -48,6 +58,7 @@
 */
 
 #include "core/data_files.h"
+#include "output/session.h"
 
 #include <algorithm>
 #include <cctype>
@@ -92,11 +103,14 @@ namespace {
 #define ZIPPERS_PROGRAM_chz5 ""
 #define ZIPPERS_PROGRAM_zipper5 ""
 #endif
+#ifndef ZIPPERS_PROGRAM_zview
+#define ZIPPERS_PROGRAM_zview ""
+#endif
 struct Program { const char* name; const char* built; };
 const Program PROGRAMS[] = {
     {"zipper", ZIPPERS_PROGRAM_zipper},   {"zmovie", ZIPPERS_PROGRAM_zmovie}, {"chz", ZIPPERS_PROGRAM_chz},
     {"zipper3", ZIPPERS_PROGRAM_zipper3}, {"link3", ZIPPERS_PROGRAM_link3},   {"chz5", ZIPPERS_PROGRAM_chz5},
-    {"zipper5", ZIPPERS_PROGRAM_zipper5},
+    {"zipper5", ZIPPERS_PROGRAM_zipper5}, {"zview", ZIPPERS_PROGRAM_zview},
 };
 
 const zippers::DataPlaces PLACES = ZIPPERS_DATA_PLACES;
@@ -219,6 +233,7 @@ const int ALL = S2 | S3 | S4, S34 = S3 | S4;
 
 const Option OPTIONS[] = {
     // draw: zipper (S2), zipper3 (S3), zipper5 (S4)
+    {"draw", ALL, "--session", 1, "", "FILE", "take the example and its options from a session file: zippers draw --session FILE [options] [-o FILE] (first, in place of the example)"},
     {"draw", ALL, "-o", 1, "-o", "FILE", "write the picture (PNG; S2 also EPS, its default without -o, on the standard output)"},
     {"draw", ALL, "-R", 1, "-R", "R", "the radius of the ball of the group whose translates are drawn (default S2 6; S3, S4 0)"},
     {"draw", ALL, "-a", 1, "-a", "ACC", "the accuracy, the largest chord on the sphere (default S2 0.004, S3 0.01, S4 0.02)"},
@@ -230,6 +245,8 @@ const Option OPTIONS[] = {
     {"draw", ALL, "--overlap", 1, "--overlap", "L", "mark the sub-branches of each leaf down to L levels as drawn (default S2 1; S3, S4 0)"},
     {"draw", ALL, "--nocull", 0, "--nocull", "", "with --zoom: no culling by default"},
     {"draw", ALL, "--nofocus", 0, "--nofocus", "", "with --zoom: no focus ball by default"},
+    {"draw", ALL, "--polylines", 1, "--polylines", "FILE", "write the curves as data (a polyline file); S2 without -o: no picture"},
+    {"draw", ALL, "--colour", 1, "--colour", "L=R,G,B", "the colour of L: Z+, Z- the zippers; S2: wheel; S3: pair.Z+, pair.Z- a pair's loops, context.Z+, context.Z- the zippers behind it; given twice, the last counts"},
     {"draw", S2, "-n", 1, "-n", "N", "the order of the cone point, 2..1000000, or inf for the cusp (default 2)"},
     {"draw", S2, "--format", 1, "-f", "FMT", "eps or png (default: png if -o ends in .png, else eps)"},
     {"draw", S2, "-w", 1, "-w", "WIDTH", "the line width in points, 0 = thinnest (default 0)"},
@@ -250,6 +267,7 @@ const Option OPTIONS[] = {
     {"draw", S34, "--cullk", 1, "--cullk", "K", "the margin factor of culling (default 16); implies --cull"},
     {"draw", S34, "--zoomacc", 0, "--zoomacc", "", "with culling: the accuracy ACC/zoom on the sphere"},
     {"draw", S34, "--focus", 1, "--focus", "M", "with --zoom: the focus ball, at M log(zoom) towards the centre (M = 1 by default for a still)"},
+    {"draw", S34, "--viewmatrix", 1, "--viewmatrix", "N1,...", "the view as its matrices (S3: 25 numbers, S4: 34), orthonormal (S3: of determinant +1), in place of --yaw, --pitch, --pole, --centre"},
     {"draw", S3, "--pole", 2, "--pole", "D1 D2", "move the pole of the projection (degrees)"},
     {"draw", S3, "--check", 0, "--check", "", "the smallest distance between the drawn Z+ and Z-"},
     {"draw", S3, "--pairs", 1, "--pairs", "FILE", "show the linked pairs of FILE (linked_pairs.txt) instead of the zippers"},
@@ -305,8 +323,8 @@ struct LeftOut {
 const LeftOut LEFT_OUT[] = {
     {"zipper", "-m", "draw", S2, "the example is the monodromy: zippers draw WORD (fig8, RRL, ...)"},
     {"zipper", "-f", "draw", S2, "an S2 example has no substitution file (its arcs come from the monodromy); the format of the picture is --format"},
-    {"zipper", "-v", "draw", S2, "the window is not in this version (zippers view)"},
-    {"zipper", "--view", "draw", S2, "the window is not in this version (zippers view)"},
+    {"zipper", "-v", "draw", S2, "the window is another command: zippers view"},
+    {"zipper", "--view", "draw", S2, "the window is another command: zippers view"},
     {"zipper", "-e", "draw", S2, "it is obsolete, and zipper ignores it"},
     {"zipper", "-d", "draw", S2, "it is another name of -R"},
     {"zipper", "--nest", "draw", S2, "it is another name of --overlap"},
@@ -321,12 +339,12 @@ const LeftOut LEFT_OUT[] = {
     {"chz5", "kernel", "search", S4, "zippers search runs it"},
     {"chz5", "selftest", "check", S4, "zippers check runs it"},
     {"chz5", "ball", "", S4, "the counts of a ball: run chz5 ball itself"},
-    {"zipper3", "-v", "draw", S3, "the window is not in this version (zippers view)"},
-    {"zipper3", "--snap", "draw", S3, "it is an option of the window, which is not in this version (zippers view)"},
-    {"zipper3", "--movie", "draw", S3, "the films of zipper3 play in its window, which is not in this version (zippers view)"},
-    {"zipper3", "--moviescript", "draw", S3, "the films of zipper3 play in its window, which is not in this version (zippers view)"},
-    {"zipper3", "--moviestart", "draw", S3, "the films of zipper3 play in its window, which is not in this version (zippers view)"},
-    {"zipper3", "--moviescale", "draw", S3, "the films of zipper3 play in its window, which is not in this version (zippers view)"},
+    {"zipper3", "-v", "draw", S3, "the window is another command: zippers view"},
+    {"zipper3", "--snap", "draw", S3, "it is an option of zipper3's own window; the window is zippers view, whose p saves a picture"},
+    {"zipper3", "--movie", "draw", S3, "the films of zipper3 play in its own window, and zippers view plays none"},
+    {"zipper3", "--moviescript", "draw", S3, "the films of zipper3 play in its own window, and zippers view plays none"},
+    {"zipper3", "--moviestart", "draw", S3, "the films of zipper3 play in its own window, and zippers view plays none"},
+    {"zipper3", "--moviescale", "draw", S3, "the films of zipper3 play in its own window, and zippers view plays none"},
     {"link3", "selftest", "check", S3, "zippers check runs it"},
     {"zipper5", "-h", "draw", S4, "zippers has its own help: zippers draw imm-m5 --help"},
     {"zipper5", "--help", "draw", S4, "zippers has its own help: zippers draw imm-m5 --help"},
@@ -348,10 +366,37 @@ const char* program_of(const string& command, int sphere)
     return "";
 }
 
+// the options of draw that view does not take, and why: the outputs (the window saves its own pictures, with p) and
+// those that only print
+const char* const VIEW_LEFT_OUT[][2] = {
+    {"--stats", "it only prints (zippers draw EXAMPLE --stats)"},
+    {"--check", "it only prints (zippers draw cartwright-steger --check)"},
+    {"--timing", "it only prints (zippers draw EXAMPLE --timing)"},
+    {"--polylines", "it is an output of draw; the window saves its pictures with p"},
+    {"--format", "it is an output of draw; the window saves its pictures with p, as PNG"},
+};
+
+// the options of draw whose help in view says what view takes: {name, values, help}
+const char* const VIEW_HELP[][3] = {
+    {"-o", "STEM", "the stem of the pictures that p saves, STEM.png and STEM.zsession (by default the example's name)"},
+    {"--session", "FILE", "take the example and its options from a session file: zippers view --session FILE [options] [-o STEM] (first, in place of the example)"},
+};
+
+const char* view_left_out(const string& name)
+{
+    for (const auto& v : VIEW_LEFT_OUT)
+        if (name == v[0]) return v[1];
+    return nullptr;
+}
+
+// the options of a command: view takes those of draw, less VIEW_LEFT_OUT
+const char* options_of(const string& command) { return command == "view" ? "draw" : command.c_str(); }
+
 const Option* find_option(const string& command, int sphere, const string& name)
 {
+    if (command == "view" && view_left_out(name)) return nullptr;
     for (const Option& o : OPTIONS)
-        if (command == o.command && (o.spheres & sphere) && name == o.name) return &o;
+        if (!strcmp(options_of(command), o.command) && (o.spheres & sphere) && name == o.name) return &o;
     return nullptr;
 }
 
@@ -359,8 +404,9 @@ const Option* find_option(const string& command, int sphere, const string& name)
 string spheres_with(const string& command, const string& name)
 {
     int s = 0;
+    if (command == "view" && view_left_out(name)) return "";
     for (const Option& o : OPTIONS)
-        if (command == o.command && name == o.name) s |= o.spheres;
+        if (!strcmp(options_of(command), o.command) && name == o.name) s |= o.spheres;
     string r;
     if (s & S2) r += "fig8 (S2)";
     if (s & S3) r += string(r.empty() ? "" : ", ") + "cartwright-steger (S3)";
@@ -410,8 +456,11 @@ Parsed parse(const string& command, const Example& e, const vector<string>& args
         }
         const Option* o = find_option(command, e.sphere, a);
         if (!o) {
+            if (command == "view" && view_left_out(a))
+                fail("%s %s: %s is not an option of zippers view: %s", command.c_str(), e.name.c_str(), a.c_str(),
+                     view_left_out(a));
             for (const LeftOut& l : LEFT_OUT)
-                if (command == l.command && (l.spheres & e.sphere) && a == l.name)
+                if (!strcmp(options_of(command), l.command) && (l.spheres & e.sphere) && a == l.name)
                     fail("%s %s: %s is not an option of zippers: %s", command.c_str(), e.name.c_str(), a.c_str(), l.reason);
             string other = spheres_with(command, a);
             if (!other.empty())
@@ -467,6 +516,8 @@ void pass_on(const Parsed& p, vector<string>& out)
 [[noreturn]] void run(const string& program, const vector<string>& args, bool dry)
 {
     string looked, path = program_path(program, looked);
+    if (path.empty() && program == "zview")
+        fail("view: this installation has no window: it has no zview (looked for %s)", looked.c_str());
     if (path.empty()) fail("cannot find the program %s (looked for %s)", program.c_str(), looked.c_str());
     if (dry) {
         string line = quoted(path);
@@ -486,13 +537,19 @@ void pass_on(const Parsed& p, vector<string>& out)
 
 // ---- the usage texts ------------------------------------------------------------------------------------------------
 
+#ifdef ZIPPERS_HAVE_WINDOW
+#define NO_WINDOW ""
+#else
+#define NO_WINDOW " (this build has no window)"
+#endif
+
 void usage_top(FILE* f)
 {
     fprintf(f,
 "usage: zippers [--dry-run] COMMAND [EXAMPLE] [options]\n"
 "  list [EXAMPLE]                         the examples, and where their data files are found\n"
 "  draw EXAMPLE [options] [-o FILE]       a picture: PNG (S2 examples also EPS)\n"
-"  view EXAMPLE                           the window (not in this version)\n"
+"  view [EXAMPLE] [options] [-o STEM]     the window on the curves of draw" NO_WINDOW "\n"
 "  search EXAMPLE [C R [TPHI]] [options]  the substitution and the certificate that S_c generates the kernel\n"
 "  link cartwright-steger [options]       linking numbers of loops in the zippers\n"
 "  film SHOT.txt [options]                the frames of a shot of the S2 film engine\n"
@@ -509,15 +566,24 @@ void usage_top(FILE* f)
 void usage_options(FILE* f, const char* command, int spheres)
 {
     for (const Option& o : OPTIONS) {
-        if (strcmp(command, o.command) || !(o.spheres & spheres) || !o.help) continue;
-        string left = string("  ") + o.name + (*o.args ? string(" ") + o.args : string());
+        if (strcmp(options_of(command), o.command) || !(o.spheres & spheres) || !o.help) continue;
+        if (!strcmp(command, "view") && view_left_out(o.name)) continue;
+        const char* args = o.args;
+        const char* help = o.help;
+        if (!strcmp(command, "view"))
+            for (const auto& v : VIEW_HELP)
+                if (!strcmp(o.name, v[0])) {
+                    args = v[1];
+                    help = v[2];
+                }
+        string left = string("  ") + o.name + (*args ? string(" ") + args : string());
         string tag;
         if (spheres != o.spheres && strcmp(command, "film")) {
             for (int s : {S2, S3, S4})
                 if (o.spheres & s) tag += string(tag.empty() ? "" : ",") + sphere_name(s);
             tag = " [" + tag + "]";
         }
-        fprintf(f, "%-22s %s%s\n", left.c_str(), o.help, (spheres == ALL || spheres == S34) ? tag.c_str() : "");
+        fprintf(f, "%-22s %s%s\n", left.c_str(), help, (spheres == ALL || spheres == S34) ? tag.c_str() : "");
     }
 }
 
@@ -532,15 +598,35 @@ void usage_command(FILE* f, const string& command, int sphere)
     } else if (command == "draw") {
         fprintf(f,
 "usage: zippers draw EXAMPLE [options] [-o FILE]\n"
+"       zippers draw --session SESSION [options] [-o FILE]\n"
 "  runs zipper -m EXAMPLE (S2), zipper3 (cartwright-steger) or zipper5 (imm-m5) with the options, which have the\n"
 "  programs' names, meanings and defaults; in zippers -f is always a substitution file (S2's format is --format).\n"
 "  Without -o an S2 picture is EPS on the standard output (refused when that is a terminal), and S3 and S4 draw no\n"
-"  picture, but build the zippers and print what they print (with --check, --stats).\n");
+"  picture, but build the zippers and print what they print (with --check, --stats). --polylines FILE writes the\n"
+"  curves as data, a polyline file (with -o as well as the picture; S2 without -o writes only the file).\n"
+"  The colours, --colour L=R,G,B (one option for each L), default to the programs' own: L is Z+ or Z- for the\n"
+"  zippers; in S2 wheel for the wheel; in S3 pair.Z+ and pair.Z- for the loops of a pair (--pairs), and context.Z+\n"
+"  and context.Z- for the zippers drawn faintly behind it (--context). A name that the picture does not draw\n"
+"  changes nothing, and when one is given twice, the last one counts.\n"
+"  With --session, the example and every option of the picture come from a session file (KEY = VALUE lines, as a\n"
+"  window writes beside each picture it saves); options given after it replace the session's. The substitution\n"
+"  file, and the file of --pairs, are found as always, and must have the SHA-256 that the session gives.\n");
         usage_options(f, "draw", sphere ? sphere : ALL);
     } else if (command == "view") {
         fprintf(f,
-"usage: zippers view EXAMPLE\n"
-"  the window, which is not in this version: zippers draw draws pictures.\n");
+"usage: zippers view [EXAMPLE] [options] [-o STEM]\n"
+"       zippers view --session SESSION [options] [-o STEM]\n"
+"  runs zview, the window on the curves of zippers draw EXAMPLE [options] (by default fig8 -n 2 -R 6), or of a\n"
+"  session file, with the options given after it in place of the session's. The window runs zippers draw for the\n"
+"  curves it shows and for the pictures it saves (p: NAME.png and NAME.zsession, never overwriting a file, and the\n"
+"  commands that remake them printed). The options are those of draw, less its outputs and those that only print\n"
+"  (--polylines, --format, --stats, --check, --timing); -o STEM is the stem of the pictures (by default the\n"
+"  example's name)."
+#ifndef ZIPPERS_HAVE_WINDOW
+" This build has no window: zview says so."
+#endif
+"\n");
+        usage_options(f, "view", sphere ? sphere : ALL);
     } else if (command == "search") {
         fprintf(f,
 "usage: zippers search EXAMPLE [C R [TPHI]] [options]\n"
@@ -992,10 +1078,15 @@ Example example_arg(const string& command, const vector<string>& args)
     return e;
 }
 
+int draw_session(const vector<string>& args, bool dry);
+
 int draw(const vector<string>& args, bool dry)
 {
+    if (!args.empty() && args[0] == "--session") return draw_session(args, dry);
     Example e = example_arg("draw", args);
     Parsed p = parse("draw", e, vector<string>(args.begin() + 1, args.end()), false);
+    if (has(p, "--session"))
+        fail("draw: --session takes the place of the example: zippers draw --session FILE [options] [-o FILE]");
     check_phi(p, "draw");
     string out;
     bool png_format = false;
@@ -1011,7 +1102,7 @@ int draw(const vector<string>& args, bool dry)
     if (ends_with_ci(out, ".svg")) fail("draw: -o %s: SVG is not available in this version", out.c_str());
     if (e.sphere != S2 && ends_with_ci(out, ".eps"))
         fail("draw: -o %s: %s draws PNG pictures only", out.c_str(), example_title(e).c_str());
-    if (e.sphere == S2 && out.empty() && !png_format && isatty(1) && !dry)
+    if (e.sphere == S2 && out.empty() && !png_format && !has(p, "--polylines") && isatty(1) && !dry)
         fail("draw: without -o an S2 picture is EPS on the standard output, which is a terminal here: give -o FILE "
              "(.eps or .png), or redirect the output");
     vector<string> a;
@@ -1023,15 +1114,95 @@ int draw(const vector<string>& args, bool dry)
     run(program_of("draw", e.sphere), a, dry);
 }
 
-int view(const vector<string>& args)
+// a file that a session names (key: f, the substitution file, or pairs), found by the data search, against the hash
+// the session gives (sha256.f, sha256.pairs; none when an option given after the session replaced the file)
+void check_session_file(const zippers::session::Session& s, const string& fn, const Example& e, const char* key,
+                        const char* hash_key, const char* what, const char* option)
 {
+    const string* h = s.value(hash_key);
+    if (!h) return;
+    const string* v = s.value(key);
+    if (!v && strcmp(key, "f")) return;                  // (no file of pairs: nothing to check)
+    string name;
+    if (v) name = *v;
+    else if (e.sphere == S3 && s.value("pairs")) name = zippers::session::DEFAULT_PAIRS_FILE;
+    else name = zippers::session::find_key("f", e.sphere == S3 ? 3 : 4)->dflt[e.sphere == S3 ? 1 : 2];
+    zippers::DataFile r = zippers::find_data_file(name, e.sphere == S4 ? "s4" : "s3", PLACES);
+    if (r.path.empty()) {
+        zippers::data_file_missing(name, r, what, option);
+        exit(1);
+    }
+    string hex, err;
+    if (!zippers::sha256_file(r.path, hex, &err)) fail("draw --session %s: %s", fn.c_str(), err.c_str());
+    if (hex != *h) {
+        const string where = r.path == name ? "in the working folder" : "at " + r.path;
+        fail("draw --session %s: %s %s, found %s, has the SHA-256 %s; the session's is %s (it was written with another "
+             "file of that name)", fn.c_str(), what, name.c_str(), where.c_str(), hex.c_str(), h->c_str());
+    }
+}
+
+// zippers draw --session FILE [options]: the session's example and options, with those given after it in their place,
+// and its files checked by their hashes; then the picture, as from that command line
+int draw_session(const vector<string>& args, bool dry)
+{
+    if (args.size() < 2 || option_like(args[1]))
+        fail("draw: --session needs a session file: zippers draw --session FILE [options] [-o FILE]");
+    const string fn = args[1];
+    zippers::session::Session s;
+    string err;
+    vector<string> warnings;
+    if (!zippers::session::read(fn, s, &err, &warnings)) fail("draw --session: %s", err.c_str());
+    for (const string& w : warnings) fprintf(stderr, "zippers: draw --session: warning: %s\n", w.c_str());
+    Example e;
+    if (!find_example(*s.value("example"), e)) fail("draw --session %s: unknown example", fn.c_str());
+    const vector<string> rest(args.begin() + 2, args.end());
+    for (const string& a : rest)
+        if (a == "-h" || a == "--help") {
+            usage_command(stdout, "draw", e.sphere);
+            exit(0);
+        }
+    Parsed p = parse("draw", e, rest, false);          // the options given after it, against the table
+    if (has(p, "--session")) fail("draw: --session is given once, first: zippers draw --session FILE [options] [-o FILE]");
+    vector<string> others;
+    if (!zippers::session::apply(s, rest, others, err)) fail("draw --session %s: %s", fn.c_str(), err.c_str());
+    if (e.sphere != S2) check_session_file(s, fn, e, "f", "sha256.f", "the substitution file", "-f");
+    if (e.sphere == S3) check_session_file(s, fn, e, "pairs", "sha256.pairs", "the file of linked pairs", "--pairs");
+    vector<string> a = zippers::session::args_of(s);
+    a.insert(a.end(), others.begin(), others.end());
+    return draw(a, dry);
+}
+
+// zippers view [EXAMPLE] [options], or --session FILE [options]: the options checked against draw's table (less
+// VIEW_LEFT_OUT), then zview with the arguments unchanged
+int view(const vector<string>& args_given, bool dry)
+{
+    const vector<string> args = args_given.empty() ? vector<string>{"fig8", "-n", "2", "-R", "6"} : args_given;
+    if (args[0] == "--session") {
+        if (args.size() < 2 || option_like(args[1]))
+            fail("view: --session needs a session file: zippers view --session FILE [options] [-o STEM]");
+        zippers::session::Session s;
+        string err;
+        if (!zippers::session::read(args[1], s, &err)) fail("view --session: %s", err.c_str());
+        Example e;
+        if (!find_example(*s.value("example"), e)) fail("view --session %s: unknown example", args[1].c_str());
+        const vector<string> rest(args.begin() + 2, args.end());
+        for (const string& a : rest)
+            if (a == "-h" || a == "--help") {
+                usage_command(stdout, "view", e.sphere);
+                exit(0);
+            }
+        Parsed p = parse("view", e, rest, false);
+        if (has(p, "--session")) fail("view: --session is given once, first: zippers view --session FILE [options]");
+        vector<string> others;
+        if (!zippers::session::apply(s, rest, others, err)) fail("view --session %s: %s", args[1].c_str(), err.c_str());
+        run("zview", args, dry);
+    }
     Example e = example_arg("view", args);
-    fprintf(stderr, "zippers view: the window is not in this version; zippers draw draws pictures.%s\n",
-            e.sphere == S2 ? " The window of the original S2 program is built in legacy/s2/ (macOS, with the viewers)."
-            : e.sphere == S3 ? " The window of the original S3 program is built in legacy/s3/ (with the viewers); it "
-                               "draws that program's pictures."
-                             : "");
-    return 1;
+    Parsed p = parse("view", e, vector<string>(args.begin() + 1, args.end()), false);
+    if (has(p, "--session"))
+        fail("view: --session takes the place of the example: zippers view --session FILE [options]");
+    check_phi(p, "view");
+    run("zview", args, dry);
 }
 
 bool is_number(const string& s, bool integer)
@@ -1185,7 +1356,7 @@ int main(int argc, char** argv)
         return list(rest);
     }
     if (command == "draw") return draw(rest, dry);
-    if (command == "view") return view(rest);
+    if (command == "view") return view(rest, dry);
     if (command == "search") return search(rest, dry);
     if (command == "link") return link(rest, dry);
     if (command == "film") return film(rest, dry);

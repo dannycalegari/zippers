@@ -90,6 +90,30 @@
                     Everywhere else (zoom 1, no -o, the viewer, --pairs) culling and the focus are off unless asked for.
                     --nocull is refused with --cull, --cullk and --zoomacc, --nofocus with --focus. --zoomacc needs culling,
                     which may be the default's.
+
+    THREE OPTIONS FOR OTHER PROGRAMS (a window, among them), which change nothing when they are not given:
+      --polylines FILE   the curves as data, a polyline file (output/polylines.h; write_polylines below says what its header
+                    holds): the layers Z+ and Z-, the renderers' points with the root and the letter of each polyline, and
+                    with --pairs pair.Z+ and pair.Z-, whose polyline k is the loop of pair k; for each layer, whether its
+                    renderer reached the cap of leaves (so its curves are incomplete). Written after the build (and the
+                    pairs, and --check), before any picture. An argument that holds a line break is refused at the start,
+                    since the header's command line cannot hold it, and so is a FILE that cannot be written (a folder of
+                    the name, a folder that may not be written in).
+      --viewmatrix N1,...,N25   the view as its matrices: the frame Q of R^4 (16 numbers, row by row) and the rotation of
+                    R^3 (9 numbers, row by row), comma-separated, in place of the view of --yaw, --pitch, --pole and
+                    --centre (which it does not go with); --zoom and --clip as usual. Both must be orthonormal to within
+                    1e-9 (view/options.h), and of determinant +1: a frame or a rotation of determinant -1 would draw the
+                    mirror image, on which every linking number has the other sign (no option makes one). The view is
+                    then exactly the one given, bit for bit, so a program that knows a view (a window, or the header of a
+                    polyline file, whose viewmatrix is the view of the zippers in these numbers) can have it drawn. With
+                    --pairs and -o the pair is drawn in this view, with --zoom and --clip, in place of its own
+                    (pair_view: the frame of the pair's pole, its clip radius and zoom 1, which the header gives as
+                    pair.K.pole and pair.K.clip; the header's viewmatrix is still the zippers' view).
+      --colour L=R,G,B   the colour of what L names, three numbers in [0, 1]: Z+ and Z- (the zippers), pair.Z+ and pair.Z-
+                    (a pair's loops), context.Z+ and context.Z- (the zippers drawn faintly behind a pair, --context). A
+                    name that the picture does not draw is accepted and changes nothing; when one is given twice, the
+                    last one counts. The defaults are the colours the program always had, so the same numbers given
+                    again draw the same picture, byte for byte.
 */
 
 #include "analysis/pairs.h"
@@ -101,6 +125,8 @@
 #include "examples/cartwright_steger_roots.h"
 #include "geometry/pu21/pu21.h"
 #include "render/world.h"
+#include "output/polylines.h"
+#include "view/options.h"
 #include "view/s3.h"
 
 #include <cmath>
@@ -151,7 +177,21 @@ struct Options {
     bool nofocus = false;          // --nofocus: neither is the focus ball
     bool cull_default = false;     // culling is on because of the default (a zoomed still), not because of an option
     bool focus_default = false;    // so is the focus ball
+    // for other programs: the curves as data, the exact view, the colours
+    string polylines;              // --polylines FILE (output/polylines.h)
+    string command;                // the command line, for the header of --polylines
+    bool viewmatrix = false;       // --viewmatrix: the frame Q and the rotation of R^3, as given
+    double vm[25] = {0};           // Q row by row, then the rotation row by row
+    bool view_options = false;     // --yaw, --pitch, --pole or --centre was given
+    bool colour_given[6] = {false, false, false, false, false, false};   // --colour, in the order of COLOUR_NAMES
+    double colour[6][3] = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
 };
+
+// the colours of the pictures, unless --colour gives others: the zippers, a pair's loops (the zippers' colours), and the
+// zippers drawn faintly behind a pair (--context)
+static const double PLUS[3] = {0.05, 0.15, 0.85}, MINUS[3] = {0.85, 0.08, 0.08};
+static const double CONTEXT_PLUS[3] = {0.70, 0.75, 0.95}, CONTEXT_MINUS[3] = {0.95, 0.72, 0.72};
+static const char* const COLOUR_NAMES[6] = {"Z+", "Z-", "pair.Z+", "pair.Z-", "context.Z+", "context.Z-"};
 
 // a comma-separated list of n numbers
 static bool parse_numbers(const string& s, size_t n, vector<double>& v)
@@ -169,6 +209,83 @@ static bool parse_numbers(const string& s, size_t n, vector<double>& v)
         i = j + 1;
     }
     return v.size() == n;
+}
+
+// the colour of what COLOUR_NAMES[k] names, as --colour gives it, or the default
+static const double* colour_of(const Options& opt, int k, const double* dflt)
+{
+    return opt.colour_given[k] ? opt.colour[k] : dflt;
+}
+
+// --polylines FILE: the curves as data (output/polylines.h). The layers Z+ and Z-, the renderers' points with the root and
+// the letter of each polyline (roots: W.rootd, the distances of the roots; with the focus ball, the first roots.main are
+// B(R)'s), and with --pairs pair.Z+ and pair.Z- (polyline k is the loop of pair k, with no root or letter). The header: the
+// program and its command line, the example, the file (as found), R, the accuracy drawn, the cap, marking, the zippers
+// drawn (only), culling (its K, or off) and the focus ball (its M, or off), the view of the zippers (viewmatrix: the
+// numbers of --viewmatrix; zoom; clip), the marks t+ and t- (mark NAME x1 x2 x3 x4), for each layer whether its renderer
+// reached the cap of leaves (capped NAME yes|no; a pair's loops have no cap), and with --pairs their number and for each
+// pair K its pole (pair.K.pole), its clip radius (pair.K.clip), its linking number (pair.K.lk) and its line (pair.K.line).
+// A pair's own view is the frame of its pole (s3::frame_with_pole), its clip radius and zoom 1 (pair_view).
+static bool write_polylines(const Options& opt, const World<PU21>& W, const s3::ViewState& view, double acc,
+                            const vector<LinkedPair<PU21>>& pairs)
+{
+    namespace pl = zippers::polylines;
+    pl::File f;
+    f.sphere = 3;
+    f.add("program", "zipper3");
+    f.add("command", opt.command);
+    f.add("example", "cartwright-steger");
+    f.add("file", opt.subst);
+    f.add("R", pl::exact(opt.R));
+    f.add("acc", pl::exact(acc));
+    f.add("cap", std::to_string(opt.cap));
+    f.add("overlap", std::to_string(opt.overlap));
+    f.add("only", opt.which == 1 ? "+" : opt.which == 2 ? "-" : "both");
+    f.add("cull", W.cull ? pl::exact(opt.cullk) : string("off"));
+    f.add("focus", W.focus ? pl::exact(opt.focus) : string("off"));
+    if (W.focus) f.add("roots.main", std::to_string(W.nmain));
+    double vm[25];
+    for (int r = 0; r < 4; r++) for (int k = 0; k < 4; k++) vm[4*r + k] = view.Q[r][k];
+    for (int i = 0; i < 9; i++) vm[16 + i] = view.rot[i];
+    f.add("viewmatrix", pl::exact_list(vm, 25, ','));
+    f.add("zoom", pl::exact(view.zoom));
+    f.add("clip", pl::exact(view.clip));
+    f.add("mark", "t+ " + pl::exact_list(W.plus.V.x, 4));
+    f.add("mark", "t- " + pl::exact_list(W.minus.V.x, 4));
+    f.add("capped", string("Z+ ") + (W.rp->capped ? "yes" : "no"));
+    f.add("capped", string("Z- ") + (W.rn->capped ? "yes" : "no"));
+    f.layers.push_back(pl::layer_of("Z+", *W.rp));
+    f.layers.push_back(pl::layer_of("Z-", *W.rn));
+    if (!pairs.empty()) {
+        f.add("capped", "pair.Z+ no");
+        f.add("capped", "pair.Z- no");
+        f.add("pairs", std::to_string(pairs.size()));
+        pl::Layer a, b;
+        a.name = "pair.Z+";
+        b.name = "pair.Z-";
+        for (size_t k = 0; k < pairs.size(); k++) {
+            const LinkedPair<PU21>& p = pairs[k];
+            const string K = "pair." + std::to_string(k) + ".";
+            f.add(K + "pole", pl::exact_list(p.pole, 4));
+            f.add(K + "clip", pl::exact(p.clip));
+            f.add(K + "lk", std::to_string(p.lk));
+            f.add(K + "line", pair_desc(p, (int)k));
+            for (pl::Layer* L : {&a, &b}) {
+                const Renderer<PU21>& r = *(L == &a ? p.a : p.b);
+                L->first.push_back((uint32_t)(L->pts.size()/4));
+                L->root.push_back(-1);
+                L->letter.push_back(-1);
+                L->pts.insert(L->pts.end(), r.pts.begin(), r.pts.end());
+            }
+        }
+        f.layers.push_back(std::move(a));
+        f.layers.push_back(std::move(b));
+    }
+    f.rootd = W.rootd;
+    string err;
+    if (!pl::write(opt.polylines, f, &err)) { fprintf(stderr, "%s\n", err.c_str()); return false; }
+    fprintf(stderr, "wrote %s\n", opt.polylines.c_str());
+    return true;
 }
 
 static void usage()
@@ -213,7 +330,15 @@ static void usage()
 "  --moviescript 1|2|3|FILE   which script: built-in, or a file with one segment per line,\n"
 "               FRAMES R PAIR ARCS YAW POLE CAPTION  (R -1: keep the roots; PAIR -1: the zippers,\n"
 "               -2: a blank frame with the caption; YAW, POLE in degrees per frame; caption '-': none)\n"
-"  --moviestart N   number the frames from N (default 0)\n");
+"  --moviestart N   number the frames from N (default 0)\n"
+"  --polylines FILE  write the curves as data (a polyline file): Z+, Z-, and with --pairs the loops of every pair\n"
+"  --viewmatrix N1,...,N25   the view as its matrices: the frame of R^4 (16 numbers, row by row), then the rotation\n"
+"               of R^3 (9), comma-separated, orthonormal and of determinant +1; in place of --yaw, --pitch,\n"
+"               --pole and --centre\n"
+"  --colour L=R,G,B  the colour of L, three numbers in [0, 1]: Z+ and Z- the zippers (0.05,0.15,0.85 and\n"
+"               0.85,0.08,0.08), pair.Z+ and pair.Z- a pair's loops (the same), context.Z+ and context.Z- the\n"
+"               zippers behind a pair (--context: 0.70,0.75,0.95 and 0.95,0.72,0.72); a name the picture does not\n"
+"               draw changes nothing; given twice, the last counts\n");
 }
 
 int main(int argc, char** argv)
@@ -232,9 +357,9 @@ int main(int argc, char** argv)
         else if (a == "--only") { string w = next(); opt.which = w == "+" ? 1 : w == "-" ? 2 : 3; }
         else if (a == "--clip") opt.clip = atof(next().c_str());
         else if (a == "--zoom") opt.zoom = atof(next().c_str());
-        else if (a == "--yaw") opt.yaw = atof(next().c_str());
-        else if (a == "--pitch") opt.pitch = atof(next().c_str());
-        else if (a == "--pole") { opt.pole1 = atof(next().c_str()); opt.pole2 = atof(next().c_str()); }
+        else if (a == "--yaw") { opt.yaw = atof(next().c_str()); opt.view_options = true; }
+        else if (a == "--pitch") { opt.pitch = atof(next().c_str()); opt.view_options = true; }
+        else if (a == "--pole") { opt.pole1 = atof(next().c_str()); opt.pole2 = atof(next().c_str()); opt.view_options = true; }
         else if (a == "--cap") opt.cap = (size_t)atof(next().c_str());
         else if (a == "--check") opt.check = true;
         else if (a == "--stats") opt.stats = true;
@@ -265,6 +390,7 @@ int main(int argc, char** argv)
             if (!(nn > 0)) { usage(); return 1; }
             for (int k = 0; k < 4; k++) opt.c[k] = v[k]/std::sqrt(nn);
             opt.centre = true;
+            opt.view_options = true;
         }
         else if (a == "--cull") opt.cull = true;
         else if (a == "--cullk") {
@@ -279,7 +405,65 @@ int main(int argc, char** argv)
         }
         else if (a == "--nocull") opt.nocull = true;
         else if (a == "--nofocus") opt.nofocus = true;
+        else if (a == "--polylines") opt.polylines = next();
+        else if (a == "--viewmatrix") {
+            vector<double> v;
+            bool ok = parse_numbers(next(), 25, v);
+            for (size_t k = 0; ok && k < v.size(); k++) ok = std::isfinite(v[k]);
+            if (!ok) {
+                fprintf(stderr, "--viewmatrix: 25 numbers, comma-separated: the frame of R^4 (16, row by row), then the "
+                        "rotation of R^3 (9, row by row)\n");
+                return 1;
+            }
+            for (int k = 0; k < 25; k++) opt.vm[k] = v[k];
+            opt.viewmatrix = true;
+        }
+        else if (a == "--colour") {
+            string v = next(), name;
+            double c[3];
+            int k = -1;
+            if (viewopt::parse_colour(v, name, c))
+                for (int j = 0; j < 6; j++) if (name == COLOUR_NAMES[j]) k = j;
+            if (k < 0) {
+                fprintf(stderr, "--colour %s: a name (Z+, Z-, pair.Z+, pair.Z-, context.Z+ or context.Z-) and three numbers "
+                        "in [0, 1], as Z+=0.05,0.15,0.85\n", v.c_str());
+                return 1;
+            }
+            for (int j = 0; j < 3; j++) opt.colour[k][j] = c[j];
+            opt.colour_given[k] = true;
+        }
         else { usage(); return 1; }
+    }
+    opt.command = polylines::command_line(argc, argv);
+    if (!opt.polylines.empty() && !polylines::recordable(opt.command)) {
+        fprintf(stderr, "--polylines: an argument holds a line break, which the command line in the file's header cannot "
+                "hold\n");
+        return 1;
+    }
+    if (!opt.polylines.empty()) {                        // a file that cannot be written: refused before the build
+        const string wp = polylines::write_problem(opt.polylines);
+        if (!wp.empty()) { fprintf(stderr, "cannot write %s: %s\n", opt.polylines.c_str(), wp.c_str()); return 1; }
+    }
+    // --viewmatrix: the whole view, orthonormal, of determinant +1
+    if (opt.viewmatrix && opt.view_options) {
+        fprintf(stderr, "--viewmatrix gives the whole view: it does not go with --yaw, --pitch, --pole or --centre\n");
+        return 1;
+    }
+    if (opt.viewmatrix) {
+        double eq = viewopt::orthonormal_error(opt.vm, 4), er = viewopt::orthonormal_error(opt.vm + 16, 3);
+        if (!(eq <= viewopt::VIEWMATRIX_TOL) || !(er <= viewopt::VIEWMATRIX_TOL)) {
+            fprintf(stderr, "--viewmatrix: the %s is not orthonormal: the largest entry of |M M^T - I| is %g, above %g\n",
+                    !(eq <= viewopt::VIEWMATRIX_TOL) ? "frame of R^4 (the first 16 numbers)" : "rotation of R^3 (the last 9)",
+                    !(eq <= viewopt::VIEWMATRIX_TOL) ? eq : er, viewopt::VIEWMATRIX_TOL);
+            return 1;
+        }
+        const double dq = viewopt::determinant(opt.vm, 4), dr = viewopt::determinant(opt.vm + 16, 3);
+        if (dq < 0 || dr < 0) {
+            fprintf(stderr, "--viewmatrix: the %s has determinant -1: its picture would be the mirror image, on which every "
+                    "linking number has the other sign; a view is a rotation (determinant +1)\n",
+                    dq < 0 ? "frame of R^4 (the first 16 numbers)" : "rotation of R^3 (the last 9)");
+            return 1;
+        }
     }
     // --nocull and --nofocus turn off what a zoomed still has by default; they contradict the options that turn it on
     if (opt.nocull && (opt.cull || opt.zoomacc)) {
@@ -315,6 +499,10 @@ int main(int argc, char** argv)
         double e1[3] = {1,0,0}, e2[3] = {0,1,0};
         s3::move_pole(view.Q, e1, opt.pole1*s3::PI/180);
         s3::move_pole(view.Q, e2, opt.pole2*s3::PI/180);
+    }
+    if (opt.viewmatrix) {                      // the view as given: the frame, then the rotation of R^3
+        for (int r = 0; r < 4; r++) for (int k = 0; k < 4; k++) view.Q[r][k] = opt.vm[4*r + k];
+        for (int i = 0; i < 9; i++) view.rot[i] = opt.vm[16 + i];
     }
     // say which defaults are on, and how to turn them off (a line each, before the build's own lines)
     if (opt.cull_default)
@@ -382,6 +570,7 @@ int main(int argc, char** argv)
                              d, now() - t0, wa.x[0], wa.x[1], wa.x[2], wa.x[3]);
         else fprintf(stderr, "check: min distance Z+ to Z- is at least %.2f\n", h/2 - opt.acc);
     }
+    if (!opt.polylines.empty() && !write_polylines(opt, W, view, acc, pairs)) return 1;
     if (opt.viewer) {
         fprintf(stderr, "built without the viewer\n");
         return 1;
@@ -390,14 +579,19 @@ int main(int argc, char** argv)
         const LinkedPair<PU21>& p = pairs[opt.pairindex % pairs.size()];
         s3::ViewState v;
         s3::init_view(W, v, opt.yaw, opt.pitch, opt.pole1, opt.pole2, opt.zoom, opt.clip);
-        pair_view(p, v);
+        if (opt.viewmatrix) v = view;          // the view as given, with --zoom and --clip
+        else pair_view(p, v);
         vector<s3::Layer<PU21>> layers;
         if (opt.context) {
-            layers.push_back({W.rp, {0.70, 0.75, 0.95}, 0});
-            layers.push_back({W.rn, {0.95, 0.72, 0.72}, 0});
+            const double* c0 = colour_of(opt, 4, CONTEXT_PLUS);
+            const double* c1 = colour_of(opt, 5, CONTEXT_MINUS);
+            layers.push_back({W.rp, {c0[0], c0[1], c0[2]}, 0});
+            layers.push_back({W.rn, {c1[0], c1[1], c1[2]}, 0});
         }
-        if (opt.which & 1) layers.push_back({p.a, {0.05, 0.15, 0.85}});
-        if (opt.which & 2) layers.push_back({p.b, {0.85, 0.08, 0.08}});
+        const double* c2 = colour_of(opt, 2, PLUS);
+        const double* c3 = colour_of(opt, 3, MINUS);
+        if (opt.which & 1) layers.push_back({p.a, {c2[0], c2[1], c2[2]}});
+        if (opt.which & 2) layers.push_back({p.b, {c3[0], c3[1], c3[2]}});
         if (!s3::write_png(opt.out.c_str(), opt.size, layers, v, {}, opt.thick ? opt.thick : 2)) { fprintf(stderr, "cannot write %s\n", opt.out.c_str()); return 1; }
         fprintf(stderr, "%s\nwrote %s\n", pair_desc(p, opt.pairindex % pairs.size()).c_str(), opt.out.c_str());
         return 0;
@@ -405,8 +599,10 @@ int main(int argc, char** argv)
     if (!opt.out.empty()) {
         const s3::ViewState& v = view;
         vector<s3::Layer<PU21>> layers;
-        if (opt.which & 1) layers.push_back({W.rp, {0.05, 0.15, 0.85}});
-        if (opt.which & 2) layers.push_back({W.rn, {0.85, 0.08, 0.08}});
+        const double* c0 = colour_of(opt, 0, PLUS);
+        const double* c1 = colour_of(opt, 1, MINUS);
+        if (opt.which & 1) layers.push_back({W.rp, {c0[0], c0[1], c0[2]}});
+        if (opt.which & 2) layers.push_back({W.rn, {c1[0], c1[1], c1[2]}});
         vector<SpherePoint<4>> marks = {W.plus.V, W.minus.V};
         if (!s3::write_png(opt.out.c_str(), opt.size, layers, v, marks, opt.thick)) { fprintf(stderr, "cannot write %s\n", opt.out.c_str()); return 1; }
         fprintf(stderr, "wrote %s\n", opt.out.c_str());

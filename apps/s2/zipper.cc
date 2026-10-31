@@ -29,14 +29,30 @@
 
     apps/s2/zipper.cc (the zippers suite): the program of legacy/s2/zipper.cc in its
     batch build (legacy/s2/nogui/zipper, without ZIPPER_VIEWER), on the shared library src/,
-    with the same options, usage text, messages and files.  Its PNG writer draws its lines
-    with raster::line_index, downsamples with raster::downsample_palette_rows and writes the
-    file with png::write_rows (src/output/), and the memory guard reads resident_bytes and
-    calls release_memory of src/core/memory.h.  Everything else (the character-variety
-    solver, the ball search, the renderer, the Catherine wheel, the EPS writer) is the legacy
-    code, unchanged.  The window is not built: as in the legacy nogui build, -v says so (that
-    this build has no viewer, and where the original program's window is built) and exits with
-    status 1.  The film engine apps/s2/zmovie.cc includes this file, with main renamed.
+    with the same options, usage text, messages and files, and two more options.  Its PNG
+    writer draws its lines with raster::line_index, downsamples with
+    raster::downsample_palette_rows and writes the file with png::write_rows (src/output/),
+    the memory guard reads resident_bytes and calls release_memory of src/core/memory.h, and
+    the view (View, make_view) is that of src/view/s2.h.  Everything else (the
+    character-variety solver, the ball search, the renderer, the Catherine wheel, the EPS
+    writer) is the legacy code, unchanged.  The window is not built: as in the legacy nogui
+    build, -v says so (that this build has no viewer, and where the original program's window
+    is built) and exits with status 1.  The film engine apps/s2/zmovie.cc includes this file,
+    with main renamed.
+
+    The two options, which change nothing when they are not given:
+      --polylines FILE  writes the curves (Z+, Z-, and with -C the wheel) as a polyline file
+                        (src/output/polylines.h: write_polylines below says what its header
+                        holds).  Without -o no picture is written (not even EPS on the
+                        standard output); with -o both are.  A FILE that cannot be written
+                        (a folder of the name among them), or an argument that holds a line
+                        break (which the header's command line cannot hold), is refused
+                        before anything is computed.
+      --colour L=R,G,B  the colour of Z+, Z- or the wheel in the picture, three numbers in
+                        [0, 1]; the defaults are the colours the program always had (Z+
+                        0,0,1, Z- 1,0,0, the wheel 0,0.6,0), so the same numbers given again
+                        draw the same picture, byte for byte.  The wheel's colour without -C
+                        changes nothing; when one is given twice, the last one counts.
 */
 
 #include <complex>
@@ -66,6 +82,9 @@
 #include <chrono>
 #include "output/png.h"           // PNG output (and zlib)
 #include "output/raster.h"
+#include "output/polylines.h"     // --polylines: the curves as data
+#include "view/options.h"         // --colour
+#include "view/s2.h"              // the view (View, make_view)
 
 using std::string;
 using std::vector;
@@ -74,6 +93,8 @@ using zippers::resident_bytes;    // (src/core/memory.h; the film engine calls r
 using zippers::release_memory;
 namespace png = zippers::png;
 namespace raster = zippers::raster;
+using zippers::s2::View;          // (src/view/s2.h)
+using zippers::s2::make_view;
 
 // hidden --timing: wall-clock time of each phase, on stderr
 static bool g_timing = false;
@@ -2599,22 +2620,7 @@ static vector<Mat> enumerate_ball(const Rep& rep, double R, const Mat* focusInv,
 
 // ------------------------------------------------------------------ viewing / projection
 typedef std::pair<double,double> P2;
-struct View { double m[9]; };                    // rotation: (X,Y,Z) = m * (x,y,z)
-// Rz(roll) * Ry(yaw) * Rx(pitch).  The eye looks along Z, so the hidden --roll turns the
-// picture in its plane (counterclockwise); with it every orientation of the viewer has an
-// exact command-line form (see vw::view_angles).
-static View make_view(double yaw_deg, double pitch_deg, double roll_deg = 0.0) {
-    double y = yaw_deg*PI/180.0, p = pitch_deg*PI/180.0;
-    double cy=std::cos(y), sy=std::sin(y), cp=std::cos(p), sp=std::sin(p);
-    View v = {{ cy,  sy*sp,  sy*cp,                 // Ry(yaw) * Rx(pitch)
-                0,   cp,    -sp,
-               -sy,  cy*sp,  cy*cp }};
-    if (roll_deg == 0.0) return v;
-    double r = roll_deg*PI/180.0, cr = std::cos(r), sr = std::sin(r);
-    View w = v;
-    for (int j = 0; j < 3; ++j) { w.m[j] = cr*v.m[j] - sr*v.m[3+j]; w.m[3+j] = sr*v.m[j] + cr*v.m[3+j]; }
-    return w;
-}
+// (View, the rotation, and make_view(yaw, pitch, roll) are in src/view/s2.h)
 static inline void vrot(const View& v, float x, float y, float z, double& X, double& Y, double& Z) {
     X = v.m[0]*x + v.m[1]*y + v.m[2]*z;
     Y = v.m[3]*x + v.m[4]*y + v.m[5]*z;
@@ -3691,6 +3697,9 @@ struct Options {
     bool   wheel      = false;    // draw the Catherine wheel
     int    wheelres   = 10000000; // wheel mesh: finest edge pi/wheelres
     string outfile;
+    string polylines;             // --polylines FILE: the curves as data (output/polylines.h)
+    string command;               // the command line, for the header of --polylines
+    double colour[3][3] = {{0,0,1}, {1,0,0}, {0,0.6,0}};   // --colour: Z+, Z-, the wheel
 };
 
 // a drawable layer: the polylines of one renderer plus its RGB colour
@@ -4121,6 +4130,61 @@ static bool writable(const string& fn) {
     return access(dir.c_str(), W_OK) == 0;
 }
 
+// --polylines FILE: the curves as data (src/output/polylines.h). The layers Z+, Z- and, with -C, wheel hold the
+// points as the renderers store them; the polylines record no roots or letters (they are joined across roots). The
+// header gives the program's command line, the example, the parameters, the view, whether the curves were culled to
+// the view (cull on) or are the whole sphere (off), the largest R that check_radius accepts, without and with the
+// focus ball, and that check_wheel accepts, and for each layer whether its curves are incomplete because a cap was
+// reached (capped NAME yes|no): the renderer's memory limit, or the cap of the root search (roots_capped: then every
+// layer); the wheel is, when a zipper is.
+static bool write_polylines(const Options& opt, const Rep& rep, const View& v, bool culled, const Renderer& rp,
+                            const Renderer& rn, const Renderer* rw, bool roots_capped) {
+    namespace pl = zippers::polylines;
+    pl::File f;
+    f.sphere = 2;
+    f.add("program", "zipper");
+    f.add("command", opt.command);
+    f.add("example", opt.monodromy);
+    f.add("order", opt.order <= 0 ? string("inf") : std::to_string(opt.order));
+    f.add("R", pl::exact(opt.radius));
+    f.add("acc", pl::exact(opt.accuracy));
+    f.add("overlap", std::to_string(opt.overlap));
+    f.add("chains", opt.chains ? "on" : "off");
+    if (opt.wheel) f.add("wheelres", std::to_string(opt.wheelres));
+    f.add("view", pl::exact_list(v.m, 9));
+    f.add("yaw", pl::exact(opt.yaw));
+    f.add("pitch", pl::exact(opt.pitch));
+    f.add("roll", pl::exact(opt.roll));
+    f.add("zoom", pl::exact(opt.zoom));
+    f.add("cull", culled ? "on" : "off");
+    f.add("focus", will_focus(opt) ? "on" : "off");
+    f.add("maxR", pl::exact(max_radius(rep, false)));
+    f.add("maxR.focus", pl::exact(max_radius(rep, true)));
+    f.add("maxR.wheel", pl::exact(max_radius(rep, false, wheel_large_order(opt.order) ? WHEEL_ROOTS_LARGE_N : WHEEL_ROOTS)));
+    const bool cp = roots_capped || rp.memFull, cn = roots_capped || rn.memFull;
+    f.add("capped", string("Z+ ") + (cp ? "yes" : "no"));
+    f.add("capped", string("Z- ") + (cn ? "yes" : "no"));
+    if (rw) f.add("capped", string("wheel ") + (cp || cn ? "yes" : "no"));
+    const Renderer* rs[3] = {&rp, &rn, rw};
+    const char* names[3] = {"Z+", "Z-", "wheel"};
+    for (int k = 0; k < 3; ++k) {
+        if (!rs[k]) continue;
+        const Renderer& r = *rs[k];
+        pl::Layer L;
+        L.name = names[k];
+        L.first.assign(r.pstart.begin(), r.pstart.end());
+        L.root.assign(r.pstart.size(), -1);
+        L.letter.assign(r.pstart.size(), -1);
+        L.pts.resize(3*r.px.size());
+        for (size_t i = 0; i < r.px.size(); ++i) { L.pts[3*i] = r.px[i]; L.pts[3*i+1] = r.py[i]; L.pts[3*i+2] = r.pz[i]; }
+        f.layers.push_back(std::move(L));
+    }
+    string err;
+    if (!pl::write(opt.polylines, f, &err)) { fprintf(stderr, "%s\n", err.c_str()); return false; }
+    fprintf(stderr, "wrote %s\n", opt.polylines.c_str());
+    return true;
+}
+
 // Compute and write one EPS/PNG file for the view v (also used by the viewer's 'p').
 static int render_file(const Options& opt, const Monodromy& mon, const Rep& rep, const View& v) {
     Renderer rp(rep), rn(rep);
@@ -4132,13 +4196,14 @@ static int render_file(const Options& opt, const Monodromy& mon, const Rep& rep,
     bool cull = opt.cull && !opt.wheel;               // the wheel needs the whole sphere
     build_zippers(opt, mon, rep, cull ? &zv : nullptr, rp, rn, zs);
     vector<Layer> layers;
-    if (opt.zippers) layers = {{&rp,{0,0,1}}, {&rn,{1,0,0}}};
+    if (opt.zippers) layers = {{&rp,{opt.colour[0][0],opt.colour[0][1],opt.colour[0][2]}},
+                               {&rn,{opt.colour[1][0],opt.colour[1][1],opt.colour[1][2]}}};
 
     std::unique_ptr<Renderer> rw;
     if (opt.wheel) {
         rw.reset(new Renderer(rep));
         compute_wheel(rp, rn, opt.wheelres, *rw);
-        layers.push_back({rw.get(), {0.0, 0.6, 0.0}});   // Catherine wheel, green
+        layers.push_back({rw.get(), {opt.colour[2][0], opt.colour[2][1], opt.colour[2][2]}});   // Catherine wheel, green
         size_t np = rw->px.size();
         bool closed = np >= 4 && rw->npoly() == 1 && rw->px[0] == rw->px[np-1] &&
                       rw->py[0] == rw->py[np-1] && rw->pz[0] == rw->pz[np-1];
@@ -4146,10 +4211,13 @@ static int render_file(const Options& opt, const Monodromy& mon, const Rep& rep,
                 closed ? "closed" : "NOT closed");
     }
 
+    if (!opt.polylines.empty() && !write_polylines(opt, rep, v, cull, rp, rn, rw.get(), zs.capHit)) return 1;
     bool ok = true;
     tlog("(wheel)");
     g_visible = 0;
-    if (opt.format == FMT_PNG) {
+    const bool picture = !opt.outfile.empty() || opt.polylines.empty();   // --polylines without -o: no picture
+    if (!picture) {}
+    else if (opt.format == FMT_PNG) {
         string fn = opt.outfile.empty() ? string("zipper.png") : opt.outfile;
         ok = write_png(fn.c_str(), opt, layers, v);
         if (ok) fprintf(stderr, "wrote %s\n", fn.c_str());
@@ -4187,7 +4255,7 @@ static int render_file(const Options& opt, const Monodromy& mon, const Rep& rep,
             return 2;
         }
     }
-    if (opt.zippers && g_visible == 0)
+    if (picture && opt.zippers && g_visible == 0)
         fprintf(stderr, "warning: nothing was drawn (no curve meets the view)\n");
     if (!ok) return 1;
     return (rp.memFull || rn.memFull) ? 3 : 0;            // 3: written, but incomplete
@@ -4231,6 +4299,9 @@ static void usage(const char* prog) {
 "             c cycle zippers/wheel, p save PNG of the current view as STEM.png, STEM_1.png,\n"
 "             ... (STEM from -o, default zipper; never overwrites), q quit)\n"
 "  -o FILE    output file (default stdout for eps)\n"
+"  --polylines FILE  also write the curves as data (a polyline file); without -o, only that\n"
+"  --colour L=R,G,B  the colour of L: Z+, Z- or wheel, three numbers in [0, 1]\n"
+"             (default Z+=0,0,1 Z-=1,0,0 wheel=0,0.6,0); given twice, the last counts\n"
 "  -h         this help\n", prog);
 }
 
@@ -4248,6 +4319,7 @@ static bool parse_num(const string& v, double& out) {
 int main(int argc, char** argv) {
     Options opt;
     bool fmt_set = false;
+    opt.command = zippers::polylines::command_line(argc, argv);
     for (int i = 1; i < argc; ++i) {
         string s = argv[i];
         auto need = [&](const char* w)->string {
@@ -4306,6 +4378,13 @@ int main(int argc, char** argv) {
                                       [](double x){ return x >= 8 && x <= 10000000 && x == std::floor(x); },
                                       "must be an integer 8..10000000");
         else if (s=="-o") opt.outfile = need("-o");
+        else if (s=="--polylines") opt.polylines = need("--polylines");
+        else if (s=="--colour") { string v = need("--colour"), name; double c[3]; int k = -1;
+                                  if (zippers::viewopt::parse_colour(v, name, c))
+                                      k = name=="Z+" ? 0 : name=="Z-" ? 1 : name=="wheel" ? 2 : -1;
+                                  if (k < 0) { fprintf(stderr, "--colour %s: a name (Z+, Z- or wheel) and three "
+                                                       "numbers in [0, 1], as Z+=0,0,1\n", v.c_str()); return 1; }
+                                  for (int i = 0; i < 3; ++i) opt.colour[k][i] = c[i]; }
         else if (s=="-h"||s=="--help") { usage(argv[0]); return 0; }
         else { fprintf(stderr, "unknown option %s\n", s.c_str()); usage(argv[0]); return 1; }
     }
@@ -4325,6 +4404,13 @@ int main(int argc, char** argv) {
     Monodromy mon; Rep rep;
     tlog("(start)");
     if (!opt.view && !writable(opt.outfile)) { fprintf(stderr, "cannot write %s\n", opt.outfile.c_str()); return 1; }
+    if (!opt.view && !opt.polylines.empty()) {
+        const string wp = zippers::polylines::write_problem(opt.polylines);
+        if (!wp.empty()) { fprintf(stderr, "cannot write %s: %s\n", opt.polylines.c_str(), wp.c_str()); return 1; }
+        if (!zippers::polylines::recordable(opt.command)) {
+            fprintf(stderr, "--polylines: an argument holds a line break, which the command line in the file's "
+                    "header cannot hold\n"); return 1; }
+    }
     if (!prepare(opt, mon, rep)) return 1;
     if (!check_radius(opt, rep, will_focus(opt))) return 1;
     if (opt.wheel && !check_wheel(opt, rep)) return 1;

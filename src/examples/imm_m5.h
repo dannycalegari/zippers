@@ -33,6 +33,9 @@
 // roots and rootd. One change of result: parse_fword reads facet 1, which the legacy
 // reader dropped (see parse_fword).
 //
+// New here: shell_radii, the radii at which the roots change (the distinct distances of find_roots5's roots), as
+// cs::shell_radii gives them in S^3.
+//
 // At the end of the file: the descent checks of the root balls (descents, RootCertificate,
 // certify_store5, certify_roots5 and the lines of zipper5 --stats). It verifies; it changes nothing in the search.
 
@@ -221,6 +224,18 @@ inline void find_roots5(double R, std::vector<M6>& roots, std::vector<double>& r
     for (size_t i = 0; i < B.size(); i++) if (B.label[i].mu == 0 && B.dist[i] <= R) idx.push_back((int)i);
     std::stable_sort(idx.begin(), idx.end(), [&](int a, int b) { return B.dist[a] < B.dist[b]; });
     for (int i : idx) { roots.push_back(B.load(i)); rootd.push_back(B.dist[i]); }
+}
+
+// the radii at which the roots change, up to rmax: the distinct distances of the roots of find_roots5(rmax), from 0 (two
+// within 1e-4 count as one, as in cs::shell_radii). find_roots5 at one of them includes its roots (d <= R). Like every
+// search of this file it needs setup() first; before it, the ball has no generators, and the answer is {0}.
+inline std::vector<double> shell_radii(double rmax)
+{
+    std::vector<M6> roots;
+    std::vector<double> d, r;
+    find_roots5(rmax, roots, d);
+    for (double x : d) if (r.empty() || x > r.back() + 1e-4) r.push_back(x);
+    return r;
 }
 
 // ---------------------------------------------------------------------------------------

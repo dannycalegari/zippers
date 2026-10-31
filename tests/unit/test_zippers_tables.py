@@ -34,20 +34,22 @@ SOURCE = {"zipper": "apps/s2/zipper.cc", "zmovie": "apps/s2/zmovie.cc", "chz": "
 VALUES = {
     "zipper": {"-o": ["x.png"], "-R": ["2"], "-a": ["0.01"], "-s": ["64"], "--zoom": ["2"], "--yaw": ["10"],
                "--pitch": ["10"], "--overlap": ["1"], "-n": ["3"], "-f": ["png"], "-w": ["1"], "--wheelres": ["100"],
-               "--memlimit": ["1"], "--roll": ["5"]},
+               "--memlimit": ["1"], "--roll": ["5"], "--polylines": ["x.zpl"], "--colour": ["Z+=0,0,1"]},
     "zmovie": {"-o": ["frames"], "-j": ["2"], "--frames": ["0:3"]},
     "chz": {"--tcand": ["0"], "--excess": ["2"], "--jexcess": ["1"]},
     "chz5": {"--tcand": ["0"], "--excess": ["2"], "--jexcess": ["1"]},
     "zipper3": {"-o": ["x.png"], "-R": ["0"], "-a": ["0.3"], "-s": ["64"], "--zoom": ["2"], "--yaw": ["10"],
                 "--pitch": ["10"], "--overlap": ["1"], "-f": ["subst_4.00_9.50_t3_r1.txt"], "--only": ["+"],
                 "--clip": ["3"], "--thick": ["1"], "--cap": ["1000"], "--centre": ["1,0,0,0"], "--cullk": ["16"],
-                "--focus": ["1"], "--pole": ["10", "20"], "--pairs": ["linked_pairs.txt"], "--pairindex": ["1"]},
+                "--focus": ["1"], "--pole": ["10", "20"], "--pairs": ["linked_pairs.txt"], "--pairindex": ["1"],
+                "--polylines": ["x.zpl"], "--colour": ["Z+=0.05,0.15,0.85"], "--viewmatrix": ["1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,1,0,0,0,1,0,0,0,1"]},
     "link3": {"-f": ["subst_4.00_9.50_t3.txt"], "-a": ["0.3"], "--rr": ["0.5"], "--maxlen": ["2"], "--nrel": ["0"],
               "--hr": ["0.5"], "--seed": ["2"], "--pair": ["0", "0", "0"], "--nproj": ["2"], "--png": ["stem"],
               "--export": ["nofile.txt"]},
     "zipper5": {"-o": ["x.png"], "-R": ["0"], "-a": ["0.3"], "-s": ["64"], "--zoom": ["2"], "--overlap": ["1"],
                 "-f": ["subst5_2.30_4.50_t1_r0.txt"], "--only": ["+"], "--centre": ["1,0,0,0,0"], "--cullk": ["16"],
-                "--focus": ["1"], "--turn": ["5"], "--turn2": ["5"], "--hidfog": ["1.5"], "--cap": ["1000"]},
+                "--focus": ["1"], "--turn": ["5"], "--turn2": ["5"], "--hidfog": ["1.5"], "--cap": ["1000"],
+                "--polylines": ["x.zpl"], "--colour": ["Z+=0.05,0.15,0.85"], "--viewmatrix": ["1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,1,0,0,0,1"]},
 }
 
 n_checks = 0

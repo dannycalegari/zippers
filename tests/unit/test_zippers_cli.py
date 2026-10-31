@@ -5,7 +5,8 @@
 Almost everything here uses zippers --dry-run, which prints the program command line that zippers would run, and runs
 nothing; so the test compares command lines, never pictures, and holds on every platform.
   - every option of every command and sphere, from zippers' own table (zippers --table): it is passed on to the right
-    program, under the program's name for it, with its values;
+    program, under the program's name for it, with its values (but draw's --session, which takes the place of the
+    example: refused after one; test_gui_session tests the sessions themselves);
   - the translations, the defaults and the aliases, case by case (the S2 example as -m WORD, --format as -f, --rho as
     chz5's third number, --phi 1,0 dropped, search without numbers, link's settings, check's list);
   - the refusals, each with exit status 1 and its message: the options of the table that zippers leaves out, the
@@ -14,7 +15,8 @@ nothing; so the test compares command lines, never pictures, and holds on every 
   - the quoting of --dry-run: arguments with spaces, quotes, '$', a backquote, a backslash, a newline, and the empty
     argument, given back exactly when the printed line is read by sh -c;
   - the usage texts (exit status 0), each listing the options of its command, and no hidden one;
-  - an S2 picture without -o is refused when the standard output is a terminal (a pseudo-terminal here);
+  - an S2 picture without -o is refused when the standard output is a terminal (a pseudo-terminal here), but not with
+    --polylines and no -o, which writes no picture (the file is written, nothing goes to the terminal);
   - four messages of the programs: zipper5 -h (its usage text), zipper -v (no window in this build), ztest with an
     unknown word (refused), and link3 when a picture cannot be written.
 
@@ -130,6 +132,33 @@ def terminal_check(master, slave):
           "zippers draw fig8 with a terminal for its standard output: refused (exit %d: %s)" % (p.returncode, err[:200]))
 
 
+def polylines_terminal_check(master, slave):
+    """zippers draw fig8 --polylines FILE without -o, its standard output a pseudo-terminal: not refused, since no
+    picture is written; the file is, and nothing goes to the terminal"""
+    drained = []
+    reader = threading.Thread(target=lambda: drained.append(drain(master)), daemon=True)
+    reader.start()
+    tmp = tempfile.mkdtemp(prefix="zippers_cli_test_")
+    env = {k: v for k, v in os.environ.items() if k != "ZIPPERS_DATA"}     # (in a folder of its own, without ZIPPERS_DATA)
+    try:
+        p = subprocess.Popen([ZIPPERS, "draw", "fig8", "-R", "0", "-a", "0.3", "--polylines", "t.zpl"],
+                             stdin=subprocess.DEVNULL, stdout=slave, stderr=subprocess.PIPE, universal_newlines=True,
+                             cwd=tmp, env=env)
+        try:
+            err = p.communicate(timeout=120)[1]
+        except subprocess.TimeoutExpired:
+            p.kill()
+            err = p.communicate()[1]
+        os.close(slave)
+        reader.join(timeout=10)
+        os.close(master)
+        ok = p.returncode == 0 and os.path.isfile(os.path.join(tmp, "t.zpl")) and drained == [0]
+        check(ok, "zippers draw fig8 --polylines with a terminal for its standard output: not refused, the file written, "
+              "nothing on the terminal (exit %d, %s bytes on the terminal: %s)" % (p.returncode, drained, err[:200]))
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
 def main():
     if not os.access(ZIPPERS, os.X_OK):
         print("test_zippers_cli: %s is not built" % ZIPPERS)
@@ -144,6 +173,9 @@ def main():
         n = int(nvalues)
         vals = values_for(zopt, n)
         ex = EXAMPLE[sphere]
+        if command == "draw" and zopt == "--session":
+            refuse(["draw", ex, zopt, "s.zsession"], "--session takes the place of the example")
+            continue
         if command == "draw":
             args = ["draw", ex, zopt] + vals
             want = (["-m", ex] if sphere == "S2" else []) + ([] if popt == "-" else [popt] + vals)
@@ -181,6 +213,14 @@ def main():
            "zipper3", ["--pairs", "linked_pairs.txt", "--pairindex", "5", "--context", "-o", "p.png"])
     expect(["draw", "imm", "--turn", "10", "--turn2", "-5", "-o", "x.png"], "zipper5",
            ["--turn", "10", "--turn2", "-5", "-o", "x.png"])
+    expect(["draw", "fig8", "-R", "3", "--polylines", "c.zpl", "--colour", "Z-=0,1,0"], "zipper",
+           ["-m", "fig8", "-R", "3", "--polylines", "c.zpl", "--colour", "Z-=0,1,0"])
+    expect(["draw", "cs", "--viewmatrix", ",".join(["0.5"] * 25), "--colour", "pair.Z+=1,0,0", "--colour", "Z+=0,0,1"],
+           "zipper3", ["--viewmatrix", ",".join(["0.5"] * 25), "--colour", "pair.Z+=1,0,0", "--colour", "Z+=0,0,1"])
+    expect(["draw", "cs", "--pairs", "linked_pairs.txt", "--context", "--colour", "context.Z+=0.7,0.75,0.95", "-o", "p.png"],
+           "zipper3", ["--pairs", "linked_pairs.txt", "--context", "--colour", "context.Z+=0.7,0.75,0.95", "-o", "p.png"])
+    expect(["draw", "imm", "--viewmatrix", "-0.5," + ",".join(["0.5"] * 33), "--polylines", "c.zpl"], "zipper5",
+           ["--viewmatrix", "-0.5," + ",".join(["0.5"] * 33), "--polylines", "c.zpl"])
     expect(["draw", "imm-m5", "--centre", "0,0,0,0,1,1", "--zoom", "100", "-o", "z.png"], "zipper5",
            ["--centre", "0,0,0,0,1,1", "--zoom", "100", "-o", "z.png"])
     expect(["search", "cs"], "chz", ["kernel", "4", "9.5", "3", "--roofs", "--jexcess", "1"],
@@ -285,7 +325,7 @@ def main():
     refuse(["list", "bogus"], "unknown example 'bogus'")
     refuse(["list", "cs", "imm"], "one example at most")
     for ex in ("fig8", "cs", "imm"):
-        refuse(["view", ex], "the window is not in this version")
+        expect(["view", ex], "zview", [ex])       # (zippers view itself: test_zview.py)
 
     section("the quoting of --dry-run, read back by sh -c")
     for value in ["a b.png", "it's.png", 'say "hi".png', "$HOME.png", "`date`.png", "back\\slash.png", "new\nline.png",
@@ -303,7 +343,8 @@ def main():
     for args, wants, wants_not in [
             (["--help"], ["usage: zippers", "  draw EXAMPLE", "  check [EXAMPLE ...]", "--dry-run"], []),
             (["-h"], ["usage: zippers"], []),
-            (["draw", "--help"], ["usage: zippers draw", "  -n N", "  --pole D1 D2", "  --turn D", " [S3]"], ["--memlimit"]),
+            (["draw", "--help"], ["usage: zippers draw", "  -n N", "  --pole D1 D2", "  --turn D", " [S3]", "context.Z+",
+                                  "the last one counts"], ["--memlimit"]),
             (["draw", "fig8", "--help"], ["  -n N", "  --format FMT", "  -C "], ["--pole", "--turn", "-f FILE", "--memlimit"]),
             (["draw", "cs", "-h"], ["  -f FILE", "  --pole D1 D2", "  --pairs FILE", "  --phi 1,0"], ["  -n N", "--turn"]),
             (["draw", "imm", "--help"], ["  --turn D", "  --hidfog H", "  --cullk K"], ["  --pole", "  --check", "  -n N"]),
@@ -339,6 +380,12 @@ def main():
         master = slave = None
     if master is not None:
         terminal_check(master, slave)
+    try:
+        master, slave = pty.openpty()
+    except OSError:
+        master = slave = None
+    if master is not None:
+        polylines_terminal_check(master, slave)
 
     section("the programs' own messages")
     tmp = tempfile.mkdtemp(prefix="zippers_cli_test_")

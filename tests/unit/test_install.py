@@ -4,17 +4,21 @@
 
   1. install the build into BUILD/install_test/ (the folder is made afresh; nothing is installed anywhere else), and
      compare the installed files with the list that they must be: bin/zippers, the seven programs in
-     libexec/zippers/, the files of data/ in share/zippers/, and README.md, COPYING, CITATION.cff in share/doc/zippers/;
+     libexec/zippers/ (and zview, the window's program, when the build has the window), the files of data/ in
+     share/zippers/, and README.md, COPYING, CITATION.cff in share/doc/zippers/;
   2. from an empty folder outside the build: zippers --version; zippers list cartwright-steger and imm-m5 find every
      default file in the installed data; zippers draw of each geometry writes a picture that is byte for byte the one
      the build's own program draws (in a folder that holds the data file it reads: the same machine, so this holds on
-     every platform); zippers check passes;
+     every platform); zippers check passes; zippers --dry-run view runs the installed zview (with the window), or
+     says that the installation has no window; the installed zview --headless finds the installed zippers (it never
+     opens a window: ZIPPERS_NO_WINDOW is set);
   3. move the installed tree, and do 2 again from the moved tree (list, and a picture);
   4. install with DESTDIR and an absolute prefix (as packagers do): the files land under DESTDIR/prefix.
 The moved tree is removed at the end when everything passed.
 
-usage: test_install.py CMAKE BUILD REPO BINDIR LIBEXECDIR DATADIR DOCDIR   (the install folders as CMake names them,
-       CMAKE_INSTALL_BINDIR and so on; Python 3.6 or later, standard library only)
+usage: test_install.py CMAKE BUILD REPO BINDIR LIBEXECDIR DATADIR DOCDIR [WINDOW]   (the install folders as CMake
+       names them, CMAKE_INSTALL_BINDIR and so on; WINDOW ON when the build has the window, else OFF, the default;
+       Python 3.6 or later, standard library only)
 """
 import os
 import shutil
@@ -23,6 +27,7 @@ import sys
 import tempfile
 
 CMAKE, BUILD, REPO, BINDIR, LIBEXECDIR, DATADIR, DOCDIR = sys.argv[1:8]
+WINDOW = (sys.argv[8] if len(sys.argv) > 8 else "OFF") == "ON"
 BUILD = os.path.abspath(BUILD)
 REPO = os.path.abspath(REPO)
 PREFIX = os.path.join(BUILD, "install_test")
@@ -59,6 +64,8 @@ def files_under(root):
 
 def expected():
     want = {BINDIR + "/zippers"} | {LIBEXECDIR + "/zippers/" + p for p in PROGRAMS}
+    if WINDOW:
+        want.add(LIBEXECDIR + "/zippers/zview")
     want |= {DATADIR + "/zippers/README.md"}
     for g in ("s3", "s4"):
         for f in os.listdir(os.path.join(REPO, "data", g)):
@@ -75,6 +82,8 @@ def same_file(a, b):
 def env_without_data():
     env = dict(os.environ)
     env.pop("ZIPPERS_DATA", None)
+    env.pop("ZIPPERS_KEYS", None)
+    env["ZIPPERS_NO_WINDOW"] = "1"             # an installed zview never opens its window here
     return env
 
 
@@ -94,6 +103,17 @@ def use(prefix, work, pictures):
             ok = code == 0 and line and all(("found in %s/%s" % (data, g)) in x for x in line)
             check(ok, "zippers list %s: %s found in the installed data %s/%s (%s)" % (ex, f, data, g,
                                                                                     line or (out + err)[:300]))
+    code, out, err = run([z, "--dry-run", "view"], work, env)
+    zview = os.path.realpath(os.path.join(prefix, LIBEXECDIR, "zippers", "zview"))
+    if WINDOW:
+        words = out.split()
+        check(code == 0 and words and os.path.realpath(words[0]) == zview,
+              "zippers --dry-run view: the installed zview (exit %d: %s)" % (code, (out + err).strip()[:300]))
+        code, out, err = run([zview, "--headless", "fig8", "-R", "2", "-a", "0.05"], work, env)
+        check(code == 0, "the installed zview --headless runs the installed zippers (exit %d: %s)" % (code, err[-300:]))
+    else:
+        check(code == 1 and "this installation has no window" in err,
+              "zippers --dry-run view: this installation has no window (exit %d: %s)" % (code, (out + err).strip()[:300]))
     for name, args, program, pargs, datafile in pictures:
         code, out, err = run([z, "draw"] + args + ["-o", name], work, env)
         got = os.path.join(work, name)

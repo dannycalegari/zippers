@@ -1,0 +1,23 @@
+zippers session 1
+# zippers draw --session s2_fig8.zsession -o s2_fig8.png remakes s2_fig8.png
+made_by = zippers 0.9, Darwin arm64, AppleClang 21.0.0.21000101
+example = fig8
+n = 3
+R = 3
+a = 0.004
+s = 300
+w = 0
+zoom = 1
+yaw = 20
+pitch = -10
+roll = 5
+overlap = 1
+C = no
+wheelres = 10000000
+nocull = no
+nofocus = no
+nochains = no
+memlimit = 4
+colour = Z+=0,0,1
+colour = Z-=1,0,0
+colour = wheel=0,0.6,0
