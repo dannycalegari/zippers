@@ -52,7 +52,7 @@ so that `zippers draw --session FILE -o PIC` remakes the picture:
 
 ```
 zippers session 1
-made_by = zippers 0.9, Darwin arm64, AppleClang 21.0.0.21000101
+made_by = zippers 1.0, Darwin arm64, AppleClang 21.0.0.21000101
 example = cartwright-steger
 phi = 1,0
 f = subst_4.00_9.50_t3_r1.txt

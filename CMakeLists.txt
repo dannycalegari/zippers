@@ -21,7 +21,7 @@ if(_zippers_src STREQUAL _zippers_bin)
 endif()
 
 project(zippers
-  VERSION 0.9
+  VERSION 1.0
   DESCRIPTION "Zippers on the spheres at infinity of hyperbolic manifolds"
   LANGUAGES CXX)
 

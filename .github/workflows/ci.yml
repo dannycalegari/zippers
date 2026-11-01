@@ -1,7 +1,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Automatic test runs: build the suite and run the fast tests, on macOS and on Linux, for every push and every pull
-# request. (This runs only once the repository is on GitHub.)
+# Automatic test runs: build the suite and run the fast tests on Linux for every push and every pull request, and on
+# macOS and Linux when the workflow is started by hand (workflow_dispatch: "Run workflow" on the Actions page, or
+# `gh workflow run CI`). A minute of a macOS runner counts ten times against a private repository's included minutes.
 #
 # The fast tests are the ones labelled "fast" (ctest -L fast), the same as `make test`. The slow "reference" tests
 # are run by hand, and so is the test that opens the window (label gui, make test-gui).
@@ -11,6 +12,7 @@ name: CI
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -23,7 +25,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, ubuntu-latest]
+        # macOS only in a run started by hand
+        os: ${{ github.event_name == 'workflow_dispatch' && fromJSON('["macos-latest", "ubuntu-latest"]') || fromJSON('["ubuntu-latest"]') }}
     steps:
       - name: Check out the repository
         uses: actions/checkout@v5

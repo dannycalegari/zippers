@@ -1,0 +1,291 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1.1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\lk}{\operatorname{lk}}
+
+\title{Zippers: an informal note\\on the mathematics behind the programs}
+\author{Danny Calegari \and Claude (Anthropic)}
+\date{October 2026}
+
+\begin{document}
+\maketitle
+
+\begin{center}
+\fbox{\parbox{0.88\textwidth}{\small This is an informal note, \emph{not for publication}. It describes some elements of
+the mathematical theory of zippers, as the programs of the \texttt{zippers} suite illustrate them. Theorems~\ref{thm:conn} and~\ref{thm:link} are
+work in progress: what is given for them is a sketch of a proof, not a proof.}}
+\end{center}
+
+\section{Zippers}
+
+Let $M$ be a closed manifold with word-hyperbolic fundamental group $G$, and let $\varphi\colon G\to\Z$ be a
+surjective homomorphism, for instance the one induced by a map $M\to S^1$. Write $K=\ker\varphi$. The universal cover
+$\widetilde M$ is $\delta$-hyperbolic, and $G$ acts on it and on its Gromov boundary $\partial_\infty G$. The map $M\to S^1$ lifts to a function $f\colon\widetilde M\to\R$ with $f(gx)=f(x)+\varphi(g)$: a height.
+
+A \emph{staircase} is a ray in $\widetilde M$ that goes to infinity at a linear speed, and along which the height $f$
+grows at a linear rate. (Precisely: a quasigeodesic ray along which $f$ increases linearly.) Every staircase converges to a
+point of $\partial_\infty G$. Following Calegari and Loukidou~\cite{CL}:
+\[
+Z^+=\{\text{the endpoints of staircases}\},\qquad Z^-=\{\text{the endpoints of staircases for } -f\}.
+\]
+
+\begin{theorem}[Calegari--Loukidou \cite{CL}]\label{thm:CL}
+If $K$ is finitely generated, then $Z^+$ and $Z^-$ are nonempty, disjoint, path-connected and invariant under
+$G$; in particular both are dense in $\partial_\infty G$.
+\end{theorem}
+
+They are disjoint for a simple reason: two rays with the same endpoint stay a bounded distance apart, so they cannot have
+heights going to $+\infty$ on one and $-\infty$ on the other.
+
+\begin{remark}\label{rem:quasi}
+Theorem~\ref{thm:CL} holds more generally whenever $\varphi\colon G\to\Z$ is a quasimorphism whose coarse level sets are coarsely
+connected. In this note we consider only homomorphisms, for simplicity.
+\end{remark}
+
+\begin{remark}\label{rem:cusps}
+If $M$ has cusps, so that $G$ is relatively hyperbolic, the sets $Z^+$ and $Z^-$ can still be constructed, but they are no
+longer disjoint.
+\end{remark}
+
+\section{How the programs draw them: base arcs from a presentation}
+
+\paragraph{The input.} The programs start from a \emph{presentation} of the situation:
+\begin{itemize}
+\item a finite set $S\subset K$ that generates $K$ and contains the inverse of each of its elements (the \emph{letters});
+\item an element $t\in G$ with $\varphi(t)>0$;
+\item for each letter $s$, its \emph{roof}: an expression
+\[
+t^{-1}st=x_1x_2\cdots x_k\qquad(x_i\in S).
+\]
+It exists because $K$ is normal: $t^{-1}st$ lies in $K$, so it is a word in the letters.
+\end{itemize}
+
+\paragraph{The base arcs.} Let $V$ be the attracting fixed point of $t$ on $\partial_\infty G$. For each letter $s$ there is an arc
+$\alpha_s$ in $\partial_\infty G$ from $V$ to $sV$, determined by the self-similarity
+\[
+\alpha_s \;=\; t\cdot\bigl(\alpha_{x_1}\,\cup\, x_1\alpha_{x_2}\,\cup\, x_1x_2\alpha_{x_3}\,\cup\cdots\cup\,
+x_1\cdots x_{k-1}\alpha_{x_k}\bigr).
+\]
+The right-hand side is a path: $x_1\cdots x_{i-1}\alpha_{x_i}$ runs from $x_1\cdots x_{i-1}V$ to $x_1\cdots x_iV$, and
+applying $t$ (which fixes $V$) gives a path from $V$ to $tx_1\cdots x_kV=stV=sV$. The arcs $\alpha_s$ are the
+\emph{base arcs}. Every point of a base arc is the endpoint of a staircase, so the union of the translates
+$g\alpha_s$, $g\in G$, is a path-connected, $G$-invariant subset of $Z^+$. The same construction with $t^{-1}$,
+its attracting fixed point, and the \emph{down roofs} $tst^{-1}=y_1\cdots y_l$ gives the base arcs of $Z^-$.
+\begin{remark}\label{rem:union}
+The union of the translates of the base arcs is contained in $Z^+$. It is probably equal to $Z^+$, but we have not
+thought about this carefully.
+\end{remark}
+
+\paragraph{What the programs compute.} A translate $h\alpha_s$ (a \emph{branch}) is replaced by the $k$ branches on the
+right-hand side, $ht\alpha_{x_1}, htx_1\alpha_{x_2},\dots$, until the chord joining the two ends of each branch is shorter
+than the accuracy (the option \texttt{-a}); such a branch is drawn as a segment. All group elements are kept exactly, and
+a branch reached twice is drawn once. The picture is the union of the translates $g\alpha_s$ for the elements $g$ of a
+ball of $G$ (those with $d(o,go)\le R$, the option \texttt{-R}), nearest first. With \texttt{-R 0} it is the base arcs
+alone.
+
+\section{Roofs}
+
+Arrange the elements of $G$ by their height $\varphi$. The letter $s$ is a step from $1$ to $s$ at height $0$. Its roof
+is a path one story up, from $t$ to $st$, through the points
+\[
+t,\quad tx_1,\quad tx_1x_2,\quad\dots,\quad tx_1\cdots x_k=st,
+\]
+all at height $\varphi(t)$. Each step of the roof is again a letter, so it has a roof of its own, one story higher, and so on.
+These nested roofs are the \emph{blocks} of~\cite{CL}; a staircase climbs through them, and the base arc $\alpha_s$ is the set of
+the endpoints of the staircases that start on the step from $1$ to $s$.
+
+The presentation is not unique: $S$, $t$ and the roofs can all be chosen in many ways. Different choices give different
+base arcs, but $Z^+$ and $Z^-$ depend only on $G$ and $\varphi$. The choice matters for the pictures:
+\begin{itemize}
+\item the kernel search of the suite (\texttt{zippers search}) finds $S$, $t$ and the roofs, and checks every roof exactly;
+\item it can choose short roofs, and roofs that make the two orientations of an arc coincide; with them, far less of the
+picture is drawn twice (the overdraw of $Z^-$ in $S^4$ falls from $79\%$ to $5\%$; \texttt{docs/developer\_guide.md}).
+\end{itemize}
+
+\section{Coarse connectivity of the level sets, and connectivity at infinity}
+
+A \emph{level set} is $L_c=f^{-1}(c)\subset\widetilde M$. It is \emph{coarsely $n$-connected} if there is a constant $D$
+such that every map of a sphere $S^i$, $i\le n$, into $L_c$ extends to a map of the ball $B^{i+1}$ into the
+$D$-neighbourhood of $L_c$. For $n=0$ this says that $L_c$ is coarsely connected, which holds exactly when $K$ is finitely
+generated; in general, the level sets are coarsely $n$-connected exactly when $K$ is of type $F_{n+1}$ (Gromov~\cite{G},
+where coarse higher connectivity is introduced).
+
+\begin{theorem}[Calegari, work in progress]\label{thm:conn}
+If the level sets of $f$ are coarsely $n$-connected, then $Z^+$ and $Z^-$ are $n$-connected: every map of a sphere $S^i$,
+$i\le n$, into $Z^\pm$ extends to a map of the ball $B^{i+1}$ into $Z^\pm$.
+\end{theorem}
+
+The key to the first step of the proof is a lemma about the geodesics that run from a point of $Z^-$ to the points of
+a compact subset of $Z^+$, in its weak topology. Fix a basepoint $o$. For $K\ge1$ let $Z^+(K)$ be the set of the endpoints
+of the geodesic rays that start within distance $K$ of $o$ and along which the height tends to $+\infty$ and is a
+$K$-quasi-isometry to $\R$; define $Z^-(K)$ in the same way with $-f$. Then $Z^+$ is the increasing union of the sets
+$Z^+(K)$, and it has the \emph{weak topology}: a set is open when its intersection with each $Z^+(K)$ is open (in the
+topology of $\partial_\infty G$). The sets $Z^+(K)$ are not invariant under $G$, but $Z^+$ is, and $G$ acts on it by
+homeomorphisms of the weak topology. A compact subset of $Z^+$, such as the image of a sphere or of a null-homotopy of
+one, lies in a single $Z^+(K)$.
+
+\begin{lemma}\label{lem:geod}
+Let $X$ be a compact subset of $Z^+$, and let $p$ be a point of $Z^-$. Let $\Gamma(X)$ be the family of the geodesics from $p$
+to the points of $X$. Then the height $f$ is a quasi-isometry to $\R$ along every geodesic $\gamma$ in $\Gamma(X)$, with
+constants that do not depend on $\gamma$.
+\end{lemma}
+
+\begin{proof}
+Since $X$ is compact, it lies in a single $Z^+(K)$, and $p$ lies in some $Z^-(K')$. For $x\in X$ let $r_x$ be a ray from
+near $o$ to $x$ along which the height is a $K$-quasi-isometry, and $r^-$ a ray from near $o$ to $p$ along which $-f$ is a
+$K'$-quasi-isometry.
+\begin{enumerate}
+\item The union $r^-\cup r_x$ is \emph{expanding}: any two of its points $y,y'$ satisfy $|f(y)-f(y')|\ge d(y,y')/A-B$,
+with $A$, $B$ depending only on $K$, $K'$ and the Lipschitz constant of $f$. On each ray this is the quasi-isometry. For
+$y\in r^-$ and $y'\in r_x$ it follows from $f(y)\le f(o)-d(o,y)/A+B$, $f(y')\ge f(o)+d(o,y')/A-B$ and the triangle
+inequality.
+\item The geodesic $\gamma$ from $p$ to $x$ stays within a bounded distance of $r^-\cup r_x$, since ideal polygons in a
+hyperbolic space are thin and the two rays start near $o$.
+\item Being expanding passes to bounded neighbourhoods, since $f$ is Lipschitz. So $|f(\gamma(u))-f(\gamma(u'))|\ge
+|u-u'|/A'-B'$, and $f\circ\gamma$ runs from $-\infty$ to $+\infty$. A continuous function on $\R$ with these two properties
+increases coarsely: it is a quasi-isometry, with constants that do not depend on $x$.\qedhere
+\end{enumerate}
+\end{proof}
+
+\noindent\emph{Sketch of a proof of Theorem~\ref{thm:conn}.} This is a sketch only, and the details have not been written out.
+\begin{enumerate}
+\item Let $S^i\to Z^+$ be a map, with image $X$, and fix a point $p$ of $Z^-$. By Lemma~\ref{lem:geod}, along each geodesic from $p$
+to a point of $X$ the height goes from $-\infty$ to $+\infty$ at a uniformly linear rate, so the upper half of each is a
+staircase, with uniform constants. These geodesics vary continuously with their endpoints, and each crosses a given
+level set in a set of bounded size: the crossings form a coarse sphere in that level set.
+\item Since the level set is coarsely $n$-connected, that coarse sphere bounds a coarse ball at the same level.
+\item Push the ball up, story by story: each small cell at one level is spanned by a cell one story higher, as each step is
+spanned by its roof. This is the higher-dimensional form of the block filling that proves Theorem~\ref{thm:CL} (where $i=0$, and a
+path of steps is filled by its roofs).
+\item The pushed-up cells form a ball's worth of staircases, and their endpoints give a ball in $Z^+$ bounding the
+sphere.
+\end{enumerate}
+The work lies in step~3: keeping the constants uniform, so that the pushed-up family is still a family of staircases, and
+the endpoint map is continuous.
+
+\section{Examples}
+
+\subsection{Hyperbolic 3-manifolds that fiber over the circle: zippers on $S^2$}
+
+The figure-eight knot complement fibers over the circle with fiber a once-punctured torus, whose fundamental group is the
+free group $F=\langle a,b\rangle$. The monodromy is the automorphism
+\[
+\varphi(a)=ab,\qquad \varphi(b)=bab,
+\]
+the product of the two Dehn twists $R\colon(a,b)\mapsto(a,ba)$ and $L\colon(a,b)\mapsto(ab,b)$, written $RL$ (applied
+from left to right). The group is $G=\langle a,b,t\mid t^{-1}gt=\varphi(g)\text{ for } g\in F\rangle$, the
+height of an element is its exponent of $t$, and $K=F$. So the roofs are just the monodromy:
+\[
+t^{-1}at=ab,\qquad t^{-1}bt=bab,
+\]
+and the two base arcs of $Z^+$ satisfy
+\[
+\alpha_a=t\,(\alpha_a\cup a\,\alpha_b),\qquad \alpha_b=t\,(\alpha_b\cup b\,\alpha_a\cup ba\,\alpha_b).
+\]
+\begin{itemize}
+\item \texttt{zippers draw fig8 -n inf} draws them for the knot complement, which is cusped (of finite volume, but not
+closed).
+\item \texttt{zippers draw fig8 -n N} draws them for the closed orbifold obtained by replacing the puncture with a cone point
+of order $N$. It is hyperbolic for every $N\ge2$: the fiber is then a hyperbolic $2$-orbifold, a torus with one cone
+point, and the monodromy is pseudo-Anosov. The program finds its holonomy by following the fixed point of the trace map
+from the cusp.
+\item Any positive word in $R$ and $L$ with both letters gives another example (\texttt{zippers draw RRL}).
+\item \texttt{-C} also draws the \emph{CaTherine wheel}~\cite{CLwheels}.
+\end{itemize}
+
+\subsection{The examples of Llosa Isenrich and Py: zippers on $S^3$}
+
+Llosa Isenrich and Py~\cite{LIP} construct compact complex hyperbolic manifolds $X=G\backslash B^m$ of complex
+dimension $m$, with a map to the circle whose height function $f$ is Morse, all of whose critical points have index $m$
+(the middle dimension). For them $K$ is of type $F_{m-1}$ but not of type $FP_m$. Here $B^m$ is complex hyperbolic space,
+and $\partial_\infty G=S^{2m-1}$.
+
+The simplest is the \emph{Cartwright--Steger surface}~\cite{CS}, with $m=2$: a compact complex hyperbolic surface whose
+first Betti number is $2$. Its map to the circle comes from its Albanese map to an elliptic curve, a Lefschetz
+fibration with exactly three nodes whose fibers have genus $19$ (see Szab\'o~\cite{Sz} for the Albanese map and the
+fundamental group), and $f$ has $3$ critical points in $X$, all of index $2$. So $K$ is finitely generated but not finitely presented, and the zippers are
+path-connected subsets of $S^3$ (Theorem~\ref{thm:CL}).
+\begin{itemize}
+\item \texttt{zippers draw cs} draws them. The default presentation has $36$ letters and an element $t$ that is a word of
+length $17$ in the three generators of the lattice.
+\item For instance, letter $1$ is $a_1^{-1}a_3^{-1}$, and its roof is $t^{-1}s_1t=s_{32}\,s_8\,s_{19}$. The $36$ roofs have
+$6$ letters on average, and at most $14$.
+\end{itemize}
+
+\subsection{A near example: a cusped hyperbolic 5-manifold, zippers on $S^4$}
+
+Italiano, Martelli and Migliorini~\cite{IMM} found a hyperbolic $5$-manifold that fibers over the circle. It has finite
+volume but is not closed: it has cusps, so $\pi_1$ is relatively hyperbolic and $Z^+$ and $Z^-$ are not disjoint; see Remark~\ref{rem:cusps}.
+The programs draw its arcs by the same construction (\texttt{zippers draw imm}). Near a cusp, an arc runs into the cusp's
+point at infinity, and the programs draw it through those points. The pictures show a close family resemblance to the
+zippers of the figure-eight knot complement, especially near the cusps.
+
+\section{Linking at infinity and homology in the middle dimension}
+
+Let $X=G\backslash B^m$ be one of the examples of Llosa Isenrich and Py. Every critical point $p$ of the height $f$ on
+$B^m$ (there are finitely many up to $G$) has:
+\begin{itemize}
+\item an \emph{ascending thimble} $T^+_p$, the points that flow up from $p$ along the gradient of $f$; it is an
+$m$-dimensional plane, since the index of $p$ is $m$;
+\item a \emph{descending thimble} $T^-_p$, the points that flow down from $p$; also an $m$-plane.
+\end{itemize}
+
+\begin{theorem}[work in progress]\label{thm:link}
+The closure of $T^+_p$ in the closed ball $B^m\cup S^{2m-1}$ meets the sphere at infinity in an $(m-1)$-sphere
+$v^+_p\subset Z^+$; likewise $T^-_p$ gives an $(m-1)$-sphere $v^-_p\subset Z^-$. Their linking numbers in $S^{2m-1}$ are
+\[
+\lk(v^+_p,v^-_q)=\delta_{pq}
+\]
+(with suitable orientations). Consequently $H_{m-1}(Z^\pm)\neq0$, and with Theorem~\ref{thm:conn}, $Z^\pm$ is $(m-2)$-connected but not
+$(m-1)$-connected.
+\end{theorem}
+
+So the connectivity of the zippers records exactly how finite $K$ is: of type $F_{m-1}$ (Theorem~\ref{thm:conn} gives
+$(m-2)$-connected zippers), but not $FP_m$ (the linked spheres).
+
+\noindent\emph{Sketch of a proof.} Again a sketch only.
+\begin{enumerate}
+\item The gradient lines in $T^+_p$ that start at $p$ are staircases: along them $f$ increases linearly, and they are
+quasigeodesic, with constants that do not depend on $p$. So their endpoints lie in $Z^+$, and they make up an
+$(m-1)$-sphere at infinity.
+\item $T^+_p$ and $T^-_q$ are disjoint when $p\ne q$, and when $p=q$ they meet only at $p$, transversally. So the
+intersection number of the two disks in the $2m$-ball is $\delta_{pq}$, and the linking number of their boundaries is the
+same.
+\item A sphere in $Z^+$ that links a sphere of $Z^-$ cannot be filled in the complement of the second, which contains
+$Z^+$. So it is essential in $Z^+$.
+\end{enumerate}
+
+\paragraph{What the programs show.} For the Cartwright--Steger surface ($m=2$) the theorem predicts linked loops. The
+thimble loops $v^\pm_p$ need not lie in the drawn zippers, but the program \texttt{link3} finds loops in the drawn $Z^+$ and
+$Z^-$, made from relations of $K$, and computes their linking numbers: the $13$ pairs of \texttt{data/s3/linked\_pairs.txt}
+have linking number $\pm1$. One of them (pair $5$, linking number $-1$) is the $S^3$ picture of the gallery:
+\texttt{zippers draw cs --pairs linked\_pairs.txt --pairindex 5 --context}.
+
+\begin{thebibliography}{9}
+\bibitem{CL} D.~Calegari and I.~Loukidou, \emph{Zippers}, Geom.\ Topol.\ \textbf{30} (2026), 1931--1962; arXiv:2411.15610.
+\bibitem{CLwheels} D.~Calegari and I.~Loukidou, \emph{CaTherine wheels}, arXiv:2604.24619.
+\bibitem{CS} D.~I.~Cartwright and T.~Steger, \emph{Enumeration of the 50 fake projective planes}, C.~R.~Math.~Acad.~Sci.\
+Paris \textbf{348} (2010), 11--13.
+\bibitem{G} M.~Gromov, \emph{Asymptotic invariants of infinite groups}, in \emph{Geometric Group Theory}, Vol.~2
+(Sussex, 1991), London Math.\ Soc.\ Lecture Note Ser.\ \textbf{182}, Cambridge Univ.\ Press, 1993, 1--295.
+\bibitem{IMM} G.~Italiano, B.~Martelli and M.~Migliorini, \emph{Hyperbolic 5-manifolds that fiber over $S^1$}, Invent.\
+Math.\ \textbf{231} (2023), 1--38.
+\bibitem{LIP} C.~Llosa Isenrich and P.~Py, \emph{Subgroups of hyperbolic groups, finiteness properties and complex
+hyperbolic lattices}, Invent.\ Math.\ \textbf{235} (2024), 233--254; arXiv:2204.05788.
+\bibitem{Sz} Z.~Szab\'o, \emph{A polynomial formula for the Albanese map of the Cartwright--Steger surface},
+arXiv:2609.23124.
+\end{thebibliography}
+
+\end{document}

@@ -115,7 +115,7 @@ monodromy fig8, order 2: tr a = 1.780776+0.624811i, tr c = 2.135779+0.000000i
 ```
 
 `zippers draw fig8 --polylines F` also records that largest value (`maxR`, section 5). The wheel (`-C`) is the green
-circle that separates Z⁺ from Z⁻ (the Catherine wheel).
+circle that separates Z⁺ from Z⁻ (the CaTherine wheel).
 
 ### S³: `cartwright-steger`
 
@@ -238,7 +238,7 @@ picture.
 | `-n N` | 2 to 1000000, `inf` or 0 | 2 | 2 | the order of the cone point; `inf` is the cusp |
 | `--format FMT` | `eps` or `png` | 2 | png if `-o` ends in `.png`, else eps | the format of the picture |
 | `-w WIDTH` | points | 2 | 0 | the line width in points; 0 is the thinnest |
-| `-C` | none | 2 | | also draw the Catherine wheel |
+| `-C` | none | 2 | | also draw the CaTherine wheel |
 | `--wheel` | none | 2 | | the same as `-C` |
 | `--wheelres N` | 8 to 10^7 | 2 | 10000000 | the finest edge π/N of the wheel's mesh |
 | `--timing` | none | 2 | | print the time of each phase (on the standard error) |
@@ -550,7 +550,7 @@ polyline file and the zippers behind a pair:
 | name | what | default |
 |---|---|---|
 | `Z+`, `Z-` | the zippers | S² `0,0,1` and `1,0,0`; S³ and S⁴ `0.05,0.15,0.85` and `0.85,0.08,0.08` |
-| `wheel` | the Catherine wheel (S² only, `-C`) | `0,0.6,0` |
+| `wheel` | the CaTherine wheel (S² only, `-C`) | `0,0.6,0` |
 | `pair.Z+`, `pair.Z-` | the loops of a pair (S³ only, `--pairs`) | the zippers' colours |
 | `context.Z+`, `context.Z-` | the zippers behind a pair (S³ only, `--context`) | `0.70,0.75,0.95` and `0.95,0.72,0.72` |
 
@@ -606,7 +606,7 @@ file that can also be written by hand:
 
 ```text
 zippers session 1
-made_by = zippers 0.9, Darwin arm64, AppleClang 21.0.0.21000101
+made_by = zippers 1.0, Darwin arm64, AppleClang 21.0.0.21000101
 example = cartwright-steger
 phi = 1,0
 f = subst_4.00_9.50_t3_r1.txt

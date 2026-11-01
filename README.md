@@ -8,6 +8,14 @@ substitution. The suite covers hyperbolic 3-orbifolds that fiber over the circle
 Cartwright–Steger complex hyperbolic surface (on S³), and a fibered hyperbolic 5-manifold of Italiano–Martelli–Migliorini
 (on S⁴), together with the tools that make films of them.
 
+| S² | S³ | S⁴ |
+|:---:|:---:|:---:|
+| <img src="docs/images/s2_fig8_wheel.png" width="260" alt="Z+, Z- and the CaTherine wheel of the figure-eight monodromy"> | <img src="docs/images/s3_pair5.png" width="260" alt="a linked pair of loops of the Cartwright-Steger surface"> | <img src="docs/images/s4_base_arcs.png" width="260" alt="the base arcs of the 5-manifold of Italiano-Martelli-Migliorini"> |
+| Z⁺ (blue), Z⁻ (red) and the CaTherine wheel (green) of the figure-eight monodromy, cone order 3 | a pair of loops in Z⁺ and Z⁻ of the Cartwright–Steger surface, with linking number −1, in front of the base arcs | the base arcs of Z⁺ and Z⁻ of the 5-manifold of Italiano–Martelli–Migliorini, with the hidden direction turned by 25° |
+
+The commands that make these pictures are in `docs/gallery.md`. The mathematics behind the programs is outlined in an
+informal note, `docs/background/zippers_note.pdf`.
+
 **The state of the suite.** The three programs run on one shared library (`src/`): the batch programs are in `apps/`,
 with the command lines of the original programs, which are in `legacy/` with their windows; the new window, on all three
 spheres, is `zippers view`. The command `zippers` runs them by the names of the examples (below). The tests in `tests/` re-run 46

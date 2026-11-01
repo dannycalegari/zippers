@@ -4,6 +4,8 @@ cff-version: 1.2.0
 message: "If you use this software, please cite it as below, and cite the paper that defines zippers."
 type: software
 title: "zippers"
+version: "1.0"
+date-released: 2026-11-01
 abstract: "Programs that draw zippers on the spheres at infinity of hyperbolic manifolds."
 authors:
   - family-names: Calegari
@@ -17,8 +19,44 @@ references:
       - family-names: Loukidou
         given-names: Ino
     title: "Zippers"
-    year: 2024
+    journal: "Geometry & Topology"
+    volume: 30
+    start: 1931
+    end: 1962
+    year: 2026
     url: "https://arxiv.org/abs/2411.15610"
     identifiers:
       - type: other
         value: "arXiv:2411.15610"
+  - type: article
+    authors:
+      - family-names: Cartwright
+        given-names: Donald I.
+      - family-names: Steger
+        given-names: Tim
+    title: "Enumeration of the 50 fake projective planes"
+    journal: "Comptes Rendus Mathématique"
+    volume: 348
+    issue: "1-2"
+    start: 11
+    end: 13
+    year: 2010
+    doi: "10.1016/j.crma.2009.11.016"
+  - type: article
+    authors:
+      - family-names: Italiano
+        given-names: Giovanni
+      - family-names: Martelli
+        given-names: Bruno
+      - family-names: Migliorini
+        given-names: Matteo
+    title: "Hyperbolic 5-manifolds that fiber over S¹"
+    journal: "Inventiones mathematicae"
+    volume: 231
+    start: 1
+    end: 38
+    year: 2023
+    doi: "10.1007/s00222-022-01141-y"
+    identifiers:
+      - type: other
+        value: "arXiv:2105.14795"
