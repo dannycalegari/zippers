@@ -6,6 +6,14 @@ type: software
 title: "zippers"
 version: "1.0"
 date-released: 2026-11-01
+doi: "10.5281/zenodo.23862172"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.23862171"
+    description: "All versions of zippers (the concept DOI)"
+  - type: doi
+    value: "10.5281/zenodo.23862172"
+    description: "zippers 1.0"
 abstract: "Programs that draw zippers on the spheres at infinity of hyperbolic manifolds."
 authors:
   - family-names: Calegari

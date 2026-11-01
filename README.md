@@ -92,4 +92,8 @@ version 3 or (at your option) any later version. It comes with no warranty. The 
 
 ## Citing
 
-See `CITATION.cff`.
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23862171.svg)](https://doi.org/10.5281/zenodo.23862171)
+
+zippers 1.0 is archived at Zenodo: [doi:10.5281/zenodo.23862172](https://doi.org/10.5281/zenodo.23862172) (all versions:
+[doi:10.5281/zenodo.23862171](https://doi.org/10.5281/zenodo.23862171)). See `CITATION.cff`, and cite the paper that
+defines zippers.
